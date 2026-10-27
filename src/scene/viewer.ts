@@ -8,6 +8,7 @@ import {
 import { createWalker, WALKABLE } from '../penny/walk';
 import { createZoneTerrain } from '../penny/twine-terrain';
 import { addZoneBackdrops, addZoneScenery } from '../penny/backdrops';
+import { addZoneObjectives } from '../penny/objectives';
 import { createSky, SUN_DIRECTION, HORIZON } from '../penny/atmosphere';
 import { OUTPOST_ZONE_TERRAIN } from '../penny/zones';
 import { sceneMatrix, scenePoint } from '../core/transforms';
@@ -54,6 +55,7 @@ export class Viewer {
   readonly markers = new THREE.Group();
   readonly terrain = new THREE.Group();
   readonly scenery = new THREE.Group();
+  readonly objectives = new THREE.Group();
   readonly backdrop = new THREE.Group();
   private resources: {
     dispose(): void;
@@ -120,6 +122,7 @@ export class Viewer {
       this.markers,
       this.terrain,
       this.scenery,
+      this.objectives,
       this.backdrop,
       this.previewGroup,
     );
@@ -882,7 +885,7 @@ export class Viewer {
     if (zone !== this.environmentZone) {
       for (const r of this.environmentResources) r.dispose();
       this.environmentResources = [];
-      for (const group of [this.terrain, this.scenery, this.backdrop]) {
+      for (const group of [this.terrain, this.scenery, this.backdrop, this.objectives]) {
         group.traverse((o) => {
           if (o instanceof THREE.InstancedMesh) o.dispose();
         });
@@ -922,6 +925,10 @@ export class Viewer {
         await Promise.all([
           addZoneBackdrops(zone, this.backdrop, () => generation !== this.generation),
           addZoneScenery(zone, this.scenery, () => generation !== this.generation),
+          addZoneObjectives(zone, this.objectives, () => generation !== this.generation).catch(
+            (error) =>
+              report.limitations.push(`Outpost objectives could not load: ${String(error)}`),
+          ),
         ]);
       } else report.limitations.push('Unrecognized zone: no terrain has been added.');
     }
