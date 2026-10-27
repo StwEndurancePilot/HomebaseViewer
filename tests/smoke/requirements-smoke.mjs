@@ -85,7 +85,12 @@ try {
     await page.locator('#selectedTrapPerks [data-rarity="legendary"] .perk-rank-bars .lit').count(),
     10,
   );
-  assert.ok((await page.locator('#requirementsPanel').boundingBox()).width >= 400);
+  const viewportWidth = await page.evaluate(() => innerWidth);
+  assert.equal(
+    (await page.locator('#requirementsPanel').boundingBox()).width,
+    viewportWidth <= 1100 ? 350 : 410,
+    `Requirements panel must fit the ${viewportWidth}px viewport`,
+  );
   await page.waitForTimeout(250);
   await page.screenshot({ path: 'artifacts/validation/requirements-perks.png' });
   while ((await page.locator('html').getAttribute('data-theme')) !== 'light') await click('theme');
@@ -140,6 +145,7 @@ try {
   assert.equal(await page.locator('#requirementsVisible').textContent(), '1 / 3 traps shown');
   await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0].setSize(960, 640));
   await page.waitForTimeout(200);
+  assert.equal((await page.locator('#requirementsPanel').boundingBox()).width, 350);
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
   await page.screenshot({ path: 'artifacts/validation/requirements-compact.png' });
   const gallery = structuredClone(source),
