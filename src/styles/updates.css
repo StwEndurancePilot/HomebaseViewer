@@ -1,0 +1,46 @@
+#updatesPanel {
+  position: fixed;
+  top: 66px;
+  right: 16px;
+  width: 300px;
+  padding: 16px 20px;
+  border-radius: 24px;
+  z-index: 6;
+}
+#updatesPanel h2 {
+  font-size: 20px;
+}
+#updatesPanel p {
+  margin: 8px 0;
+  font-size: 13px;
+  line-height: 1.5;
+}
+#updatesVersion {
+  color: var(--md-sys-color-on-surface-variant);
+}
+#updatesProgress {
+  width: 100%;
+  height: 4px;
+  accent-color: var(--md-sys-color-primary);
+  border: 0;
+}
+#updatesOpen {
+  position: relative;
+}
+#updatesOpen.update-ready::after {
+  content: '';
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--md-sys-color-primary);
+  pointer-events: none;
+}
+
+@media (max-width: 1000px) {
+  .app-bar .brand strong {
+    display: none;
+  }
+}

@@ -1,0 +1,174 @@
+{
+  "source": "Locally installed Fortnite 42.40 assets, read-only extraction",
+  "extractor": "CUE4Parse-Conversion 1.2.2.202610",
+  "sources": [
+    {
+      "file": "S_Floor_HealthSquare.glb",
+      "sha256": "4cc377d4db8a0c63b9faac1fd9ddb1e7023b819e20e31ceb6c831b6866e5a950"
+    },
+    {
+      "file": "Floor_Health_D.png",
+      "sha256": "ed2dbdff5480544618c55d4dfcc9d908e8460314a0a2ecc0c1227e40fee07978"
+    },
+    {
+      "file": "Floor_Health_N.png",
+      "sha256": "e7eae3b3b57175524028889e60ed219cf59bbd7aa4973313fa1e893d263428c7"
+    },
+    {
+      "file": "SM_Flame_Grill_Trap.glb",
+      "sha256": "deeec92e7a191d9f6b61046ce8136a3115f819b3f4c025edf2fce8a35401e474"
+    },
+    {
+      "file": "T_Flame_Grill_Trap_D.png",
+      "sha256": "19692a050ce6b8aff1e2bd8bcf10e1061429e09e94316aa3dafa0226476ccf41"
+    },
+    {
+      "file": "T_Flame_Grill_Trap_N.png",
+      "sha256": "60063621a339a0c6806bb5df6906972432e02c9b15770c30ca169588847a2efa"
+    },
+    {
+      "file": "Trap_Floor_Ward_AntiAir.json",
+      "sha256": "d49234305ce532b645e1dab6cedb84ca5f799b247a9929ef73f82020e006b47d"
+    },
+    {
+      "file": "Patrol_Ward_Trap_base.glb",
+      "sha256": "1636f43d2a2a7c05aca6cc5f29ac18bc868df750acdb270beab05c081b8f22a1"
+    },
+    {
+      "file": "T_Patrol_Ward_Trap_D.png",
+      "sha256": "ce2516073b24ddf12ef22fd6edf3f409890ef720c099d62919339ca3afbf4ac5"
+    },
+    {
+      "file": "T_Patrol_Ward_Trap_N.png",
+      "sha256": "baaa22a7b549162ee023f9f6feb9325761f07fd24e99844cc673e6d81763e169"
+    },
+    {
+      "file": "T_Patrol_Ward_Trap_E.png",
+      "sha256": "e85ea21105dc336817f3facb9b497a6991ce4d879050c80cd06ecf5d2b202ab7"
+    },
+    {
+      "file": "Patrol_Ward_Trap_core.glb",
+      "sha256": "3f345cf10696f642731bc2d2fdc11642f88123b9a936b8df75838de6f7f73087"
+    },
+    {
+      "file": "Patrol_Ward_Trap_turrethead.glb",
+      "sha256": "60234c5c42dba536201b388a06b46ba7630be26fb2fa9d5e6cb2a04201054813"
+    },
+    {
+      "file": "SM_Turret_Gun_Ammo.glb",
+      "sha256": "9c6a549d203ae9c483f65c7b3c30dced423114cc4c261ccfc4431ffb599f7e13"
+    },
+    {
+      "file": "T_Battery_Charge.png",
+      "sha256": "4444d31203fce9e12e9046d4bf2c674c35230e501fdf6f140b9a685c8c9a1ebf"
+    },
+    {
+      "file": "T_Turret_Gun_D.png",
+      "sha256": "668b52104d81b60f30a3babf2f5ca8a1c50acb02dd5b633393def2759d7ffedd"
+    },
+    {
+      "file": "T_Turret_Gun_N.png",
+      "sha256": "45c65c0660e5a702a9524ed5d1359376d43c605f1a02c1fda8ac748b0cb14de0"
+    },
+    {
+      "file": "T_Turret_Gun_E.png",
+      "sha256": "5989f4f88e8bbd864fb8a4e086ca8002d0cbcb7d4d9c385360b13ea66b5e4f89"
+    }
+  ],
+  "outputSha256": "938127db0c8c7aad89f46e72457b57fd054920affcc584417c6e2c400a87a4f1",
+  "coordinates": "Native mesh pivots; CUE GLTF metres transformed to (UE Y, UE Z, -UE X)/512. No centering or seating offsets.",
+  "antiAirComponents": [
+    {
+      "name": "StaticMeshComponent0",
+      "mesh": {
+        "ObjectName": "StaticMesh'Patrol_Ward_Trap_base'",
+        "ObjectPath": "/SaveTheWorld/Weapons/FORT_TRAPS/Patrol_Ward_Trap/Mesh/Patrol_Ward_Trap_base.1"
+      },
+      "translation": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      },
+      "rotation": {
+        "Pitch": 0,
+        "Yaw": 0,
+        "Roll": 0
+      },
+      "scale": {
+        "X": 1,
+        "Y": 1,
+        "Z": 1
+      }
+    },
+    {
+      "name": "TurretBody_GEN_VARIABLE",
+      "mesh": {
+        "ObjectName": "StaticMesh'Patrol_Ward_Trap_core'",
+        "ObjectPath": "/SaveTheWorld/Weapons/FORT_TRAPS/Patrol_Ward_Trap/Mesh/Patrol_Ward_Trap_core.1"
+      },
+      "translation": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      },
+      "rotation": {
+        "Pitch": 0,
+        "Yaw": 0,
+        "Roll": 0
+      },
+      "scale": {
+        "X": 1,
+        "Y": 1,
+        "Z": 1
+      }
+    },
+    {
+      "name": "TurretGun_GEN_VARIABLE",
+      "mesh": {
+        "ObjectName": "StaticMesh'Patrol_Ward_Trap_turrethead'",
+        "ObjectPath": "/SaveTheWorld/Weapons/FORT_TRAPS/Patrol_Ward_Trap/Mesh/Patrol_Ward_Trap_turrethead.1"
+      },
+      "translation": {
+        "X": -5.5,
+        "Y": 0,
+        "Z": 102.5
+      },
+      "rotation": {
+        "Pitch": -30,
+        "Yaw": 0,
+        "Roll": 0
+      },
+      "scale": {
+        "X": 1,
+        "Y": 1,
+        "Z": 1
+      }
+    },
+    {
+      "name": "SM_Turret_Gun_AmmoCounter_GEN_VARIABLE",
+      "mesh": {
+        "ObjectName": "StaticMesh'SM_Turret_Gun_Ammo'",
+        "ObjectPath": "/SaveTheWorld/Gadgets/Assets/Turret/SM_Turret_Gun_Ammo.1"
+      },
+      "translation": {
+        "X": -17,
+        "Y": 4,
+        "Z": 15
+      },
+      "rotation": {
+        "Pitch": 0,
+        "Yaw": 0,
+        "Roll": 0
+      },
+      "scale": {
+        "X": 0.5,
+        "Y": 0.5,
+        "Z": 0.5
+      }
+    }
+  ],
+  "limitations": [
+    "Anti-air uses blueprint default component poses; live turret aim and charge state are not saved.",
+    "Original diffuse/normal/emissive textures with static PBR approximation; Unreal animated materials and effects are not reproduced."
+  ]
+}

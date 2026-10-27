@@ -1,0 +1,2603 @@
+{
+  "source": "Fortnite 42.40 installed assets; CUE4Parse read-only export. Mesh availability checked against Penny builds.glb.",
+  "patterns": [
+    {
+      "id": "Solid",
+      "kind": "wall",
+      "label": "Full wall",
+      "cells": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "source": "EMP_Wall_Solid.json",
+      "sha256": "d6b3c17e816a71d8a67aeac3d2b4f008745e27f62906c7eb5298a5fc2a1a31c6"
+    },
+    {
+      "id": "WindowC",
+      "kind": "wall",
+      "label": "Window",
+      "cells": [
+        1,
+        1,
+        1,
+        1,
+        0,
+        1,
+        1,
+        1,
+        1
+      ],
+      "source": "EMP_Wall_WindowC.json",
+      "sha256": "67488be4618a36a7957a6ef888272abc45bf4dd4177958b0f941bd9d879471f4"
+    },
+    {
+      "id": "WindowSide",
+      "kind": "wall",
+      "label": "Side window",
+      "cells": [
+        1,
+        1,
+        1,
+        0,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "source": "EMP_Wall_WindowSide.json",
+      "sha256": "7076c5fd96d639cf83c342a21a0470e14dcd47ea98f34b0cab7265412ed9b2e6"
+    },
+    {
+      "id": "Windows",
+      "kind": "wall",
+      "label": "Two windows",
+      "cells": [
+        1,
+        1,
+        1,
+        0,
+        1,
+        0,
+        1,
+        1,
+        1
+      ],
+      "source": "EMP_Wall_Windows.json",
+      "sha256": "027d310efab6a035059a98481b78860ad4d3be47474edadee9b0a8fb81eb1db7"
+    },
+    {
+      "id": "DoorC",
+      "kind": "wall",
+      "label": "Door",
+      "cells": [
+        1,
+        1,
+        1,
+        1,
+        0,
+        1,
+        1,
+        0,
+        1
+      ],
+      "source": "EMP_Wall_DoorC.json",
+      "sha256": "1e048b8c76e3fcafad61f71d263a62efd625c3ee9ac5893539b180254d758386"
+    },
+    {
+      "id": "DoorSide",
+      "kind": "wall",
+      "label": "Side door",
+      "cells": [
+        1,
+        1,
+        1,
+        0,
+        1,
+        1,
+        0,
+        1,
+        1
+      ],
+      "source": "EMP_Wall_DoorSide.json",
+      "sha256": "a42061aa4ddd9d7465ec9dee2fb0f0d655ebea4afc3812a02f2fca450030bb99"
+    },
+    {
+      "id": "DoorS",
+      "kind": "wall",
+      "label": "Door + window",
+      "cells": [
+        1,
+        1,
+        1,
+        0,
+        1,
+        0,
+        0,
+        1,
+        1
+      ],
+      "source": "EMP_Wall_DoorS.json",
+      "sha256": "0f2e26af537673efa7ae0507cb18638039d56921a6133ef04e798917f536aa0c"
+    },
+    {
+      "id": "Archway",
+      "kind": "wall",
+      "label": "Arch",
+      "cells": [
+        1,
+        1,
+        1,
+        1,
+        0,
+        1,
+        0,
+        0,
+        0
+      ],
+      "source": "EMP_Wall_Archway.json",
+      "sha256": "35e8af0e7f1e588d759b9905812d9da3ac34a0ecf05f6bd48998930650dce21d"
+    },
+    {
+      "id": "ArchwayLarge",
+      "kind": "wall",
+      "label": "Wide arch",
+      "cells": [
+        1,
+        1,
+        1,
+        0,
+        0,
+        1,
+        0,
+        0,
+        1
+      ],
+      "source": "EMP_Wall_ArchwayLarge.json",
+      "sha256": "ea97ec3cf6868cfaa068666ee249056a4b067616f16c6b8715ba639fad4eac1b"
+    },
+    {
+      "id": "ArchwayLargeSupport",
+      "kind": "wall",
+      "label": "Arch support",
+      "cells": [
+        0,
+        0,
+        1,
+        0,
+        0,
+        1,
+        0,
+        0,
+        1
+      ],
+      "source": "EMP_Wall_ArchwayLargeSupport.json",
+      "sha256": "b81e5216f4a5709054221ec083eeb65ce3697b08a604a59c8260a4be0fa00327"
+    },
+    {
+      "id": "HalfWall",
+      "kind": "wall",
+      "label": "Half wall",
+      "cells": [
+        0,
+        0,
+        0,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "source": "EMP_Wall_HalfWallS.json",
+      "sha256": "4f26270d33d43e9ebf264b3f208d6e5943c6679101cb85bee61e1b5a5712bdbb"
+    },
+    {
+      "id": "HalfWallDoor",
+      "kind": "wall",
+      "label": "Half wall + door",
+      "cells": [
+        0,
+        0,
+        0,
+        1,
+        0,
+        1,
+        1,
+        0,
+        1
+      ],
+      "source": "EMP_Wall_HalfWallDoor.json",
+      "sha256": "bf4f1fc7bd1396b4c0c0804e4bf23b939fe4512e030610a4092a2f08105619db"
+    },
+    {
+      "id": "HalfWallDoorS",
+      "kind": "wall",
+      "label": "Half wall + side door",
+      "cells": [
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        0,
+        1,
+        1
+      ],
+      "source": "EMP_Wall_HalfWallDoorS.json",
+      "sha256": "d625baccc345b07b5788d09877a7822b3465afb69506891b9b66f667d1a9ebaa"
+    },
+    {
+      "id": "HalfWallHalf",
+      "kind": "wall",
+      "label": "Half-height side",
+      "cells": [
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        1,
+        0,
+        0
+      ],
+      "source": "EMP_Wall_HalfWallHalf.json",
+      "sha256": "7dd50607365c7a90c5d8a072cb6dd7ebe8a05cd8fb749c0937a824b68d6f3a8f"
+    },
+    {
+      "id": "QuarterWallS",
+      "kind": "wall",
+      "label": "Low wall",
+      "cells": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        1
+      ],
+      "source": "EMP_Wall_QuarterWallS.json",
+      "sha256": "03253b7f71afc8003b02ded2f183491fc05e40cd2a1ded1b1b505a6944856984"
+    },
+    {
+      "id": "QuarterWallHalf",
+      "kind": "wall",
+      "label": "Low side wall",
+      "cells": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        0
+      ],
+      "source": "EMP_Wall_QuarterWallHalf.json",
+      "sha256": "29b1d9e80cab27d6c241cb2db7f28bd40bad709eb3a6a1e64a3ad58bd6b07efd"
+    },
+    {
+      "id": "Pillar",
+      "kind": "wall",
+      "label": "Pillar",
+      "cells": [
+        0,
+        1,
+        0,
+        0,
+        1,
+        0,
+        0,
+        1,
+        0
+      ],
+      "source": "EMP_Wall_Pillar.json",
+      "sha256": "160f68044ccdf56c84c6c85c383a3dc62b7d00876bb216c3b3bc9fe34d067e2a"
+    },
+    {
+      "id": "Brace",
+      "kind": "wall",
+      "label": "Upper diagonal",
+      "cells": [
+        1,
+        1,
+        1,
+        0,
+        1,
+        1,
+        0,
+        0,
+        1
+      ],
+      "source": "EMP_Wall_Brace_TopLeft.json",
+      "sha256": "0b287928ca429162278b5262d09642cb612eccb028eeb93de6383a132466640e"
+    },
+    {
+      "id": "RoofWall",
+      "kind": "wall",
+      "label": "Lower diagonal",
+      "cells": [
+        1,
+        0,
+        0,
+        1,
+        1,
+        0,
+        1,
+        1,
+        1
+      ],
+      "source": "EMP_Wall_RoofWall_TopLeft.json",
+      "sha256": "9de9d4e55d2f6a495480f51f5cb7f2e776c23e181fce5331dd1b4253c940f371"
+    },
+    {
+      "id": "Floor",
+      "kind": "floor",
+      "label": "Full floor",
+      "cells": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "source": "EMP_Floor_Floor.json",
+      "sha256": "b9dcf12801ba74c5d57f5235240083673792a9fe6111ce445837afd8869c6256"
+    },
+    {
+      "id": "BalconyS",
+      "kind": "floor",
+      "label": "Half floor",
+      "cells": [
+        0,
+        0,
+        1,
+        1
+      ],
+      "source": "EMP_Floor_BalconyS.json",
+      "sha256": "344151fe08b3d08c26cc4787103199d648db62fa447fdcd98e22ad85b4ecca58"
+    },
+    {
+      "id": "BalconyO",
+      "kind": "floor",
+      "label": "Quarter floor",
+      "cells": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "source": "EMP_Floor_BalconyO.json",
+      "sha256": "91eb95ae475546362728af0698e1fb99ed72b56bc9a3b3ddabfa9b968204773a"
+    },
+    {
+      "id": "BalconyI",
+      "kind": "floor",
+      "label": "Corner opening",
+      "cells": [
+        1,
+        0,
+        1,
+        1
+      ],
+      "source": "EMP_Floor_BalconyL.json",
+      "sha256": "759d2d190a49b0c858f3797be13abede9994af93096663239475b65ad026c7f5"
+    },
+    {
+      "id": "BalconyD",
+      "kind": "floor",
+      "label": "Diagonal floor",
+      "cells": [
+        1,
+        0,
+        0,
+        1
+      ],
+      "source": "EMP_Floor_BalconyD.json",
+      "sha256": "21801e6f10c142ecc0444e4175dd6d1f7dfb07b54ebc73bfa55a2f3771c9c477"
+    },
+    {
+      "id": "StairW",
+      "kind": "stair",
+      "label": "Full ramp",
+      "cells": [
+        2,
+        2,
+        1,
+        1
+      ],
+      "source": "EMP_Stair_StairW.json",
+      "sha256": "82ff40b239d1bd7b8a2529f46acce540a75a4b93a3463f0093bc21866e0580e8"
+    },
+    {
+      "id": "StairF",
+      "kind": "stair",
+      "label": "Half ramp",
+      "cells": [
+        2,
+        0,
+        1,
+        0
+      ],
+      "source": "EMP_Stair_StairF.json",
+      "sha256": "bddf0a6af9130b8a49dab7a586f7733ef46000bbf8fa3bd5e38b38050c6be5fa"
+    },
+    {
+      "id": "StairT",
+      "kind": "stair",
+      "label": "Turning ramp",
+      "cells": [
+        2,
+        3,
+        1,
+        0
+      ],
+      "source": "EMP_Stair_StairT.json",
+      "sha256": "cd67463823ab821c96c8a9b7113f53d01ee198a311dec2aa6cf2220e5baa60fb"
+    },
+    {
+      "id": "StairR",
+      "kind": "stair",
+      "label": "Switchback",
+      "cells": [
+        2,
+        3,
+        1,
+        4
+      ],
+      "source": "EMP_Stair_StairR.json",
+      "sha256": "dbfc122cc58c2948e6527bceb3a08c39b7413c2c47bbb3e5a93f5d51f7cb2cd8"
+    },
+    {
+      "id": "RoofC",
+      "kind": "roof",
+      "label": "Cone",
+      "cells": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "source": "EMP_Roof_RoofC.json",
+      "sha256": "655beb9077c42a9989ff62ccb813e28be2f0af2ce644dd583d74593c7da75418"
+    },
+    {
+      "id": "RoofO",
+      "kind": "roof",
+      "label": "One raised corner",
+      "cells": [
+        0,
+        1,
+        0,
+        0
+      ],
+      "source": "EMP_Roof_RoofO.json",
+      "sha256": "9d3141b1a6ef3d5c56d38d6558d41f07f1aa1786d610d09146688d09551f759c"
+    },
+    {
+      "id": "RoofS",
+      "kind": "roof",
+      "label": "Sloped roof",
+      "cells": [
+        1,
+        1,
+        0,
+        0
+      ],
+      "source": "EMP_Roof_RoofS.json",
+      "sha256": "4a61b7e2f356bcc3015a6acc66f67b2f9f47210c46429be7969ce2d8c57c1747"
+    },
+    {
+      "id": "RoofI",
+      "kind": "roof",
+      "label": "Three raised corners",
+      "cells": [
+        1,
+        1,
+        0,
+        1
+      ],
+      "source": "EMP_Roof_RoofI.json",
+      "sha256": "5a25d1b904d20e33dde8369cbc55043550d52a6d8052482893511602072f4f4f"
+    },
+    {
+      "id": "RoofD",
+      "kind": "roof",
+      "label": "Diagonal roof",
+      "cells": [
+        1,
+        0,
+        0,
+        1
+      ],
+      "source": "EMP_Roof_RoofD.json",
+      "sha256": "468a2c9f023ce83985a893de87998bf51bf2b3c6ab4afbc92bfddf967a7c5860"
+    }
+  ],
+  "definitions": [
+    {
+      "shape": "Archway",
+      "material": 2,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L1/PBWA_M1_Archway.PBWA_M1_Archway_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L1/PBW_M1_Archway.PBW_M1_Archway"
+    },
+    {
+      "shape": "ArchwayLarge",
+      "material": 2,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L1/PBWA_M1_ArchwayLarge.PBWA_M1_ArchwayLarge_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L1/PBW_M1_ArchwayLarge.PBW_M1_ArchwayLarge"
+    },
+    {
+      "shape": "ArchwayLargeSupport",
+      "material": 2,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L1/PBWA_M1_ArchwayLargeSupport.PBWA_M1_ArchwayLargeSupport_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L1/PBW_M1_ArchwayLargeSupport.PBW_M1_ArchwayLargeSupport"
+    },
+    {
+      "shape": "BalconyD",
+      "material": 2,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L1/PBWA_M1_BalconyD.PBWA_M1_BalconyD_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L1/PBW_M1_BalconyD.PBW_M1_BalconyD"
+    },
+    {
+      "shape": "BalconyI",
+      "material": 2,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L1/PBWA_M1_BalconyI.PBWA_M1_BalconyI_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L1/PBW_M1_BalconyI.PBW_M1_BalconyI"
+    },
+    {
+      "shape": "BalconyO",
+      "material": 2,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L1/PBWA_M1_BalconyO.PBWA_M1_BalconyO_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L1/PBW_M1_BalconyO.PBW_M1_BalconyO"
+    },
+    {
+      "shape": "BalconyS",
+      "material": 2,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L1/PBWA_M1_BalconyS.PBWA_M1_BalconyS_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L1/PBW_M1_BalconyS.PBW_M1_BalconyS"
+    },
+    {
+      "shape": "Brace",
+      "material": 2,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L1/PBWA_M1_Brace.PBWA_M1_Brace_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L1/PBW_M1_Brace.PBW_M1_Brace"
+    },
+    {
+      "shape": "DoorC",
+      "material": 2,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L1/PBWA_M1_DoorC.PBWA_M1_DoorC_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L1/PBW_M1_DoorC.PBW_M1_DoorC"
+    },
+    {
+      "shape": "DoorS",
+      "material": 2,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L1/PBWA_M1_DoorS.PBWA_M1_DoorS_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L1/PBW_M1_DoorS.PBW_M1_DoorS"
+    },
+    {
+      "shape": "DoorSide",
+      "material": 2,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L1/PBWA_M1_DoorSide.PBWA_M1_DoorSide_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L1/PBW_M1_DoorSide.PBW_M1_DoorSide"
+    },
+    {
+      "shape": "Floor",
+      "material": 2,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L1/PBWA_M1_Floor.PBWA_M1_Floor_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L1/PBW_M1_Floor.PBW_M1_Floor"
+    },
+    {
+      "shape": "HalfWall",
+      "material": 2,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L1/PBWA_M1_HalfWall.PBWA_M1_HalfWall_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L1/PBW_M1_HalfWall.PBW_M1_HalfWall"
+    },
+    {
+      "shape": "HalfWallDoor",
+      "material": 2,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L1/PBWA_M1_HalfWallDoor.PBWA_M1_HalfWallDoor_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L1/PBW_M1_HalfWallDoor.PBW_M1_HalfWallDoor"
+    },
+    {
+      "shape": "HalfWallDoorS",
+      "material": 2,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L1/PBWA_M1_HalfWallDoorS.PBWA_M1_HalfWallDoorS_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L1/PBW_M1_HalfWallDoorS.PBW_M1_HalfWallDoorS"
+    },
+    {
+      "shape": "HalfWallHalf",
+      "material": 2,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L1/PBWA_M1_HalfWallHalf.PBWA_M1_HalfWallHalf_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L1/PBW_M1_HalfWallHalf.PBW_M1_HalfWallHalf"
+    },
+    {
+      "shape": "Pillar",
+      "material": 2,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L1/PBWA_M1_Pillar.PBWA_M1_Pillar_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L1/PBW_M1_Pillar.PBW_M1_Pillar"
+    },
+    {
+      "shape": "QuarterWallHalf",
+      "material": 2,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L1/PBWA_M1_QuarterWallHalf.PBWA_M1_QuarterWallHalf_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L1/PBW_M1_QuarterWallHalf.PBW_M1_QuarterWallHalf"
+    },
+    {
+      "shape": "QuarterWallS",
+      "material": 2,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L1/PBWA_M1_QuarterWallS.PBWA_M1_QuarterWallS_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L1/PBW_M1_QuarterWallS.PBW_M1_QuarterWallS"
+    },
+    {
+      "shape": "RoofC",
+      "material": 2,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L1/PBWA_M1_RoofC.PBWA_M1_RoofC_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L1/PBW_M1_RoofC.PBW_M1_RoofC"
+    },
+    {
+      "shape": "RoofD",
+      "material": 2,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L1/PBWA_M1_RoofD.PBWA_M1_RoofD_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L1/PBW_M1_RoofD.PBW_M1_RoofD"
+    },
+    {
+      "shape": "RoofI",
+      "material": 2,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L1/PBWA_M1_RoofI.PBWA_M1_RoofI_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L1/PBW_M1_RoofI.PBW_M1_RoofI"
+    },
+    {
+      "shape": "RoofO",
+      "material": 2,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L1/PBWA_M1_RoofO.PBWA_M1_RoofO_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L1/PBW_M1_RoofO.PBW_M1_RoofO"
+    },
+    {
+      "shape": "RoofS",
+      "material": 2,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L1/PBWA_M1_RoofS.PBWA_M1_RoofS_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L1/PBW_M1_RoofS.PBW_M1_RoofS"
+    },
+    {
+      "shape": "RoofWall",
+      "material": 2,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L1/PBWA_M1_RoofWall.PBWA_M1_RoofWall_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L1/PBW_M1_RoofWall.PBW_M1_RoofWall"
+    },
+    {
+      "shape": "Solid",
+      "material": 2,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L1/PBWA_M1_Solid.PBWA_M1_Solid_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L1/PBW_M1_Solid.PBW_M1_Solid"
+    },
+    {
+      "shape": "StairF",
+      "material": 2,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L1/PBWA_M1_StairF.PBWA_M1_StairF_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L1/PBW_M1_StairF.PBW_M1_StairF"
+    },
+    {
+      "shape": "StairR",
+      "material": 2,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L1/PBWA_M1_StairR.PBWA_M1_StairR_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L1/PBW_M1_StairR.PBW_M1_StairR"
+    },
+    {
+      "shape": "StairT",
+      "material": 2,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L1/PBWA_M1_StairT.PBWA_M1_StairT_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L1/PBW_M1_StairT.PBW_M1_StairT"
+    },
+    {
+      "shape": "StairW",
+      "material": 2,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L1/PBWA_M1_StairW.PBWA_M1_StairW_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L1/PBW_M1_StairW.PBW_M1_StairW"
+    },
+    {
+      "shape": "WindowC",
+      "material": 2,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L1/PBWA_M1_WindowC.PBWA_M1_WindowC_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L1/PBW_M1_WindowC.PBW_M1_WindowC"
+    },
+    {
+      "shape": "Windows",
+      "material": 2,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L1/PBWA_M1_Windows.PBWA_M1_Windows_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L1/PBW_M1_Windows.PBW_M1_Windows"
+    },
+    {
+      "shape": "WindowSide",
+      "material": 2,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L1/PBWA_M1_WindowSide.PBWA_M1_WindowSide_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L1/PBW_M1_WindowSide.PBW_M1_WindowSide"
+    },
+    {
+      "shape": "Archway",
+      "material": 2,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L2/PBWA_M2_Archway.PBWA_M2_Archway_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L2/PBW_M2_Archway.PBW_M2_Archway"
+    },
+    {
+      "shape": "ArchwayLarge",
+      "material": 2,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L2/PBWA_M2_ArchwayLarge.PBWA_M2_ArchwayLarge_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L2/PBW_M2_ArchwayLarge.PBW_M2_ArchwayLarge"
+    },
+    {
+      "shape": "ArchwayLargeSupport",
+      "material": 2,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L2/PBWA_M2_ArchwayLargeSupport.PBWA_M2_ArchwayLargeSupport_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L2/PBW_M2_ArchwayLargeSupport.PBW_M2_ArchwayLargeSupport"
+    },
+    {
+      "shape": "BalconyD",
+      "material": 2,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L2/PBWA_M2_BalconyD.PBWA_M2_BalconyD_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L2/PBW_M2_BalconyD.PBW_M2_BalconyD"
+    },
+    {
+      "shape": "BalconyI",
+      "material": 2,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L2/PBWA_M2_BalconyI.PBWA_M2_BalconyI_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L2/PBW_M2_BalconyI.PBW_M2_BalconyI"
+    },
+    {
+      "shape": "BalconyO",
+      "material": 2,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L2/PBWA_M2_BalconyO.PBWA_M2_BalconyO_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L2/PBW_M2_BalconyO.PBW_M2_BalconyO"
+    },
+    {
+      "shape": "BalconyS",
+      "material": 2,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L2/PBWA_M2_BalconyS.PBWA_M2_BalconyS_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L2/PBW_M2_BalconyS.PBW_M2_BalconyS"
+    },
+    {
+      "shape": "Brace",
+      "material": 2,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L2/PBWA_M2_Brace.PBWA_M2_Brace_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L2/PBW_M2_Brace.PBW_M2_Brace"
+    },
+    {
+      "shape": "DoorC",
+      "material": 2,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L2/PBWA_M2_DoorC.PBWA_M2_DoorC_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L2/PBW_M2_DoorC.PBW_M2_DoorC"
+    },
+    {
+      "shape": "DoorS",
+      "material": 2,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L2/PBWA_M2_DoorS.PBWA_M2_DoorS_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L2/PBW_M2_DoorS.PBW_M2_DoorS"
+    },
+    {
+      "shape": "DoorSide",
+      "material": 2,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L2/PBWA_M2_DoorSide.PBWA_M2_DoorSide_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L2/PBW_M2_DoorSide.PBW_M2_DoorSide"
+    },
+    {
+      "shape": "Floor",
+      "material": 2,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L2/PBWA_M2_Floor.PBWA_M2_Floor_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L2/PBW_M2_Floor.PBW_M2_Floor"
+    },
+    {
+      "shape": "HalfWall",
+      "material": 2,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L2/PBWA_M2_HalfWall.PBWA_M2_HalfWall_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L2/PBW_M2_HalfWallS.PBW_M2_HalfWallS"
+    },
+    {
+      "shape": "HalfWallDoor",
+      "material": 2,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L2/PBWA_M2_HalfWallDoor.PBWA_M2_HalfWallDoor_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L2/PBW_M2_HalfWallDoor.PBW_M2_HalfWallDoor"
+    },
+    {
+      "shape": "HalfWallDoorS",
+      "material": 2,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L2/PBWA_M2_HalfWallDoorS.PBWA_M2_HalfWallDoorS_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L2/PBW_M2_HalfWallDoorS.PBW_M2_HalfWallDoorS"
+    },
+    {
+      "shape": "HalfWallHalf",
+      "material": 2,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L2/PBWA_M2_HalfWallHalf.PBWA_M2_HalfWallHalf_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L2/PBW_M2_HalfWallHalf.PBW_M2_HalfWallHalf"
+    },
+    {
+      "shape": "Pillar",
+      "material": 2,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L2/PBWA_M2_Pillar.PBWA_M2_Pillar_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L2/PBW_M2_Pillar.PBW_M2_Pillar"
+    },
+    {
+      "shape": "QuarterWallHalf",
+      "material": 2,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L2/PBWA_M2_QuarterWallHalf.PBWA_M2_QuarterWallHalf_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L2/PBW_M2_QuarterWallHalf.PBW_M2_QuarterWallHalf"
+    },
+    {
+      "shape": "QuarterWallS",
+      "material": 2,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L2/PBWA_M2_QuarterWallS.PBWA_M2_QuarterWallS_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L2/PBW_M2_QuarterWallS.PBW_M2_QuarterWallS"
+    },
+    {
+      "shape": "RoofC",
+      "material": 2,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L2/PBWA_M2_RoofC.PBWA_M2_RoofC_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L2/PBW_M2_RoofC.PBW_M2_RoofC"
+    },
+    {
+      "shape": "RoofD",
+      "material": 2,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L2/PBWA_M2_RoofD.PBWA_M2_RoofD_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L2/PBW_M2_RoofD.PBW_M2_RoofD"
+    },
+    {
+      "shape": "RoofI",
+      "material": 2,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L2/PBWA_M2_RoofI.PBWA_M2_RoofI_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L2/PBW_M2_RoofI.PBW_M2_RoofI"
+    },
+    {
+      "shape": "RoofO",
+      "material": 2,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L2/PBWA_M2_RoofO.PBWA_M2_RoofO_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L2/PBW_M2_RoofO.PBW_M2_RoofO"
+    },
+    {
+      "shape": "RoofS",
+      "material": 2,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L2/PBWA_M2_RoofS.PBWA_M2_RoofS_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L2/PBW_M2_RoofS.PBW_M2_RoofS"
+    },
+    {
+      "shape": "RoofWall",
+      "material": 2,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L2/PBWA_M2_RoofWall.PBWA_M2_RoofWall_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L2/PBW_M2_RoofWall.PBW_M2_RoofWall"
+    },
+    {
+      "shape": "Solid",
+      "material": 2,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L2/PBWA_M2_Solid.PBWA_M2_Solid_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L2/PBW_M2_Solid.PBW_M2_Solid"
+    },
+    {
+      "shape": "StairF",
+      "material": 2,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L2/PBWA_M2_StairF.PBWA_M2_StairF_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L2/PBW_M2_StairF.PBW_M2_StairF"
+    },
+    {
+      "shape": "StairR",
+      "material": 2,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L2/PBWA_M2_StairR.PBWA_M2_StairR_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L2/PBW_M2_StairR.PBW_M2_StairR"
+    },
+    {
+      "shape": "StairT",
+      "material": 2,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L2/PBWA_M2_StairT.PBWA_M2_StairT_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L2/PBW_M2_StairT.PBW_M2_StairT"
+    },
+    {
+      "shape": "StairW",
+      "material": 2,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L2/PBWA_M2_StairW.PBWA_M2_StairW_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L2/PBW_M2_StairW.PBW_M2_StairW"
+    },
+    {
+      "shape": "WindowC",
+      "material": 2,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L2/PBWA_M2_WindowC.PBWA_M2_WindowC_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L2/PBW_M2_WindowC.PBW_M2_WindowC"
+    },
+    {
+      "shape": "Windows",
+      "material": 2,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L2/PBWA_M2_Windows.PBWA_M2_Windows_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L2/PBW_M2_Windows.PBW_M2_Windows"
+    },
+    {
+      "shape": "WindowSide",
+      "material": 2,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L2/PBWA_M2_WindowSide.PBWA_M2_WindowSide_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L2/PBW_M2_WindowSide.PBW_M2_WindowSide"
+    },
+    {
+      "shape": "Archway",
+      "material": 2,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L3/PBWA_M3_Archway.PBWA_M3_Archway_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L3/PBW_M3_Archway.PBW_M3_Archway"
+    },
+    {
+      "shape": "ArchwayLarge",
+      "material": 2,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L3/PBWA_M3_ArchwayLarge.PBWA_M3_ArchwayLarge_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L3/PBW_M3_ArchwayLG.PBW_M3_ArchwayLG"
+    },
+    {
+      "shape": "ArchwayLargeSupport",
+      "material": 2,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L3/PBWA_M3_ArchwayLargeSupport.PBWA_M3_ArchwayLargeSupport_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L3/PBW_M3_ArchwayLGSupport.PBW_M3_ArchwayLGSupport"
+    },
+    {
+      "shape": "BalconyD",
+      "material": 2,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L3/PBWA_M3_BalconyD.PBWA_M3_BalconyD_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L3/PBW_M3_BalconyD.PBW_M3_BalconyD"
+    },
+    {
+      "shape": "BalconyI",
+      "material": 2,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L3/PBWA_M3_BalconyI.PBWA_M3_BalconyI_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L3/PBW_M3_BalconyI.PBW_M3_BalconyI"
+    },
+    {
+      "shape": "BalconyO",
+      "material": 2,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L3/PBWA_M3_BalconyO.PBWA_M3_BalconyO_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L3/PBW_M3_BalconyO.PBW_M3_BalconyO"
+    },
+    {
+      "shape": "BalconyS",
+      "material": 2,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L3/PBWA_M3_BalconyS.PBWA_M3_BalconyS_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L3/PBW_M3_BalconyS.PBW_M3_BalconyS"
+    },
+    {
+      "shape": "Brace",
+      "material": 2,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L3/PBWA_M3_Brace.PBWA_M3_Brace_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L3/PBW_M3_Brace.PBW_M3_Brace"
+    },
+    {
+      "shape": "DoorC",
+      "material": 2,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L3/PBWA_M3_DoorC.PBWA_M3_DoorC_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L3/PBW_M3_DoorC.PBW_M3_DoorC"
+    },
+    {
+      "shape": "DoorS",
+      "material": 2,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L3/PBWA_M3_DoorS.PBWA_M3_DoorS_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L3/PBW_M3_DoorS.PBW_M3_DoorS"
+    },
+    {
+      "shape": "DoorSide",
+      "material": 2,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L3/PBWA_M3_DoorSide.PBWA_M3_DoorSide_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L3/PBW_M3_DoorSide.PBW_M3_DoorSide"
+    },
+    {
+      "shape": "Floor",
+      "material": 2,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L3/PBWA_M3_Floor_2.PBWA_M3_Floor_2_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L3/PBW_M3_Floor.PBW_M3_Floor"
+    },
+    {
+      "shape": "HalfWall",
+      "material": 2,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L3/PBWA_M3_HalfWall.PBWA_M3_HalfWall_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L3/PBW_M3_HalfWall.PBW_M3_HalfWall"
+    },
+    {
+      "shape": "HalfWallDoor",
+      "material": 2,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L3/PBWA_M3_HalfWallDoor.PBWA_M3_HalfWallDoor_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L3/PBW_M3_HalfWallDoor.PBW_M3_HalfWallDoor"
+    },
+    {
+      "shape": "HalfWallDoorS",
+      "material": 2,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L3/PBWA_M3_HalfWallDoorS.PBWA_M3_HalfWallDoorS_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L3/PBW_M3_HalfWallDoorS.PBW_M3_HalfWallDoorS"
+    },
+    {
+      "shape": "HalfWallHalf",
+      "material": 2,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L3/PBWA_M3_HalfWallHalf.PBWA_M3_HalfWallHalf_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L3/PBW_M3_HalfWallHalf.PBW_M3_HalfWallHalf"
+    },
+    {
+      "shape": "Pillar",
+      "material": 2,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L3/PBWA_M3_Pillar.PBWA_M3_Pillar_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L3/PBW_M3_Pillar.PBW_M3_Pillar"
+    },
+    {
+      "shape": "QuarterWallHalf",
+      "material": 2,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L3/PBWA_M3_QuarterWallHalf.PBWA_M3_QuarterWallHalf_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L3/PBW_M3_QuarterWallHalf.PBW_M3_QuarterWallHalf"
+    },
+    {
+      "shape": "QuarterWallS",
+      "material": 2,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L3/PBWA_M3_QuarterWallS.PBWA_M3_QuarterWallS_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L3/PBW_M3_QuarterWallS.PBW_M3_QuarterWallS"
+    },
+    {
+      "shape": "RoofC",
+      "material": 2,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L3/PBWA_M3_RoofC.PBWA_M3_RoofC_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L3/PBW_M3_RoofC.PBW_M3_RoofC"
+    },
+    {
+      "shape": "RoofD",
+      "material": 2,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L3/PBWA_M3_RoofD.PBWA_M3_RoofD_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L3/PBW_M3_RoofD.PBW_M3_RoofD"
+    },
+    {
+      "shape": "RoofI",
+      "material": 2,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L3/PBWA_M3_RoofI.PBWA_M3_RoofI_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L3/PBW_M3_RoofI.PBW_M3_RoofI"
+    },
+    {
+      "shape": "RoofO",
+      "material": 2,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L3/PBWA_M3_RoofO.PBWA_M3_RoofO_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L3/PBW_M3_RoofO.PBW_M3_RoofO"
+    },
+    {
+      "shape": "RoofS",
+      "material": 2,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L3/PBWA_M3_RoofS.PBWA_M3_RoofS_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L3/PBW_M3_RoofS.PBW_M3_RoofS"
+    },
+    {
+      "shape": "RoofWall",
+      "material": 2,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L3/PBWA_M3_RoofWall.PBWA_M3_RoofWall_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L3/PBW_M3_RoofWall.PBW_M3_RoofWall"
+    },
+    {
+      "shape": "Solid",
+      "material": 2,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L3/PBWA_M3_Solid.PBWA_M3_Solid_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L3/PBW_M3_Solid.PBW_M3_Solid"
+    },
+    {
+      "shape": "StairF",
+      "material": 2,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L3/PBWA_M3_StairF.PBWA_M3_StairF_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L3/PBW_M3_StairF.PBW_M3_StairF"
+    },
+    {
+      "shape": "StairR",
+      "material": 2,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L3/PBWA_M3_StairR.PBWA_M3_StairR_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L3/PBW_M3_StairR.PBW_M3_StairR"
+    },
+    {
+      "shape": "StairT",
+      "material": 2,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L3/PBWA_M3_StairT.PBWA_M3_StairT_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L3/PBW_M3_StairT.PBW_M3_StairT"
+    },
+    {
+      "shape": "StairW",
+      "material": 2,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L3/PBWA_M3_StairW.PBWA_M3_StairW_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L3/PBW_M3_StairW.PBW_M3_StairW"
+    },
+    {
+      "shape": "WindowC",
+      "material": 2,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L3/PBWA_M3_WindowC.PBWA_M3_WindowC_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L3/PBW_M3_WindowC.PBW_M3_WindowC"
+    },
+    {
+      "shape": "Windows",
+      "material": 2,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L3/PBWA_M3_Windows.PBWA_M3_Windows_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L3/PBW_M3_Windows.PBW_M3_Windows"
+    },
+    {
+      "shape": "WindowSide",
+      "material": 2,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Metal/L3/PBWA_M3_WindowSide.PBWA_M3_WindowSide_C",
+      "meshPath": "/Game/Packages/PBW/Metal/L3/PBW_M3_WindowSide.PBW_M3_WindowSide"
+    },
+    {
+      "shape": "Archway",
+      "material": 1,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L1/PBWA_S1_Archway.PBWA_S1_Archway_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L1/PBW_B1_Archway.PBW_B1_Archway"
+    },
+    {
+      "shape": "ArchwayLarge",
+      "material": 1,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L1/PBWA_S1_ArchwayLarge.PBWA_S1_ArchwayLarge_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L1/PBW_B1_ArchwayLarge.PBW_B1_ArchwayLarge"
+    },
+    {
+      "shape": "ArchwayLargeSupport",
+      "material": 1,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L1/PBWA_S1_ArchwayLargeSupport.PBWA_S1_ArchwayLargeSupport_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L1/PBW_B1_ArchwayLargeSupport.PBW_B1_ArchwayLargeSupport"
+    },
+    {
+      "shape": "BalconyD",
+      "material": 1,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L1/PBWA_S1_BalconyD.PBWA_S1_BalconyD_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L1/PBW_B1_BalconyD.PBW_B1_BalconyD"
+    },
+    {
+      "shape": "BalconyI",
+      "material": 1,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L1/PBWA_S1_BalconyI.PBWA_S1_BalconyI_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L1/PBW_B1_BalconyI.PBW_B1_BalconyI"
+    },
+    {
+      "shape": "BalconyO",
+      "material": 1,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L1/PBWA_S1_BalconyO.PBWA_S1_BalconyO_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L1/PBW_B1_BalconyO.PBW_B1_BalconyO"
+    },
+    {
+      "shape": "BalconyS",
+      "material": 1,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L1/PBWA_S1_BalconyS.PBWA_S1_BalconyS_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L1/PBW_B1_BalconyS.PBW_B1_BalconyS"
+    },
+    {
+      "shape": "Brace",
+      "material": 1,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L1/PBWA_S1_Brace.PBWA_S1_Brace_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L1/PBW_B1_Brace.PBW_B1_Brace"
+    },
+    {
+      "shape": "DoorC",
+      "material": 1,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L1/PBWA_S1_DoorC.PBWA_S1_DoorC_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L1/PBW_B1_DoorC.PBW_B1_DoorC"
+    },
+    {
+      "shape": "DoorS",
+      "material": 1,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L1/PBWA_S1_DoorS.PBWA_S1_DoorS_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L1/PBW_B1_DoorS.PBW_B1_DoorS"
+    },
+    {
+      "shape": "DoorSide",
+      "material": 1,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L1/PBWA_S1_DoorSide.PBWA_S1_DoorSide_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L1/PBW_B1_DoorSide.PBW_B1_DoorSide"
+    },
+    {
+      "shape": "Floor",
+      "material": 1,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L1/PBWA_S1_Floor.PBWA_S1_Floor_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L1/PBW_B1_Floor.PBW_B1_Floor"
+    },
+    {
+      "shape": "HalfWallDoor",
+      "material": 1,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L1/PBWA_S1_HalfWallDoor.PBWA_S1_HalfWallDoor_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L1/PBW_B1_HalfWallDoor.PBW_B1_HalfWallDoor"
+    },
+    {
+      "shape": "HalfWallDoorS",
+      "material": 1,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L1/PBWA_S1_HalfWallDoorSide.PBWA_S1_HalfWallDoorSide_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L1/PBW_B1_HalfWallDoorS.PBW_B1_HalfWallDoorS"
+    },
+    {
+      "shape": "HalfWallHalf",
+      "material": 1,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L1/PBWA_S1_HalfWallHalf.PBWA_S1_HalfWallHalf_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L1/PBW_B1_HalfWallHalf.PBW_B1_HalfWallHalf"
+    },
+    {
+      "shape": "HalfWall",
+      "material": 1,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L1/PBWA_S1_HalfWallS.PBWA_S1_HalfWallS_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L1/PBW_B1_HalfWallS.PBW_B1_HalfWallS"
+    },
+    {
+      "shape": "Pillar",
+      "material": 1,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L1/PBWA_S1_Pillar.PBWA_S1_Pillar_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L1/PBW_B1_Pillar.PBW_B1_Pillar"
+    },
+    {
+      "shape": "QuarterWallHalf",
+      "material": 1,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L1/PBWA_S1_QuarterWallHalf.PBWA_S1_QuarterWallHalf_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L1/PBW_B1_QuarterWallHalf.PBW_B1_QuarterWallHalf"
+    },
+    {
+      "shape": "QuarterWallS",
+      "material": 1,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L1/PBWA_S1_QuarterWallS.PBWA_S1_QuarterWallS_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L1/PBW_B1_QuarterWallS.PBW_B1_QuarterWallS"
+    },
+    {
+      "shape": "RoofC",
+      "material": 1,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L1/PBWA_S1_RoofC.PBWA_S1_RoofC_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L1/PBW_B1_RoofC.PBW_B1_RoofC"
+    },
+    {
+      "shape": "RoofD",
+      "material": 1,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L1/PBWA_S1_RoofD.PBWA_S1_RoofD_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L1/PBW_B1_RoofD.PBW_B1_RoofD"
+    },
+    {
+      "shape": "RoofI",
+      "material": 1,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L1/PBWA_S1_RoofI.PBWA_S1_RoofI_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L1/PBW_B1_RoofI.PBW_B1_RoofI"
+    },
+    {
+      "shape": "RoofO",
+      "material": 1,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L1/PBWA_S1_RoofO.PBWA_S1_RoofO_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L1/PBW_B1_RoofO.PBW_B1_RoofO"
+    },
+    {
+      "shape": "RoofS",
+      "material": 1,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L1/PBWA_S1_RoofS.PBWA_S1_RoofS_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L1/PBW_B1_RoofS.PBW_B1_RoofS"
+    },
+    {
+      "shape": "RoofWall",
+      "material": 1,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L1/PBWA_S1_RoofWall.PBWA_S1_RoofWall_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L1/PBW_B1_RoofWall.PBW_B1_RoofWall"
+    },
+    {
+      "shape": "Solid",
+      "material": 1,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L1/PBWA_S1_Solid.PBWA_S1_Solid_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L1/PBW_B1_Solid.PBW_B1_Solid"
+    },
+    {
+      "shape": "StairF",
+      "material": 1,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L1/PBWA_S1_StairF.PBWA_S1_StairF_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L1/PBW_B1_StairF.PBW_B1_StairF"
+    },
+    {
+      "shape": "StairR",
+      "material": 1,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L1/PBWA_S1_StairR.PBWA_S1_StairR_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L1/PBW_B1_StairR.PBW_B1_StairR"
+    },
+    {
+      "shape": "StairT",
+      "material": 1,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L1/PBWA_S1_StairT.PBWA_S1_StairT_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L1/PBW_B1_StairT.PBW_B1_StairT"
+    },
+    {
+      "shape": "StairW",
+      "material": 1,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L1/PBWA_S1_StairW.PBWA_S1_StairW_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L1/PBW_B1_StairW.PBW_B1_StairW"
+    },
+    {
+      "shape": "Windows",
+      "material": 1,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L1/PBWA_S1_Windows.PBWA_S1_Windows_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L1/PBW_B1_Windows.PBW_B1_Windows"
+    },
+    {
+      "shape": "WindowC",
+      "material": 1,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L1/PBWA_S1_WindowsC.PBWA_S1_WindowsC_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L1/PBW_B1_WindowC.PBW_B1_WindowC"
+    },
+    {
+      "shape": "WindowSide",
+      "material": 1,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L1/PBWA_S1_WindowsSide.PBWA_S1_WindowsSide_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L1/PBW_B1_WindowSide.PBW_B1_WindowSide"
+    },
+    {
+      "shape": "Archway",
+      "material": 1,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L2/PBWA_S2_Archway.PBWA_S2_Archway_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L2/PBW_B2_Archway.PBW_B2_Archway"
+    },
+    {
+      "shape": "ArchwayLarge",
+      "material": 1,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L2/PBWA_S2_ArchwayLarge.PBWA_S2_ArchwayLarge_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L2/PBW_B2_ArchwayLarge.PBW_B2_ArchwayLarge"
+    },
+    {
+      "shape": "ArchwayLargeSupport",
+      "material": 1,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L2/PBWA_S2_ArchwayLargeSupport.PBWA_S2_ArchwayLargeSupport_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L2/PBW_B2_ArchwayLargeSupport.PBW_B2_ArchwayLargeSupport"
+    },
+    {
+      "shape": "BalconyD",
+      "material": 1,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L2/PBWA_S2_BalconyD.PBWA_S2_BalconyD_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L2/PBW_B2_BalconyD.PBW_B2_BalconyD"
+    },
+    {
+      "shape": "BalconyI",
+      "material": 1,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L2/PBWA_S2_BalconyI.PBWA_S2_BalconyI_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L2/PBW_B2_BalconyI.PBW_B2_BalconyI"
+    },
+    {
+      "shape": "BalconyO",
+      "material": 1,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L2/PBWA_S2_BalconyO.PBWA_S2_BalconyO_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L2/PBW_B2_BalconyO.PBW_B2_BalconyO"
+    },
+    {
+      "shape": "BalconyS",
+      "material": 1,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L2/PBWA_S2_BalconyS.PBWA_S2_BalconyS_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L2/PBW_B2_BalconyS.PBW_B2_BalconyS"
+    },
+    {
+      "shape": "Brace",
+      "material": 1,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L2/PBWA_S2_Brace.PBWA_S2_Brace_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L2/PBW_B2_Brace.PBW_B2_Brace"
+    },
+    {
+      "shape": "DoorC",
+      "material": 1,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L2/PBWA_S2_DoorC.PBWA_S2_DoorC_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L2/PBW_B2_DoorC.PBW_B2_DoorC"
+    },
+    {
+      "shape": "DoorS",
+      "material": 1,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L2/PBWA_S2_DoorS.PBWA_S2_DoorS_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L2/PBW_B2_DoorS.PBW_B2_DoorS"
+    },
+    {
+      "shape": "DoorSide",
+      "material": 1,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L2/PBWA_S2_DoorSide.PBWA_S2_DoorSide_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L2/PBW_B2_DoorSide.PBW_B2_DoorSide"
+    },
+    {
+      "shape": "Floor",
+      "material": 1,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L2/PBWA_S2_Floor.PBWA_S2_Floor_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L2/PBW_B2_Floor.PBW_B2_Floor"
+    },
+    {
+      "shape": "HalfWallDoor",
+      "material": 1,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L2/PBWA_S2_HalfWallDoor.PBWA_S2_HalfWallDoor_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L2/PBW_B2_HalfWallDoor.PBW_B2_HalfWallDoor"
+    },
+    {
+      "shape": "HalfWallDoorS",
+      "material": 1,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L2/PBWA_S2_HalfWallDoorS.PBWA_S2_HalfWallDoorS_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L2/PBW_B2_HalfWallDoorS.PBW_B2_HalfWallDoorS"
+    },
+    {
+      "shape": "HalfWallHalf",
+      "material": 1,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L2/PBWA_S2_HalfWallHalf.PBWA_S2_HalfWallHalf_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L2/PBW_B2_HalfWallHalf.PBW_B2_HalfWallHalf"
+    },
+    {
+      "shape": "HalfWall",
+      "material": 1,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L2/PBWA_S2_HalfWallS.PBWA_S2_HalfWallS_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L2/PBW_B2_HalfWalls.PBW_B2_HalfWalls"
+    },
+    {
+      "shape": "Pillar",
+      "material": 1,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L2/PBWA_S2_Pillar2.PBWA_S2_Pillar2_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L2/PBW_B2_Pillar.PBW_B2_Pillar"
+    },
+    {
+      "shape": "QuarterWallHalf",
+      "material": 1,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L2/PBWA_S2_QuarterWallHalf.PBWA_S2_QuarterWallHalf_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L2/PBW_B2_QuarterWallHalf.PBW_B2_QuarterWallHalf"
+    },
+    {
+      "shape": "QuarterWallS",
+      "material": 1,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L2/PBWA_S2_QuarterWallS.PBWA_S2_QuarterWallS_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L2/PBW_B2_QuarterWalls.PBW_B2_QuarterWalls"
+    },
+    {
+      "shape": "RoofC",
+      "material": 1,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L2/PBWA_S2_RoofC.PBWA_S2_RoofC_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L2/PBW_B2_RoofC.PBW_B2_RoofC"
+    },
+    {
+      "shape": "RoofD",
+      "material": 1,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L2/PBWA_S2_RoofD.PBWA_S2_RoofD_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L2/PBW_B2_RoofD.PBW_B2_RoofD"
+    },
+    {
+      "shape": "RoofI",
+      "material": 1,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L2/PBWA_S2_RoofI.PBWA_S2_RoofI_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L2/PBW_B2_RoofI.PBW_B2_RoofI"
+    },
+    {
+      "shape": "RoofO",
+      "material": 1,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L2/PBWA_S2_RoofO.PBWA_S2_RoofO_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L2/PBW_B2_RoofO.PBW_B2_RoofO"
+    },
+    {
+      "shape": "RoofS",
+      "material": 1,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L2/PBWA_S2_RoofS.PBWA_S2_RoofS_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L2/PBW_B2_RoofS.PBW_B2_RoofS"
+    },
+    {
+      "shape": "RoofWall",
+      "material": 1,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L2/PBWA_S2_RoofWall.PBWA_S2_RoofWall_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L2/PBW_B2_Roofwall.PBW_B2_Roofwall"
+    },
+    {
+      "shape": "Solid",
+      "material": 1,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L2/PBWA_S2_Solid.PBWA_S2_Solid_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L2/PBW_B2_Solid.PBW_B2_Solid"
+    },
+    {
+      "shape": "StairF",
+      "material": 1,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L2/PBWA_S2_StairF.PBWA_S2_StairF_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L2/PBW_B2_StairF.PBW_B2_StairF"
+    },
+    {
+      "shape": "StairR",
+      "material": 1,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L2/PBWA_S2_StairR.PBWA_S2_StairR_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L2/PBW_B2_StairR.PBW_B2_StairR"
+    },
+    {
+      "shape": "StairT",
+      "material": 1,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L2/PBWA_S2_StairT.PBWA_S2_StairT_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L2/PBW_B2_StairT.PBW_B2_StairT"
+    },
+    {
+      "shape": "StairW",
+      "material": 1,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L2/PBWA_S2_StairW.PBWA_S2_StairW_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L2/PBW_B2_StairW.PBW_B2_StairW"
+    },
+    {
+      "shape": "Windows",
+      "material": 1,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L2/PBWA_S2_Windows.PBWA_S2_Windows_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L2/PBW_B2_Windows.PBW_B2_Windows"
+    },
+    {
+      "shape": "WindowC",
+      "material": 1,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L2/PBWA_S2_WindowsC.PBWA_S2_WindowsC_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L2/PBW_B2_WindowC.PBW_B2_WindowC"
+    },
+    {
+      "shape": "WindowSide",
+      "material": 1,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L2/PBWA_S2_WindowsSide.PBWA_S2_WindowsSide_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L2/PBW_B2_WindowSide.PBW_B2_WindowSide"
+    },
+    {
+      "shape": "Archway",
+      "material": 1,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L3/PBWA_S3_Archway.PBWA_S3_Archway_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L3/PBW_B3_Archway.PBW_B3_Archway"
+    },
+    {
+      "shape": "ArchwayLarge",
+      "material": 1,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L3/PBWA_S3_ArchwayLarge.PBWA_S3_ArchwayLarge_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L3/PBW_B3_ArchwayLarge.PBW_B3_ArchwayLarge"
+    },
+    {
+      "shape": "ArchwayLargeSupport",
+      "material": 1,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L3/PBWA_S3_ArchwayLargeSupport.PBWA_S3_ArchwayLargeSupport_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L3/PBW_B3_ArchwayLargeSupport.PBW_B3_ArchwayLargeSupport"
+    },
+    {
+      "shape": "BalconyD",
+      "material": 1,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L3/PBWA_S3_BalconyD.PBWA_S3_BalconyD_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L3/PBW_B3_BalconyD.PBW_B3_BalconyD"
+    },
+    {
+      "shape": "BalconyI",
+      "material": 1,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L3/PBWA_S3_BalconyI.PBWA_S3_BalconyI_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L3/PBW_B3_BalconyI.PBW_B3_BalconyI"
+    },
+    {
+      "shape": "BalconyO",
+      "material": 1,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L3/PBWA_S3_BalconyO.PBWA_S3_BalconyO_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L3/PBW_B3_BalconyO.PBW_B3_BalconyO"
+    },
+    {
+      "shape": "BalconyS",
+      "material": 1,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L3/PBWA_S3_BalconyS.PBWA_S3_BalconyS_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L3/PBW_B3_BalconyS.PBW_B3_BalconyS"
+    },
+    {
+      "shape": "Brace",
+      "material": 1,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L3/PBWA_S3_Brace.PBWA_S3_Brace_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L3/PBW_B3_Brace.PBW_B3_Brace"
+    },
+    {
+      "shape": "DoorC",
+      "material": 1,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L3/PBWA_S3_DoorC.PBWA_S3_DoorC_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L3/PBW_B3_DoorC.PBW_B3_DoorC"
+    },
+    {
+      "shape": "DoorS",
+      "material": 1,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L3/PBWA_S3_DoorS.PBWA_S3_DoorS_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L3/PBW_B3_DoorS.PBW_B3_DoorS"
+    },
+    {
+      "shape": "DoorSide",
+      "material": 1,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L3/PBWA_S3_DoorSide.PBWA_S3_DoorSide_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L3/PBW_B3_DoorSide.PBW_B3_DoorSide"
+    },
+    {
+      "shape": "Floor",
+      "material": 1,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L3/PBWA_S3_Floor.PBWA_S3_Floor_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L3/PBW_B3_Floor.PBW_B3_Floor"
+    },
+    {
+      "shape": "HalfWallDoor",
+      "material": 1,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L3/PBWA_S3_HalfWallDoor.PBWA_S3_HalfWallDoor_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L3/PBW_B3_HalfWallDoor.PBW_B3_HalfWallDoor"
+    },
+    {
+      "shape": "HalfWallDoorS",
+      "material": 1,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L3/PBWA_S3_HalfWallDoorS.PBWA_S3_HalfWallDoorS_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L3/PBW_B3_HalfWallDoorS.PBW_B3_HalfWallDoorS"
+    },
+    {
+      "shape": "HalfWallHalf",
+      "material": 1,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L3/PBWA_S3_HalfWallHalf.PBWA_S3_HalfWallHalf_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L3/PBW_B3_HalfWallHalf.PBW_B3_HalfWallHalf"
+    },
+    {
+      "shape": "HalfWall",
+      "material": 1,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L3/PBWA_S3_HalfWallS.PBWA_S3_HalfWallS_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L3/PBW_B3_HalfWalls.PBW_B3_HalfWalls"
+    },
+    {
+      "shape": "Pillar",
+      "material": 1,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L3/PBWA_S3_Pillar.PBWA_S3_Pillar_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L3/PBW_B3_Pillar.PBW_B3_Pillar"
+    },
+    {
+      "shape": "QuarterWallHalf",
+      "material": 1,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L3/PBWA_S3_QuarterWallHalf.PBWA_S3_QuarterWallHalf_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L3/PBW_B3_QuarterWallHalf.PBW_B3_QuarterWallHalf"
+    },
+    {
+      "shape": "QuarterWallS",
+      "material": 1,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L3/PBWA_S3_QuarterWallS.PBWA_S3_QuarterWallS_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L3/PBW_B3_QuarterWalls.PBW_B3_QuarterWalls"
+    },
+    {
+      "shape": "RoofC",
+      "material": 1,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L3/PBWA_S3_RoofC.PBWA_S3_RoofC_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L3/PBW_B3_RoofC.PBW_B3_RoofC"
+    },
+    {
+      "shape": "RoofD",
+      "material": 1,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L3/PBWA_S3_RoofD.PBWA_S3_RoofD_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L3/PBW_B3_RoofD.PBW_B3_RoofD"
+    },
+    {
+      "shape": "RoofI",
+      "material": 1,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L3/PBWA_S3_RoofI.PBWA_S3_RoofI_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L3/PBW_B3_RoofI.PBW_B3_RoofI"
+    },
+    {
+      "shape": "RoofO",
+      "material": 1,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L3/PBWA_S3_RoofO.PBWA_S3_RoofO_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L3/PBW_B3_RoofO.PBW_B3_RoofO"
+    },
+    {
+      "shape": "RoofS",
+      "material": 1,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L3/PBWA_S3_RoofS.PBWA_S3_RoofS_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L3/PBW_B3_RoofS.PBW_B3_RoofS"
+    },
+    {
+      "shape": "RoofWall",
+      "material": 1,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L3/PBWA_S3_RoofWall.PBWA_S3_RoofWall_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L3/PBW_B3_RoofWall.PBW_B3_RoofWall"
+    },
+    {
+      "shape": "Solid",
+      "material": 1,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L3/PBWA_S3_Solid.PBWA_S3_Solid_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L3/PBW_B3_Solid.PBW_B3_Solid"
+    },
+    {
+      "shape": "StairF",
+      "material": 1,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L3/PBWA_S3_StairF.PBWA_S3_StairF_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L3/PBW_B3_StairF.PBW_B3_StairF"
+    },
+    {
+      "shape": "StairR",
+      "material": 1,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L3/PBWA_S3_StairR.PBWA_S3_StairR_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L3/PBW_B3_StairR.PBW_B3_StairR"
+    },
+    {
+      "shape": "StairT",
+      "material": 1,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L3/PBWA_S3_StairT.PBWA_S3_StairT_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L3/PBW_B3_StairT.PBW_B3_StairT"
+    },
+    {
+      "shape": "StairW",
+      "material": 1,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L3/PBWA_S3_StairW.PBWA_S3_StairW_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L3/PBW_B3_StairW.PBW_B3_StairW"
+    },
+    {
+      "shape": "WindowC",
+      "material": 1,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L3/PBWA_S3_WindowC.PBWA_S3_WindowC_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L3/PBW_B3_WindowC.PBW_B3_WindowC"
+    },
+    {
+      "shape": "Windows",
+      "material": 1,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L3/PBWA_S3_Windows.PBWA_S3_Windows_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L3/PBW_B3_Windows.PBW_B3_Windows"
+    },
+    {
+      "shape": "WindowSide",
+      "material": 1,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Stone/L3/PBWA_S3_WindowSide.PBWA_S3_WindowSide_C",
+      "meshPath": "/Game/Packages/PBW/Brick/L3/PBW_B3_WindowSide.PBW_B3_WindowSide"
+    },
+    {
+      "shape": "Archway",
+      "material": 0,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L1/PBWA_W1_Archway.PBWA_W1_Archway_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L1/PBW_W1_Archway.PBW_W1_Archway"
+    },
+    {
+      "shape": "ArchwayLarge",
+      "material": 0,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L1/PBWA_W1_ArchwayLarge.PBWA_W1_ArchwayLarge_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L1/PBW_W1_ArchwayLarge.PBW_W1_ArchwayLarge"
+    },
+    {
+      "shape": "ArchwayLargeSupport",
+      "material": 0,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L1/PBWA_W1_ArchwayLargeSupport.PBWA_W1_ArchwayLargeSupport_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L1/PBW_W1_ArchwaySupportLarge.PBW_W1_ArchwaySupportLarge"
+    },
+    {
+      "shape": "BalconyD",
+      "material": 0,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L1/PBWA_W1_BalconyD.PBWA_W1_BalconyD_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L1/PBW_W1_BalconyD.PBW_W1_BalconyD"
+    },
+    {
+      "shape": "BalconyI",
+      "material": 0,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L1/PBWA_W1_BalconyI.PBWA_W1_BalconyI_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L1/PBW_W1_BalconyI.PBW_W1_BalconyI"
+    },
+    {
+      "shape": "BalconyO",
+      "material": 0,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L1/PBWA_W1_BalconyO.PBWA_W1_BalconyO_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L1/PBW_W1_BalconyO.PBW_W1_BalconyO"
+    },
+    {
+      "shape": "BalconyS",
+      "material": 0,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L1/PBWA_W1_BalconyS.PBWA_W1_BalconyS_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L1/PBW_W1_BalconyS.PBW_W1_BalconyS"
+    },
+    {
+      "shape": "Brace",
+      "material": 0,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L1/PBWA_W1_Brace.PBWA_W1_Brace_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L1/PBW_W1_Brace.PBW_W1_Brace"
+    },
+    {
+      "shape": "DoorC",
+      "material": 0,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L1/PBWA_W1_DoorC.PBWA_W1_DoorC_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L1/PBW_W1_DoorC.PBW_W1_DoorC"
+    },
+    {
+      "shape": "DoorS",
+      "material": 0,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L1/PBWA_W1_DoorS.PBWA_W1_DoorS_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L1/PBW_W1_DoorS.PBW_W1_DoorS"
+    },
+    {
+      "shape": "DoorSide",
+      "material": 0,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L1/PBWA_W1_DoorSide.PBWA_W1_DoorSide_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L1/PBW_W1_DoorSide.PBW_W1_DoorSide"
+    },
+    {
+      "shape": "Floor",
+      "material": 0,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L1/PBWA_W1_Floor.PBWA_W1_Floor_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L1/PBW_W1_Floor.PBW_W1_Floor"
+    },
+    {
+      "shape": "HalfWallDoor",
+      "material": 0,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L1/PBWA_W1_HalfWallDoor.PBWA_W1_HalfWallDoor_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L1/PBW_W1_HalfWallDoor.PBW_W1_HalfWallDoor"
+    },
+    {
+      "shape": "HalfWallDoorS",
+      "material": 0,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L1/PBWA_W1_HalfWallDoorS.PBWA_W1_HalfWallDoorS_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L1/PBW_W1_HalfWallDoorS.PBW_W1_HalfWallDoorS"
+    },
+    {
+      "shape": "HalfWallHalf",
+      "material": 0,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L1/PBWA_W1_HalfWallHalf.PBWA_W1_HalfWallHalf_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L1/PBW_W1_HalfWallHalf.PBW_W1_HalfWallHalf"
+    },
+    {
+      "shape": "HalfWall",
+      "material": 0,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L1/PBWA_W1_HalfWallS.PBWA_W1_HalfWallS_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L1/PBW_W1_HalfWallS.PBW_W1_HalfWallS"
+    },
+    {
+      "shape": "Pillar",
+      "material": 0,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L1/PBWA_W1_Pillar.PBWA_W1_Pillar_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L1/PBW_W1_Pillar.PBW_W1_Pillar"
+    },
+    {
+      "shape": "QuarterWallHalf",
+      "material": 0,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L1/PBWA_W1_QuarterWallHalf.PBWA_W1_QuarterWallHalf_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L1/PBW_W1_QuarterWallHalf.PBW_W1_QuarterWallHalf"
+    },
+    {
+      "shape": "QuarterWallS",
+      "material": 0,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L1/PBWA_W1_QuarterWallS.PBWA_W1_QuarterWallS_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L1/PBW_W1_QuarterWallS.PBW_W1_QuarterWallS"
+    },
+    {
+      "shape": "RoofC",
+      "material": 0,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L1/PBWA_W1_RoofC.PBWA_W1_RoofC_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L1/PBW_W1_RoofC.PBW_W1_RoofC"
+    },
+    {
+      "shape": "RoofD",
+      "material": 0,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L1/PBWA_W1_RoofD.PBWA_W1_RoofD_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L1/PBW_W1_RoofD.PBW_W1_RoofD"
+    },
+    {
+      "shape": "RoofI",
+      "material": 0,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L1/PBWA_W1_RoofI.PBWA_W1_RoofI_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L1/PBW_W1_RoofI.PBW_W1_RoofI"
+    },
+    {
+      "shape": "RoofO",
+      "material": 0,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L1/PBWA_W1_RoofO.PBWA_W1_RoofO_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L1/PBW_W1_RoofO.PBW_W1_RoofO"
+    },
+    {
+      "shape": "RoofS",
+      "material": 0,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L1/PBWA_W1_RoofS.PBWA_W1_RoofS_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L1/PBW_W1_RoofS.PBW_W1_RoofS"
+    },
+    {
+      "shape": "RoofWall",
+      "material": 0,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L1/PBWA_W1_RoofWall.PBWA_W1_RoofWall_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L1/PBW_W1_RoofWall.PBW_W1_RoofWall"
+    },
+    {
+      "shape": "Solid",
+      "material": 0,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L1/PBWA_W1_Solid.PBWA_W1_Solid_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L1/PBW_W1_Solid.PBW_W1_Solid"
+    },
+    {
+      "shape": "StairF",
+      "material": 0,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L1/PBWA_W1_StairF.PBWA_W1_StairF_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L1/PBW_W1_StairF.PBW_W1_StairF"
+    },
+    {
+      "shape": "StairR",
+      "material": 0,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L1/PBWA_W1_StairR.PBWA_W1_StairR_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L1/PBW_W1_StairR.PBW_W1_StairR"
+    },
+    {
+      "shape": "StairT",
+      "material": 0,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L1/PBWA_W1_StairT.PBWA_W1_StairT_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L1/PBW_W1_StairT.PBW_W1_StairT"
+    },
+    {
+      "shape": "StairW",
+      "material": 0,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L1/PBWA_W1_StairW.PBWA_W1_StairW_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L1/PBW_W1_StairW.PBW_W1_StairW"
+    },
+    {
+      "shape": "WindowC",
+      "material": 0,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L1/PBWA_W1_WindowC.PBWA_W1_WindowC_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L1/PBW_W1_WindowC.PBW_W1_WindowC"
+    },
+    {
+      "shape": "Windows",
+      "material": 0,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L1/PBWA_W1_Windows.PBWA_W1_Windows_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L1/PBW_W1_Windows.PBW_W1_Windows"
+    },
+    {
+      "shape": "WindowSide",
+      "material": 0,
+      "tier": 1,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L1/PBWA_W1_WindowSide.PBWA_W1_WindowSide_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L1/PBW_W1_WindowSide.PBW_W1_WindowSide"
+    },
+    {
+      "shape": "Archway",
+      "material": 0,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L2/PBWA_W2_Archway.PBWA_W2_Archway_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L2/PBW_W2_Archway.PBW_W2_Archway"
+    },
+    {
+      "shape": "ArchwayLarge",
+      "material": 0,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L2/PBWA_W2_ArchwayLarge.PBWA_W2_ArchwayLarge_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L2/PBW_W2_ArchwayLarge.PBW_W2_ArchwayLarge"
+    },
+    {
+      "shape": "BalconyD",
+      "material": 0,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L2/PBWA_W2_BalconyD.PBWA_W2_BalconyD_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L2/PBW_W2_BalconyD.PBW_W2_BalconyD"
+    },
+    {
+      "shape": "BalconyI",
+      "material": 0,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L2/PBWA_W2_BalconyI.PBWA_W2_BalconyI_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L2/PBW_W2_BalconyI.PBW_W2_BalconyI"
+    },
+    {
+      "shape": "BalconyO",
+      "material": 0,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L2/PBWA_W2_BalconyO.PBWA_W2_BalconyO_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L2/PBW_W2_BalconyO.PBW_W2_BalconyO"
+    },
+    {
+      "shape": "BalconyS",
+      "material": 0,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L2/PBWA_W2_BalconyS.PBWA_W2_BalconyS_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L2/PBW_W2_BalconyS.PBW_W2_BalconyS"
+    },
+    {
+      "shape": "Brace",
+      "material": 0,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L2/PBWA_W2_Brace.PBWA_W2_Brace_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L2/PBW_W2_Brace.PBW_W2_Brace"
+    },
+    {
+      "shape": "DoorC",
+      "material": 0,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L2/PBWA_W2_DoorC.PBWA_W2_DoorC_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L2/PBW_W2_DoorC.PBW_W2_DoorC"
+    },
+    {
+      "shape": "DoorS",
+      "material": 0,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L2/PBWA_W2_DoorS.PBWA_W2_DoorS_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L2/PBW_W2_DoorS.PBW_W2_DoorS"
+    },
+    {
+      "shape": "DoorSide",
+      "material": 0,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L2/PBWA_W2_DoorSide.PBWA_W2_DoorSide_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L2/PBW_W2_DoorSide.PBW_W2_DoorSide"
+    },
+    {
+      "shape": "Floor",
+      "material": 0,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L2/PBWA_W2_Floor.PBWA_W2_Floor_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L2/PBW_W2_Floor.PBW_W2_Floor"
+    },
+    {
+      "shape": "HalfWallDoor",
+      "material": 0,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L2/PBWA_W2_HalfWallDoor.PBWA_W2_HalfWallDoor_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L2/PBW_W2_HalfWallDoor.PBW_W2_HalfWallDoor"
+    },
+    {
+      "shape": "HalfWallDoorS",
+      "material": 0,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L2/PBWA_W2_HalfWallDoorS.PBWA_W2_HalfWallDoorS_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L2/PBW_W2_HalfWallDoorS.PBW_W2_HalfWallDoorS"
+    },
+    {
+      "shape": "HalfWallHalf",
+      "material": 0,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L2/PBWA_W2_HalfWallHalf.PBWA_W2_HalfWallHalf_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L2/PBW_W2_HalfWallHalf.PBW_W2_HalfWallHalf"
+    },
+    {
+      "shape": "HalfWall",
+      "material": 0,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L2/PBWA_W2_HalfWallS.PBWA_W2_HalfWallS_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L2/PBW_W2_HalfWallS.PBW_W2_HalfWallS"
+    },
+    {
+      "shape": "Pillar",
+      "material": 0,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L2/PBWA_W2_Pillar.PBWA_W2_Pillar_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L2/PBW_W2_Pillar.PBW_W2_Pillar"
+    },
+    {
+      "shape": "QuarterWallHalf",
+      "material": 0,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L2/PBWA_W2_QuarterWallHalf.PBWA_W2_QuarterWallHalf_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L2/PBW_W2_QuarterWallHalf.PBW_W2_QuarterWallHalf"
+    },
+    {
+      "shape": "QuarterWallS",
+      "material": 0,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L2/PBWA_W2_QuarterWallS.PBWA_W2_QuarterWallS_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L2/PBW_W2_QuarterWallS.PBW_W2_QuarterWallS"
+    },
+    {
+      "shape": "RoofC",
+      "material": 0,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L2/PBWA_W2_RoofC.PBWA_W2_RoofC_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L2/PBW_W2_RoofC.PBW_W2_RoofC"
+    },
+    {
+      "shape": "RoofD",
+      "material": 0,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L2/PBWA_W2_RoofD.PBWA_W2_RoofD_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L2/PBW_W2_RoofD.PBW_W2_RoofD"
+    },
+    {
+      "shape": "RoofI",
+      "material": 0,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L2/PBWA_W2_RoofI.PBWA_W2_RoofI_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L2/PBW_W2_RoofI.PBW_W2_RoofI"
+    },
+    {
+      "shape": "RoofO",
+      "material": 0,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L2/PBWA_W2_RoofO.PBWA_W2_RoofO_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L2/PBW_W2_RoofO.PBW_W2_RoofO"
+    },
+    {
+      "shape": "RoofS",
+      "material": 0,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L2/PBWA_W2_RoofS.PBWA_W2_RoofS_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L2/PBW_W2_RoofS.PBW_W2_RoofS"
+    },
+    {
+      "shape": "RoofWall",
+      "material": 0,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L2/PBWA_W2_RoofWall.PBWA_W2_RoofWall_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L2/PBW_W2_RoofWall.PBW_W2_RoofWall"
+    },
+    {
+      "shape": "Solid",
+      "material": 0,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L2/PBWA_W2_Solid.PBWA_W2_Solid_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L2/PBW_W2_Solid.PBW_W2_Solid"
+    },
+    {
+      "shape": "StairF",
+      "material": 0,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L2/PBWA_W2_StairF.PBWA_W2_StairF_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L2/PBW_W2_StairF.PBW_W2_StairF"
+    },
+    {
+      "shape": "StairR",
+      "material": 0,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L2/PBWA_W2_StairR.PBWA_W2_StairR_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L2/PBW_W2_StairR.PBW_W2_StairR"
+    },
+    {
+      "shape": "StairT",
+      "material": 0,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L2/PBWA_W2_StairT.PBWA_W2_StairT_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L2/PBW_W2_StairT.PBW_W2_StairT"
+    },
+    {
+      "shape": "StairW",
+      "material": 0,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L2/PBWA_W2_StairW.PBWA_W2_StairW_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L2/PBW_W2_StairW.PBW_W2_StairW"
+    },
+    {
+      "shape": "WindowC",
+      "material": 0,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L2/PBWA_W2_WindowC.PBWA_W2_WindowC_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L2/PBW_W2_WindowC.PBW_W2_WindowC"
+    },
+    {
+      "shape": "Windows",
+      "material": 0,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L2/PBWA_W2_Windows.PBWA_W2_Windows_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L2/PBW_W2_Windows.PBW_W2_Windows"
+    },
+    {
+      "shape": "WindowSide",
+      "material": 0,
+      "tier": 2,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L2/PBWA_W2_WindowSide.PBWA_W2_WindowSide_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L2/PBW_W2_WindowSide.PBW_W2_WindowSide"
+    },
+    {
+      "shape": "Archway",
+      "material": 0,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L3/PBWA_W3_Archway.PBWA_W3_Archway_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L3/PBW_W3_Archway.PBW_W3_Archway"
+    },
+    {
+      "shape": "ArchwayLarge",
+      "material": 0,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L3/PBWA_W3_ArchwayLarge.PBWA_W3_ArchwayLarge_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L3/PBW_W3_ArchwayLarge.PBW_W3_ArchwayLarge"
+    },
+    {
+      "shape": "ArchwayLargeSupport",
+      "material": 0,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L3/PBWA_W3_ArchwayLargeSupport.PBWA_W3_ArchwayLargeSupport_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L3/PBW_W3_ArchwayLargeSupport.PBW_W3_ArchwayLargeSupport"
+    },
+    {
+      "shape": "BalconyD",
+      "material": 0,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L3/PBWA_W3_BalconyD.PBWA_W3_BalconyD_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L3/PBW_W3_BalconyD.PBW_W3_BalconyD"
+    },
+    {
+      "shape": "BalconyI",
+      "material": 0,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L3/PBWA_W3_BalconyI.PBWA_W3_BalconyI_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L3/PBW_W3_BalconyI.PBW_W3_BalconyI"
+    },
+    {
+      "shape": "BalconyO",
+      "material": 0,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L3/PBWA_W3_BalconyO.PBWA_W3_BalconyO_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L3/PBW_W3_BalconyO.PBW_W3_BalconyO"
+    },
+    {
+      "shape": "BalconyS",
+      "material": 0,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L3/PBWA_W3_BalconyS.PBWA_W3_BalconyS_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L3/PBW_W3_BalconyS.PBW_W3_BalconyS"
+    },
+    {
+      "shape": "Brace",
+      "material": 0,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L3/PBWA_W3_Brace.PBWA_W3_Brace_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L3/PBW_W3_Brace.PBW_W3_Brace"
+    },
+    {
+      "shape": "DoorC",
+      "material": 0,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L3/PBWA_W3_DoorC.PBWA_W3_DoorC_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L3/PBW_W3_DoorC.PBW_W3_DoorC"
+    },
+    {
+      "shape": "DoorS",
+      "material": 0,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L3/PBWA_W3_DoorS.PBWA_W3_DoorS_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L3/PBW_W3_DoorS.PBW_W3_DoorS"
+    },
+    {
+      "shape": "DoorSide",
+      "material": 0,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L3/PBWA_W3_DoorSide.PBWA_W3_DoorSide_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L3/PBW_W3_DoorSide.PBW_W3_DoorSide"
+    },
+    {
+      "shape": "Floor",
+      "material": 0,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L3/PBWA_W3_Floor.PBWA_W3_Floor_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L3/PBW_W3_Floor.PBW_W3_Floor"
+    },
+    {
+      "shape": "HalfWallDoor",
+      "material": 0,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L3/PBWA_W3_HalfWallDoor.PBWA_W3_HalfWallDoor_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L3/PBW_W3_HalfWallDoor.PBW_W3_HalfWallDoor"
+    },
+    {
+      "shape": "HalfWallDoorS",
+      "material": 0,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L3/PBWA_W3_HalfWallDoorS.PBWA_W3_HalfWallDoorS_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L3/PBW_W3_HalfWallDoorS.PBW_W3_HalfWallDoorS"
+    },
+    {
+      "shape": "HalfWallHalf",
+      "material": 0,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L3/PBWA_W3_HalfWallHalf.PBWA_W3_HalfWallHalf_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L3/PBW_W3_HalfWallHalf.PBW_W3_HalfWallHalf"
+    },
+    {
+      "shape": "HalfWall",
+      "material": 0,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L3/PBWA_W3_HalfWallS.PBWA_W3_HalfWallS_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L3/PBW_W3_HalfWallS.PBW_W3_HalfWallS"
+    },
+    {
+      "shape": "Pillar",
+      "material": 0,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L3/PBWA_W3_Pillar.PBWA_W3_Pillar_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L3/PBW_W3_Pillar.PBW_W3_Pillar"
+    },
+    {
+      "shape": "QuarterWallHalf",
+      "material": 0,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L3/PBWA_W3_QuarterWallHalf.PBWA_W3_QuarterWallHalf_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L3/PBW_W3_QuarterWallHalf.PBW_W3_QuarterWallHalf"
+    },
+    {
+      "shape": "QuarterWallS",
+      "material": 0,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L3/PBWA_W3_QuarterWallS.PBWA_W3_QuarterWallS_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L3/PBW_W3_QuarterWallS.PBW_W3_QuarterWallS"
+    },
+    {
+      "shape": "RoofC",
+      "material": 0,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L3/PBWA_W3_RoofC.PBWA_W3_RoofC_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L3/PBW_W3_RoofC.PBW_W3_RoofC"
+    },
+    {
+      "shape": "RoofD",
+      "material": 0,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L3/PBWA_W3_RoofD.PBWA_W3_RoofD_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L3/PBW_W3_RoofD.PBW_W3_RoofD"
+    },
+    {
+      "shape": "RoofI",
+      "material": 0,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L3/PBWA_W3_RoofI.PBWA_W3_RoofI_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L3/PBW_W3_RoofI.PBW_W3_RoofI"
+    },
+    {
+      "shape": "RoofO",
+      "material": 0,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L3/PBWA_W3_RoofO.PBWA_W3_RoofO_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L3/PBW_W3_RoofO.PBW_W3_RoofO"
+    },
+    {
+      "shape": "RoofS",
+      "material": 0,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L3/PBWA_W3_RoofS.PBWA_W3_RoofS_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L3/PBW_W3_RoofS.PBW_W3_RoofS"
+    },
+    {
+      "shape": "RoofWall",
+      "material": 0,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L3/PBWA_W3_RoofWall.PBWA_W3_RoofWall_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L3/PBW_W3_RoofWall.PBW_W3_RoofWall"
+    },
+    {
+      "shape": "Solid",
+      "material": 0,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L3/PBWA_W3_Solid.PBWA_W3_Solid_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L3/PBW_W3_Solid.PBW_W3_Solid"
+    },
+    {
+      "shape": "StairF",
+      "material": 0,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L3/PBWA_W3_StairF.PBWA_W3_StairF_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L3/PBW_W3_StairF.PBW_W3_StairF"
+    },
+    {
+      "shape": "StairR",
+      "material": 0,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L3/PBWA_W3_StairR.PBWA_W3_StairR_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L3/PBW_W3_StairR.PBW_W3_StairR"
+    },
+    {
+      "shape": "StairT",
+      "material": 0,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L3/PBWA_W3_StairT.PBWA_W3_StairT_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L3/PBW_W3_StairT.PBW_W3_StairT"
+    },
+    {
+      "shape": "StairW",
+      "material": 0,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L3/PBWA_W3_StairW.PBWA_W3_StairW_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L3/PBW_W3_StairW.PBW_W3_StairW"
+    },
+    {
+      "shape": "WindowC",
+      "material": 0,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L3/PBWA_W3_WindowC.PBWA_W3_WindowC_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L3/PBW_W3_WindowC.PBW_W3_WindowC"
+    },
+    {
+      "shape": "Windows",
+      "material": 0,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L3/PBWA_W3_Windows.PBWA_W3_Windows_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L3/PBW_W3_Windows.PBW_W3_Windows"
+    },
+    {
+      "shape": "WindowSide",
+      "material": 0,
+      "tier": 3,
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L3/PBWA_W3_WindowSide.PBWA_W3_WindowSide_C",
+      "meshPath": "/Game/Packages/PBW/Wood/L3/PBW_W3_WindowSide.PBW_W3_WindowSide"
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+name: Release
+on:
+  push:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: homebase-viewer-release-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  release:
+    if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+    runs-on: windows-2022
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      CSC_LINK: ${{ secrets.WINDOWS_CSC_LINK }}
+      CSC_KEY_PASSWORD: ${{ secrets.WINDOWS_CSC_KEY_PASSWORD }}
+      WINDOWS_PUBLISHER_NAME: ${{ vars.WINDOWS_PUBLISHER_NAME }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run check
+      - name: Bump release version
+        id: version
+        run: node scripts/release/prepare.mjs
+      - name: Build setup and update manifest
+        run: npm run release:build
+      - name: Test packaged viewer
+        env:
+          VIEWER_EXE: ${{ github.workspace }}/artifacts/releases/${{ steps.version.outputs.version }}/win-unpacked/Homebase Viewer.exe
+        run: npm run test:smoke
+      - name: Publish verified release
+        run: node scripts/release/publish.mjs
+      - name: Keep build verification
+        if: success()
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+        with:
+          name: release-verification-${{ steps.version.outputs.version }}
+          path: artifacts/releases/${{ steps.version.outputs.version }}/build-verification.json
+          retention-days: 14

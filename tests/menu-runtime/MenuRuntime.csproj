@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AssemblyName>STW.Payload.Checks</AssemblyName>
+    <RdwSource>$(MSBuildThisFileDirectory)..\..\..\RDW-source</RdwSource>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="$(RdwSource)/src/STW.Menu/STW.Menu.csproj" />
+    <Compile Include="$(RdwSource)/tests/STW.Payload.Checks/KeybindChecks.cs" Link="KeybindChecks.cs" />
+    <Compile Include="$(RdwSource)/src/STW.Installer/Storage/HomebaseSaveFile.cs" Link="HomebaseSaveFile.cs" />
+  </ItemGroup>
+</Project>

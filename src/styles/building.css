@@ -1,0 +1,128 @@
+#cameraView {
+  border: 0;
+  background: transparent;
+  color: var(--md-sys-color-on-surface);
+  font-size: 12px;
+  padding: 8px 4px;
+  width: 110px;
+  outline-offset: 0;
+}
+.build-panel {
+  width: 340px;
+}
+.piece-choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+}
+.piece-choices md-text-button {
+  --md-text-button-container-height: 34px;
+  --md-text-button-leading-space: 10px;
+  --md-text-button-trailing-space: 10px;
+}
+.build-height {
+  margin: 12px 0 8px;
+}
+.build-height select {
+  max-width: 180px;
+}
+.piece-edit-panel {
+  width: 340px;
+}
+#pieceEditGrid {
+  display: grid;
+  grid-template-columns: repeat(var(--edit-columns, 3), 1fr);
+  grid-template-rows: repeat(var(--edit-columns, 3), 1fr);
+  gap: 5px;
+  aspect-ratio: 4/3;
+  touch-action: none;
+  user-select: none;
+}
+#pieceEditGrid[data-kind='floor'],
+#pieceEditGrid[data-kind='roof'],
+#pieceEditGrid[data-kind='stair'] {
+  aspect-ratio: 1.25;
+}
+#pieceEditGrid button {
+  border: 1px solid var(--md-sys-color-outline-variant);
+  border-radius: 5px;
+  background: var(--md-sys-color-surface-container-high);
+  color: var(--md-sys-color-on-surface-variant);
+  font-size: 24px;
+  cursor: crosshair;
+  touch-action: none;
+  user-select: none;
+}
+#pieceEditGrid button.kept {
+  background: var(--md-sys-color-primary-container);
+  border-color: var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-primary-container);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--md-sys-color-primary) 30%, transparent);
+}
+#pieceEditGrid button:hover:not(:disabled) {
+  outline: 2px solid var(--md-sys-color-primary);
+  outline-offset: -3px;
+}
+#pieceEditGrid button:disabled {
+  opacity: 1;
+  cursor: default;
+}
+.edit-grid-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 10px 0;
+}
+.edit-grid-actions button,
+#pieceEditPresets button {
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--md-sys-color-primary);
+  font: inherit;
+  font-size: 12px;
+  padding: 8px 10px;
+}
+.edit-grid-actions button:hover,
+#pieceEditPresets button:hover,
+#pieceEditPresets button[aria-pressed='true'] {
+  background: var(--md-sys-color-secondary-container);
+  color: var(--md-sys-color-on-secondary-container);
+}
+#pieceEditPresets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 8px 0;
+}
+.edit-confirm {
+  position: sticky;
+  bottom: -20px;
+  background: var(--md-sys-color-surface-container-low);
+  padding: 12px 0;
+  margin-bottom: 0;
+  justify-content: flex-end;
+}
+@media (max-height: 740px) {
+  .build-panel .piece-preview {
+    height: 75px;
+  }
+  .piece-edit-panel {
+    width: 310px;
+  }
+  #pieceEditGrid {
+    max-height: 150px;
+    aspect-ratio: auto;
+    min-height: 130px;
+  }
+  .piece-edit-panel .muted {
+    margin: 4px 0 10px;
+  }
+  .edit-grid-actions {
+    margin: 5px 0;
+    gap: 0;
+  }
+  .edit-grid-actions button {
+    padding: 6px 8px;
+  }
+}

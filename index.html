@@ -1,0 +1,693 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data:; connect-src 'self' blob:; worker-src 'self' blob:; object-src 'none'; base-uri 'self'"
+    />
+    <title>Homebase Viewer</title>
+  </head>
+  <body>
+    <header class="app-bar">
+      <div class="brand"><span class="brand-mark">H</span><strong>Homebase</strong></div>
+      <div id="filename" class="filename"></div>
+      <md-text-button id="newBlueprint" disabled>New blueprint</md-text-button>
+      <md-text-button id="saveDraft" disabled>Save draft</md-text-button>
+      <md-filled-tonal-button id="open"
+        ><i slot="icon" class="ph ph-folder-open" aria-hidden="true"></i>Open
+        homebases</md-filled-tonal-button
+      >
+      <div class="export-split" role="group" aria-label="Export blueprint">
+        <md-filled-button id="exportSave" disabled
+          ><i slot="icon" class="ph ph-export" aria-hidden="true"></i>Export .sav</md-filled-button
+        ><md-filled-button
+          id="exportOptions"
+          disabled
+          aria-label="Export formats"
+          aria-controls="exportMenu"
+          aria-haspopup="menu"
+          aria-expanded="false"
+          ><i class="ph ph-caret-down" aria-hidden="true"></i
+        ></md-filled-button>
+        <md-menu
+          id="exportMenu"
+          anchor="exportOptions"
+          anchor-corner="end-end"
+          menu-corner="start-end"
+          positioning="fixed"
+          y-offset="8"
+          aria-label="Export format"
+        >
+          <md-menu-item id="exportMenuSav"
+            ><i slot="start" class="ph ph-floppy-disk" aria-hidden="true"></i>
+            <div slot="headline">Menu save</div>
+            <span slot="end">.sav</span></md-menu-item
+          >
+          <md-menu-item id="exportMenuJson"
+            ><i slot="start" class="ph ph-file-code" aria-hidden="true"></i>
+            <div slot="headline">JSON</div>
+            <span slot="end">.json</span></md-menu-item
+          >
+        </md-menu>
+      </div>
+      <md-icon-button
+        id="accountOpen"
+        aria-label="Import from Epic account"
+        title="Import from Epic account"
+        ><i class="ph ph-cloud-arrow-down" aria-hidden="true"></i></md-icon-button
+      ><md-icon-button id="theme" aria-label="Change color theme" title="Color theme: system"
+        ><i class="ph ph-circle-half" aria-hidden="true"></i
+      ></md-icon-button>
+      <md-icon-button
+        id="updatesOpen"
+        aria-label="App updates"
+        title="App updates"
+        aria-expanded="false"
+        aria-controls="updatesPanel"
+        ><i class="ph ph-arrow-circle-up" aria-hidden="true"></i
+      ></md-icon-button>
+      <input id="file" type="file" accept=".sav,.asv,.json" multiple hidden />
+    </header>
+    <section id="updatesPanel" class="surface" aria-label="App updates" hidden>
+      <div class="panel-heading">
+        <h2>Updates</h2>
+        <md-icon-button id="updatesClose" aria-label="Close updates"
+          ><i class="ph ph-x" aria-hidden="true"></i
+        ></md-icon-button>
+      </div>
+      <p id="updatesVersion"></p>
+      <p id="updatesStatus" role="status"></p>
+      <progress id="updatesProgress" max="100" aria-label="Update download" hidden></progress>
+      <div class="button-row">
+        <md-text-button id="updatesCheck">Check for updates</md-text-button
+        ><md-filled-button id="updatesRestart" hidden>Restart &amp; update</md-filled-button>
+      </div>
+    </section>
+    <nav id="documents" aria-label="Open homebases"></nav>
+    <main>
+      <section id="viewport" aria-label="Interactive homebase scene">
+        <div id="welcome">
+          <div class="welcome-copy">
+            <h1>Open a homebase</h1>
+            <md-filled-button id="choose"
+              ><i slot="icon" class="ph ph-folder-open" aria-hidden="true"></i>Choose a
+              save</md-filled-button
+            ><md-text-button id="welcomeAccount">Import from Epic account</md-text-button
+            ><span class="local-note">.sav · .asv · .json</span>
+          </div>
+          <div class="welcome-model">
+            <img
+              id="welcomeModel"
+              alt="A metal floor and wall from the viewer's building library"
+            />
+          </div>
+        </div>
+        <div id="tools" hidden>
+          <div class="view-controls surface">
+            <div class="mode-group" aria-label="Camera mode">
+              <md-text-button id="orbit" class="active">Orbit</md-text-button
+              ><md-text-button id="walk">Walk</md-text-button
+              ><md-text-button id="fly">Fly</md-text-button>
+            </div>
+            <select id="cameraView" aria-label="Camera angle" title="Camera angle">
+              <option value="perspective">View</option>
+              <option value="top">Top</option>
+              <option value="bottom">Underneath</option>
+              <option value="front">Front</option>
+              <option value="back">Back</option>
+              <option value="left">Left</option>
+              <option value="right">Right</option></select
+            ><md-icon-button id="reset" aria-label="Frame base" title="Frame base"
+              ><i class="ph ph-corners-out" aria-hidden="true"></i></md-icon-button
+            ><md-icon-button
+              id="respawn"
+              aria-label="Walk from map spawn"
+              title="Walk from map spawn"
+              ><i class="ph ph-map-pin" aria-hidden="true"></i
+            ></md-icon-button>
+          </div>
+          <div class="scene-summary surface">
+            <span id="zone">Homebase</span
+            ><span class="scene-counts"
+              ><b id="structures">0</b> builds <b id="traps">0</b> traps</span
+            ><md-icon-button id="sceneToggle" aria-label="Scene settings" title="Scene settings"
+              ><i class="ph ph-sliders-horizontal" aria-hidden="true"></i
+            ></md-icon-button>
+          </div>
+          <div class="tool-dock surface" aria-label="Editing tools">
+            <md-text-button id="requirementsButton" title="Materials, trap quantities and filters"
+              ><i slot="icon" class="ph ph-list-checks" aria-hidden="true"></i
+              >Requirements</md-text-button
+            ><span class="dock-divider"></span>
+            <md-text-button id="selectTool" class="active" aria-pressed="true"
+              ><i slot="icon" class="ph ph-cursor" aria-hidden="true"></i>Select</md-text-button
+            >
+            <md-text-button id="buildTool" aria-pressed="false"
+              ><i slot="icon" class="ph ph-hammer" aria-hidden="true"></i>Build</md-text-button
+            >
+            <md-text-button
+              id="boxSelect"
+              aria-pressed="false"
+              title="Drag a rectangle to select every depth"
+              ><i slot="icon" class="ph ph-selection" aria-hidden="true"></i>Box</md-text-button
+            >
+            <md-text-button id="moveTraps" disabled title="Move selected traps (G)"
+              ><i slot="icon" class="ph ph-arrows-out-cardinal" aria-hidden="true"></i
+              >Move</md-text-button
+            ><span class="dock-divider"></span>
+            <md-icon-button id="copy" aria-label="Copy selection" title="Copy selection (Ctrl+C)"
+              ><i class="ph ph-copy" aria-hidden="true"></i
+            ></md-icon-button>
+            <md-icon-button id="paste" aria-label="Paste group" title="Paste group (Ctrl+V)"
+              ><i class="ph ph-clipboard" aria-hidden="true"></i
+            ></md-icon-button>
+            <span class="dock-divider"></span>
+            <md-icon-button id="undo" disabled aria-label="Undo" title="Undo (Ctrl+Z)"
+              ><i class="ph ph-arrow-u-up-left" aria-hidden="true"></i
+            ></md-icon-button>
+            <md-icon-button id="redo" disabled aria-label="Redo" title="Redo (Ctrl+Shift+Z)"
+              ><i class="ph ph-arrow-u-up-right" aria-hidden="true"></i
+            ></md-icon-button>
+          </div>
+          <md-filled-tonal-button id="exportIssuesButton" hidden
+            >Export issues</md-filled-tonal-button
+          ><md-filled-tonal-button id="selectionChip" hidden
+            ><i slot="icon" class="ph ph-bounding-box" aria-hidden="true"></i
+            ><span id="selectedCount">0</span> selected</md-filled-tonal-button
+          >
+        </div>
+        <div id="moveReadout" class="surface" role="status" hidden></div>
+        <div id="editor" hidden>
+          <section
+            id="placePanel"
+            class="floating-panel build-panel surface"
+            aria-label="Build palette"
+            hidden
+          >
+            <div class="panel-heading">
+              <h2>Build</h2>
+              <md-icon-button
+                id="closeBuild"
+                aria-label="Close build palette"
+                title="Return to selection (Esc)"
+                ><i class="ph ph-x" aria-hidden="true"></i
+              ></md-icon-button>
+            </div>
+            <div class="piece-choices" aria-label="Piece type">
+              <md-text-button id="chooseWall" aria-pressed="true">Wall</md-text-button
+              ><md-text-button id="chooseFloor" aria-pressed="false">Floor</md-text-button
+              ><md-text-button id="chooseStair" aria-pressed="false">Ramp</md-text-button
+              ><md-text-button id="chooseRoof" aria-pressed="false">Cone</md-text-button
+              ><md-text-button id="chooseTrap" aria-pressed="false">Trap</md-text-button>
+            </div>
+            <select id="pieceKind" aria-label="Piece type" hidden>
+              <option value="wall">Wall</option>
+              <option value="floor">Floor</option>
+              <option value="stair">Ramp</option>
+              <option value="roof">Cone</option>
+              <option value="trap">Trap</option>
+            </select>
+            <div class="piece-preview">
+              <img id="pieceImage" alt="Selected building piece" /><i
+                id="pieceFallback"
+                class="ph ph-cube"
+                aria-hidden="true"
+                hidden
+              ></i>
+            </div>
+            <div id="buildingFields">
+              <div class="material-choices" aria-label="Building material">
+                <md-filter-chip data-material="0" label="Wood"></md-filter-chip
+                ><md-filter-chip data-material="1" label="Brick"></md-filter-chip
+                ><md-filter-chip data-material="2" label="Metal" selected></md-filter-chip>
+              </div>
+              <select id="material" aria-label="Building material" hidden>
+                <option value="0">Wood</option>
+                <option value="1">Brick</option>
+                <option value="2" selected>Metal</option></select
+              ><label class="inline-field"
+                >Upgrade level<select id="tier">
+                  <option value="1">Level 1</option>
+                  <option value="2">Level 2</option>
+                  <option value="3" selected>Level 3</option>
+                </select></label
+              >
+            </div>
+            <md-text-button id="rotateBuild" title="Rotate build or cycle edge (R)"
+              ><i slot="icon" class="ph ph-arrow-clockwise" aria-hidden="true"></i>Rotate ·
+              R</md-text-button
+            >
+            <div id="trapFields" hidden>
+              <label class="search-field"
+                ><i class="ph ph-magnifying-glass" aria-hidden="true"></i
+                ><input
+                  id="trapSearch"
+                  type="search"
+                  placeholder="Find a trap"
+                  aria-label="Search captured traps" /></label
+              ><label class="field">Captured trap<select id="trapTemplate"></select></label>
+              <p id="trapEmpty" class="muted" hidden>No matching traps in your open saves.</p>
+              <details class="quiet-details">
+                <summary>Level and perks</summary>
+                <p id="trapInfo" class="muted"></p>
+              </details>
+              <div class="button-row">
+                <md-text-button id="rotatePiece"
+                  ><i slot="icon" class="ph ph-arrow-clockwise" aria-hidden="true"></i
+                  ><span id="rotationLabel">Rotate 0°</span></md-text-button
+                ><md-text-button id="flipPiece"
+                  ><i slot="icon" class="ph ph-flip-horizontal" aria-hidden="true"></i>Flip
+                  face</md-text-button
+                >
+              </div>
+              <label id="ceilingFlipRow" class="check-row" hidden
+                ><input id="ceilingFlip" type="checkbox" />Upside down on floor</label
+              ><label class="check-row"
+                ><input id="useOffsets" type="checkbox" />Use trap offsets<md-text-button
+                  id="editOffsets"
+                  >Edit</md-text-button
+                ></label
+              >
+            </div>
+            <label class="inline-field build-height"
+              >Attach<select id="buildHeight">
+                <option value="auto">Where I aim</option>
+                <option value="beside">Beside</option>
+                <option value="above">Above</option>
+                <option value="below">Below</option>
+              </select></label
+            >
+            <div id="placementFeedback" class="placement-feedback" role="status">
+              Point at a floor edge to place a wall.
+            </div>
+            <p class="placement-keys">
+              <kbd>1–5</kbd> pieces <kbd>R</kbd> rotate <kbd>E</kbd> edit
+            </p>
+            <details id="exactPlacement" class="quiet-details">
+              <summary>Exact placement</summary>
+              <p class="muted">Select a support first.</p>
+              <label class="field"
+                >Direction<select id="direction">
+                  <option value="north">North</option>
+                  <option value="east">East</option>
+                  <option value="south">South</option>
+                  <option value="west">West</option>
+                  <option value="above">Above</option>
+                  <option value="below">Below / wall base</option>
+                </select></label
+              >
+              <div class="two-fields">
+                <label class="field"
+                  >Trap rotation<select id="trapTurn">
+                    <option value="0">0°</option>
+                    <option value="90">90°</option>
+                    <option value="180">180°</option>
+                    <option value="270">270°</option>
+                  </select></label
+                ><label class="field"
+                  >Wall face<select id="trapSide">
+                    <option value="0">Front</option>
+                    <option value="1">Back</option>
+                  </select></label
+                >
+              </div>
+              <label class="field"
+                >Placement<select id="placementMode">
+                  <option value="standard">Standard</option>
+                  <option value="menu-offset">Menu offsets</option>
+                </select></label
+              >
+              <div class="button-row">
+                <md-text-button id="previewPlace">Preview</md-text-button
+                ><md-filled-button id="place" disabled>Place piece</md-filled-button>
+              </div>
+            </details>
+          </section>
+          <section
+            id="pieceEditPanel"
+            class="floating-panel build-panel piece-edit-panel surface"
+            aria-label="Edit building piece"
+            hidden
+          >
+            <div class="panel-heading">
+              <h2 id="pieceEditTitle">Edit piece</h2>
+              <md-icon-button id="closePieceEdit" aria-label="Close piece edit"
+                ><i class="ph ph-x" aria-hidden="true"></i
+              ></md-icon-button>
+            </div>
+            <p id="pieceEditHelp" class="muted"></p>
+            <div id="pieceEditGrid" aria-label="Edit tiles"></div>
+            <div class="edit-grid-actions">
+              <button id="resetPieceEdit" type="button">Reset · R</button
+              ><button id="rotatePieceEdit" type="button">Rotate</button
+              ><button id="mirrorPieceEdit" type="button">Mirror</button
+              ><button id="facePieceEdit" type="button">Face piece</button>
+            </div>
+            <p id="pieceEditResult" class="placement-feedback" role="status"></p>
+            <details class="quiet-details">
+              <summary>Presets</summary>
+              <div id="pieceEditPresets"></div>
+            </details>
+            <div class="button-row edit-confirm">
+              <md-text-button id="cancelPieceEdit">Cancel</md-text-button
+              ><md-filled-button id="confirmPieceEdit">Confirm · Enter</md-filled-button>
+            </div>
+          </section>
+          <section
+            id="selectionPanel"
+            class="floating-panel right-panel surface"
+            aria-label="Selection"
+            hidden
+          >
+            <div class="panel-heading">
+              <h2>Selection</h2>
+              <md-icon-button data-close-panel aria-label="Close selection"
+                ><i class="ph ph-x" aria-hidden="true"></i
+              ></md-icon-button>
+            </div>
+            <p id="selectionSummary" class="muted">Click a piece or box-select a group.</p>
+            <div class="button-row">
+              <md-text-button id="selectAll">Select all</md-text-button
+              ><md-text-button id="clearSelection">Clear</md-text-button
+              ><md-text-button id="frameSelection">Frame</md-text-button>
+            </div>
+            <div class="button-row">
+              <md-text-button id="trapsOnly">Keep traps</md-text-button
+              ><md-text-button id="structuresOnly">Keep structures</md-text-button>
+            </div>
+            <div class="button-row">
+              <md-filled-tonal-button id="editPiece" disabled>Edit piece · E</md-filled-tonal-button
+              ><md-filled-tonal-button id="selectionOffsets">Trap offsets</md-filled-tonal-button
+              ><md-text-button id="delete">Delete</md-text-button>
+            </div>
+            <p class="muted">Copy includes linked traps and supports.</p>
+            <details class="quiet-details">
+              <summary>Saved transforms</summary>
+              <p id="selectionHint" class="muted">Select a piece to inspect its position.</p>
+              <pre id="selection"></pre>
+            </details>
+          </section>
+          <section
+            id="offsetPanel"
+            class="floating-panel right-panel surface"
+            aria-label="Trap offsets"
+            hidden
+          >
+            <div class="panel-heading">
+              <h2>Trap offsets</h2>
+              <md-icon-button data-close-panel aria-label="Close offsets"
+                ><i class="ph ph-x" aria-hidden="true"></i
+              ></md-icon-button>
+            </div>
+            <div class="button-row">
+              <md-filled-tonal-button id="offsetMove">Drag XYZ</md-filled-tonal-button
+              ><md-text-button id="flipSelected">Flip ceiling traps</md-text-button>
+            </div>
+            <label class="check-row"
+              ><input id="constrainZ" type="checkbox" checked />Constrain Z (estimated)</label
+            >
+            <p class="muted">
+              Total Z from support: floor / ceiling ±472 cm; wall −345 to +720 cm.
+            </p>
+            <label class="inline-field"
+              >Drag snap<select id="moveSnap">
+                <option value="0">Free</option>
+                <option value="1">1 cm</option>
+                <option value="16">16 cm</option>
+                <option value="128">¼ tile · 128 cm</option>
+                <option value="256">½ tile · 256 cm</option>
+                <option value="512">1 tile · 512 cm</option>
+              </select></label
+            ><label class="field"
+              >Limit per edit<select id="offsetLimit">
+                <option value="placement">Placement menu · ±1,000 cm / ±180°</option>
+                <option value="free" selected>Free preview · ±2,000 cm / ±3,600°</option>
+                <option value="unrestricted">Unrestricted blueprint</option>
+              </select></label
+            >
+            <details class="quiet-details">
+              <summary>About offset limits</summary>
+              <p class="muted">
+                Per-edit limits are separate from Constrain Z. Game limits are unverified.
+              </p>
+            </details>
+            <p class="muted">World cm · angles in degrees · 512 cm = 1 tile</p>
+            <div class="number-grid">
+              <label
+                >X<input
+                  id="offsetX"
+                  type="number"
+                  value="0"
+                  min="-2000"
+                  max="2000"
+                  step="any" /></label
+              ><label
+                >Y<input
+                  id="offsetY"
+                  type="number"
+                  value="0"
+                  min="-2000"
+                  max="2000"
+                  step="any" /></label
+              ><label
+                >Z<input
+                  id="offsetZ"
+                  type="number"
+                  value="0"
+                  min="-2000"
+                  max="2000"
+                  step="any" /></label
+              ><label
+                >Pitch<input
+                  id="offsetPitch"
+                  type="number"
+                  value="0"
+                  min="-3600"
+                  max="3600"
+                  step="any" /></label
+              ><label
+                >Yaw<input
+                  id="offsetYaw"
+                  type="number"
+                  value="0"
+                  min="-3600"
+                  max="3600"
+                  step="any" /></label
+              ><label
+                >Roll<input
+                  id="offsetRoll"
+                  type="number"
+                  value="0"
+                  min="-3600"
+                  max="3600"
+                  step="any"
+              /></label>
+            </div>
+            <div class="button-row">
+              <md-text-button id="zeroOffsets">Reset values</md-text-button
+              ><md-filled-button id="applyOffsets">Apply to selection</md-filled-button>
+            </div>
+            <p id="offsetContext" class="muted">New traps: enable Use trap offsets.</p>
+          </section>
+          <section
+            id="pastePanel"
+            class="floating-panel right-panel surface"
+            aria-label="Paste a group"
+            hidden
+          >
+            <div class="panel-heading">
+              <h2>Paste a group</h2>
+              <md-icon-button data-close-panel aria-label="Close paste"
+                ><i class="ph ph-x" aria-hidden="true"></i
+              ></md-icon-button>
+            </div>
+            <p id="clipboardInfo" class="muted">Copy pieces from an open save first.</p>
+            <p class="field-label">Target position</p>
+            <div class="number-grid">
+              <label>X<input id="pasteX" type="number" value="0" step="any" /></label
+              ><label>Y<input id="pasteY" type="number" value="0" step="any" /></label
+              ><label>Z<input id="pasteZ" type="number" value="0" step="any" /></label>
+            </div>
+            <label class="inline-field"
+              >Rotate group<select id="pasteYaw">
+                <option value="0">0°</option>
+                <option value="90">90°</option>
+                <option value="180">180°</option>
+                <option value="270">270°</option>
+              </select></label
+            ><label class="check-row"
+              ><input id="pasteSnap" type="checkbox" checked />Move in whole tiles</label
+            ><md-text-button id="pasteAtSelected">Use selected piece as anchor</md-text-button>
+            <div class="button-row">
+              <md-text-button id="previewPaste">Preview</md-text-button
+              ><md-filled-button id="commitPaste" disabled>Paste group</md-filled-button>
+            </div>
+            <p id="pasteInfo" class="muted"></p>
+            <div class="button-row">
+              <md-text-button id="framePreview">Frame preview</md-text-button
+              ><md-text-button id="cancelPreview">Clear preview</md-text-button>
+            </div>
+          </section>
+        </div>
+        <section
+          id="exportIssuesPanel"
+          class="floating-panel right-panel surface"
+          aria-label="Export issues"
+          hidden
+        >
+          <div class="panel-heading">
+            <h2>Export issues</h2>
+            <md-icon-button data-close-panel aria-label="Close export issues"
+              ><i class="ph ph-x" aria-hidden="true"></i
+            ></md-icon-button>
+          </div>
+          <p id="exportIssueSummary" class="muted" role="status"></p>
+          <ul id="exportGeneralIssues" class="export-general-issues" hidden></ul>
+          <div class="button-row">
+            <md-text-button id="recheckExport">Recheck</md-text-button
+            ><md-filled-button id="retryExport">Retry export</md-filled-button>
+          </div>
+          <ul
+            id="exportIssueList"
+            class="export-issue-list"
+            aria-label="Pieces with export errors"
+          ></ul>
+          <div class="button-row">
+            <md-filled-tonal-button id="issueSelectionTools" disabled
+              >Selection tools</md-filled-tonal-button
+            ><md-text-button id="clearExportIssues">Clear highlights</md-text-button>
+          </div>
+        </section>
+        <section
+          id="scenePanel"
+          class="floating-panel right-panel surface"
+          aria-label="Scene settings"
+          hidden
+        >
+          <div class="panel-heading">
+            <h2>Scene</h2>
+            <md-icon-button data-close-panel aria-label="Close scene settings"
+              ><i class="ph ph-x" aria-hidden="true"></i
+            ></md-icon-button>
+          </div>
+          <label class="check-row"
+            ><input type="checkbox" id="showBuilds" checked />Structures</label
+          ><label class="check-row"><input type="checkbox" id="showTraps" checked />Traps</label
+          ><label class="check-row"><input type="checkbox" id="showTerrain" checked />Terrain</label
+          ><label class="check-row"
+            ><input type="checkbox" id="showScenery" />Trees and scenery</label
+          ><label class="check-row"
+            ><input type="checkbox" id="showMissing" checked />Missing mesh markers</label
+          >
+          <details class="quiet-details">
+            <summary>Placement fidelity</summary>
+            <p id="fidelity" class="muted">Saved positions, rotations and scales are preserved.</p>
+            <md-text-button id="report" disabled>Save fidelity report</md-text-button>
+            <p class="muted">In-game placement may differ.</p>
+          </details>
+          <p class="attribution">
+            Viewer extracted from Penny Launcher.<br />GPL-3.0 · Penny / Aerial contributors
+          </p>
+        </section>
+        <section
+          id="accountPanel"
+          class="floating-panel right-panel surface account-panel"
+          aria-label="Epic homebase import"
+          hidden
+        >
+          <div class="panel-heading">
+            <h2>Homebases</h2>
+            <md-icon-button id="accountClose" aria-label="Close account import"
+              ><i class="ph ph-x" aria-hidden="true"></i
+            ></md-icon-button>
+          </div>
+          <p id="accountStatus" class="muted"></p>
+          <div id="accountError" class="account-error" role="alert" hidden></div>
+          <div class="button-row">
+            <md-filled-button id="epicLogin">Sign in with Epic</md-filled-button
+            ><md-text-button id="epicCancel" hidden>Cancel sign-in</md-text-button
+            ><md-text-button id="epicRefresh" hidden>Refresh</md-text-button>
+          </div>
+          <p id="epicCode" class="muted" hidden></p>
+          <md-text-button id="epicReopen" hidden>Continue in browser</md-text-button>
+          <p id="cloudActivity" class="muted" role="status"></p>
+          <div id="cloudZones"></div>
+          <section id="localCloudImport" hidden>
+            <h3>Open cloud archive</h3>
+            <p id="localCloudName" class="muted"></p>
+            <label class="field"
+              >Homebase zone<select id="localCloudZone">
+                <option value="">Choose a zone</option>
+                <option value="pve_01">Stonewood</option>
+                <option value="pve_02">Plankerton</option>
+                <option value="pve_03">Canny Valley</option>
+                <option value="pve_04">Twine Peaks</option>
+              </select></label
+            >
+            <div class="button-row">
+              <md-filled-button id="importLocalCloud">Import archive</md-filled-button
+              ><md-text-button id="discardLocalCloud">Discard</md-text-button>
+            </div>
+          </section>
+        </section>
+        <section
+          id="requirementsPanel"
+          class="floating-panel requirements-panel surface"
+          aria-label="Blueprint requirements"
+          hidden
+        >
+          <div class="panel-heading">
+            <h2>Requirements</h2>
+            <md-icon-button data-close-panel aria-label="Close requirements"
+              ><i class="ph ph-x" aria-hidden="true"></i
+            ></md-icon-button>
+          </div>
+          <p id="requirementsTotals" class="muted"></p>
+          <div class="material-totals">
+            <div>
+              <img src="/assets/inventory/materials/wood.png" alt="" width="64" height="64" /><span
+                >Wood</span
+              ><strong id="requiredWood">0</strong>
+            </div>
+            <div>
+              <img src="/assets/inventory/materials/stone.png" alt="" width="64" height="64" /><span
+                >Stone</span
+              ><strong id="requiredStone">0</strong>
+            </div>
+            <div>
+              <img src="/assets/inventory/materials/metal.png" alt="" width="64" height="64" /><span
+                >Metal</span
+              ><strong id="requiredMetal">0</strong>
+            </div>
+          </div>
+          <p class="requirements-caption">Whole blueprint · includes upgrades</p>
+          <p id="requirementsWarning" class="account-error" hidden></p>
+          <div class="requirements-filter-heading">
+            <h3>Traps</h3>
+            <button id="requirementsShowAll" class="requirement-action" type="button">
+              Show all
+            </button>
+          </div>
+          <label class="search-field"
+            ><i class="ph ph-magnifying-glass" aria-hidden="true"></i
+            ><input
+              id="requirementsSearch"
+              type="search"
+              placeholder="Find a trap or perk"
+              aria-label="Search requirements"
+          /></label>
+          <p id="requirementsVisible" class="requirements-caption"></p>
+          <div id="requiredTrapList"></div>
+          <p id="requirementsEmpty" class="muted" hidden>No traps in this blueprint.</p>
+          <p id="requirementsNoMatches" class="muted" hidden>No matching traps or perks.</p>
+        </section>
+        <div id="crosshair" hidden>+</div>
+        <div id="hint">Open a homebase to start.</div>
+        <div id="status" role="status" aria-live="polite"></div>
+      </section>
+    </main>
+    <script type="module" src="/src/app/main.ts"></script>
+  </body>
+</html>

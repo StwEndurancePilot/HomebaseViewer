@@ -1,0 +1,12 @@
+node_modules/
+artifacts/
+dist/
+assets/
+notices/
+**/bin/
+**/obj/
+src/data/*.json
+src/cloud/*.json
+src/penny/outpost-zones/
+package-lock.json
+LICENSE

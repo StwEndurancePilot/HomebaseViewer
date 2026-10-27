@@ -1,0 +1,12 @@
+node_modules/
+dist/
+artifacts/
+*.sav
+*.asv
+*.log
+**/bin/
+**/obj/
+.env
+.env.*
+*.pfx
+*.p12

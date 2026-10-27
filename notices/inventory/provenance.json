@@ -1,0 +1,147 @@
+{
+  "repository": "https://github.com/ahmed5939/penny-launcher",
+  "commit": "bfae5210fdf4ffa408ec2bf5eb1d34e31ca7ea4f",
+  "note": "Unmodified Fortnite inventory artwork from Penny; original art remains Epic Games property.",
+  "files": [
+    {
+      "file": "materials/metal.png",
+      "source": "assets/images/resources/metalitemdata.png",
+      "sha256": "d94277c7d9999c8242efc81212e5a8aed97f03e169cf0aacd828df5975398025"
+    },
+    {
+      "file": "materials/stone.png",
+      "source": "assets/images/resources/stoneitemdata.png",
+      "sha256": "18a989944c233862a4b0b1f5f50ef05afc39cd5b1ceca288896ffe608d854e19"
+    },
+    {
+      "file": "materials/wood.png",
+      "source": "assets/images/resources/wooditemdata.png",
+      "sha256": "404d5799db2ba165a07365b51e23bf1dd1a221e6d8a697b8097bd3a45ecbbe60"
+    },
+    {
+      "file": "traps/ceiling_electric_aoe.png",
+      "source": "assets/images/traps/ceiling_electric_aoe.png",
+      "sha256": "95ed2c0548cc33e56249c1772fa700f5af0549231a4133748f2d5bc05bc1aedd"
+    },
+    {
+      "file": "traps/ceiling_electric_single.png",
+      "source": "assets/images/traps/ceiling_electric_single.png",
+      "sha256": "56453355dac0515de11a7c475bd8aba835e015830f6376e6efc6ea05b35e00bf"
+    },
+    {
+      "file": "traps/ceiling_falling.png",
+      "source": "assets/images/traps/ceiling_falling.png",
+      "sha256": "0bc4aa6769833ef6bddec50d3b52c917514aa74cb3415c5ec04bccadfdd3afe9"
+    },
+    {
+      "file": "traps/ceiling_gas.png",
+      "source": "assets/images/traps/ceiling_gas.png",
+      "sha256": "b8bf3b407699c9aaae32f86993ea21dfe5d501d427feb3ee103918e2c50aa419"
+    },
+    {
+      "file": "traps/floor_campfire.png",
+      "source": "assets/images/traps/floor_campfire.png",
+      "sha256": "e82c6345fb392451095a72c9c62d0ffef94b3dc74b0ce2d46c7e64170ce9dd0e"
+    },
+    {
+      "file": "traps/floor_defender.png",
+      "source": "assets/images/traps/floor_defender.png",
+      "sha256": "fc39787447c013de2822808885595fdd5e69bfc14d95bb4315da7815bf634850"
+    },
+    {
+      "file": "traps/floor_flamegrill.png",
+      "source": "assets/images/traps/floor_flamegrill.png",
+      "sha256": "ee6e44adf9884d3dd44248478ada59572894176158c879bd3f6eda28eba676e6"
+    },
+    {
+      "file": "traps/floor_freeze.png",
+      "source": "assets/images/traps/floor_freeze.png",
+      "sha256": "1e65c4881e2ead1f35b57d42e381a5b9838eaea3c91aaf016e9e83a757eaca22"
+    },
+    {
+      "file": "traps/floor_health.png",
+      "source": "assets/images/traps/floor_health.png",
+      "sha256": "93cd4ad049b16cc8538e9cadd3611ec88b53e693c8ed7815dcfb20114f38a69a"
+    },
+    {
+      "file": "traps/floor_hoverboard_speed.png",
+      "source": "assets/images/traps/floor_hoverboard_speed.png",
+      "sha256": "b80361a693ab488f42b0bcb93f3e1350c445dcb433c8ed627343475a3e9e353e"
+    },
+    {
+      "file": "traps/floor_launcher.png",
+      "source": "assets/images/traps/floor_launcher.png",
+      "sha256": "ec8424e06cedb422201903b1706d04e9465968a0fe4cb207a2a835eb6ae5583a"
+    },
+    {
+      "file": "traps/floor_player_jump_pad.png",
+      "source": "assets/images/traps/floor_player_jump_pad.png",
+      "sha256": "b3fb3ca20b96c666c503f86c6241018e535cd67b23037aec98d91fad83842f20"
+    },
+    {
+      "file": "traps/floor_player_jump_pad_free_direction.png",
+      "source": "assets/images/traps/floor_player_jump_pad_free_direction.png",
+      "sha256": "e3facf6b5474d4543dc7709fa0678f22eba08ffe6d572ce0795e0e625ef7e09b"
+    },
+    {
+      "file": "traps/floor_spikes.png",
+      "source": "assets/images/traps/floor_spikes.png",
+      "sha256": "e829410f67f6f0d078417bf1fb1ed0d7d1f0af3e4012a49baa5f1515e505400f"
+    },
+    {
+      "file": "traps/floor_spikes_wood.png",
+      "source": "assets/images/traps/floor_spikes_wood.png",
+      "sha256": "2b5f85a59eb061e1351434381cb16ebbe168ae48ff9acd579bb6ea3ae348cbd3"
+    },
+    {
+      "file": "traps/floor_tar.png",
+      "source": "assets/images/traps/floor_tar.png",
+      "sha256": "078e97e2633ce264d77c65d1a0e7d668c154843d4991d66ba1210c482c580e96"
+    },
+    {
+      "file": "traps/floor_ward.png",
+      "source": "assets/images/traps/floor_ward.png",
+      "sha256": "e9945469ab3589f0e1bee4ffc9f99be6e9ddf4e3befa704e68d854fb175bde65"
+    },
+    {
+      "file": "traps/wall_cannons.png",
+      "source": "assets/images/traps/wall_cannons.png",
+      "sha256": "0be38f98df90883d296dc018f84b63946d3ab4249f7a5ef7f25ceefe3a61b211"
+    },
+    {
+      "file": "traps/wall_darts.png",
+      "source": "assets/images/traps/wall_darts.png",
+      "sha256": "ea5aff0d7711993d44b707fae5a577687a99ca440319d7caa1fe007c5fb5a466"
+    },
+    {
+      "file": "traps/wall_electric.png",
+      "source": "assets/images/traps/wall_electric.png",
+      "sha256": "29c1e1503aa9200e4ede6275998bb11095e62b1ac69bc61babf7fffe452f443c"
+    },
+    {
+      "file": "traps/wall_launcher.png",
+      "source": "assets/images/traps/wall_launcher.png",
+      "sha256": "52c660b4f711919d157d14a6febcd571094806c4ef6189a89602a865ce35e0e4"
+    },
+    {
+      "file": "traps/wall_light.png",
+      "source": "assets/images/traps/wall_light.png",
+      "sha256": "797b173c2c32c7c67b0833ca4f6a5134bb7afb580daa84a036f79e8e9900c8d8"
+    },
+    {
+      "file": "traps/wall_mechstructor.png",
+      "source": "assets/images/traps/wall_mechstructor.png",
+      "sha256": "09c344875c2cbd90bb7c3e53f7d1390dde582b1f1c2fa5cd80e4a5aff7e7a4ea"
+    },
+    {
+      "file": "traps/wall_speaker.png",
+      "source": "assets/images/traps/wall_speaker.png",
+      "sha256": "7a5e9f4d7530c0d71a7a258b4d7da804d9963b54683492d4c70a5f563db3685e"
+    },
+    {
+      "file": "traps/wall_wood_spikes.png",
+      "source": "assets/images/traps/wall_wood_spikes.png",
+      "sha256": "23a80963866e091ddbedee151a7f7f55605ae41b66e4fd9e9106d4cf14b6e2fd"
+    }
+  ]
+}

@@ -1,0 +1,55 @@
+{
+  "name": "homebase-viewer",
+  "productName": "Homebase Viewer",
+  "version": "1.7.0",
+  "private": true,
+  "license": "GPL-3.0",
+  "type": "module",
+  "main": "electron/main.cjs",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "tsc --noEmit && vite build",
+    "test": "vitest run",
+    "start": "electron .",
+    "package": "npm run build && node scripts/build/package.mjs",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "check:structure": "node scripts/checks/source-structure.mjs",
+    "check": "npm run format:check && npm run check:structure && tsc --noEmit && npm test",
+    "test:smoke": "node tests/smoke/export-formats-smoke.mjs && node tests/smoke/building-smoke.mjs && node tests/smoke/requirements-smoke.mjs && node tests/smoke/updater-smoke.mjs",
+    "setup": "npm run build && node scripts/build/setup.mjs",
+    "release:build": "npm run build && node scripts/build/setup.mjs --release"
+  },
+  "dependencies": {
+    "electron-updater": "6.8.11"
+  },
+  "devDependencies": {
+    "@electron/asar": "4.3.1",
+    "@electron/packager": "20.3.0",
+    "@fontsource-variable/roboto": "^5.3.0",
+    "@material/material-color-utilities": "^0.4.0",
+    "@material/web": "^2.5.0",
+    "@phosphor-icons/web": "^2.1.2",
+    "@types/node": "^22.0.0",
+    "@types/three": "0.162.0",
+    "electron": "44.9.3",
+    "electron-builder": "26.18.0",
+    "esbuild": "0.28.2",
+    "playwright": "^1.58.0",
+    "prettier": "3.6.2",
+    "three": "0.162.0",
+    "typescript": "5.9.3",
+    "vite": "7.3.7",
+    "vitest": "4.1.12",
+    "yaml": "2.9.1"
+  },
+  "engines": {
+    "node": "^22.12.0 || >=24.0.0"
+  },
+  "description": "Fortnite STW homebase viewer and blueprint editor",
+  "author": "Homebase Viewer contributors",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/StwEndurancePilot/HomebaseViewer.git"
+  }
+}
