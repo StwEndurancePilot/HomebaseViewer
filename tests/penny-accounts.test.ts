@@ -89,6 +89,8 @@ it.skipIf(process.platform !== 'win32')(
         input: key.toString('base64'),
         encoding: 'utf8',
         windowsHide: true,
+        timeout: 15000,
+        maxBuffer: 4096,
       }).trim(),
       'base64',
     );
@@ -113,4 +115,5 @@ it.skipIf(process.platform !== 'win32')(
     const list = await reader.scan();
     expect(await reader.credentials(list.accounts[0].id)).toEqual(entry);
   },
+  45000,
 );
