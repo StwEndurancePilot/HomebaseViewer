@@ -10,10 +10,10 @@ export type EditPattern = {
 };
 export const EDIT_PATTERNS = catalog.patterns as EditPattern[];
 const definitions = new Map(catalog.definitions.map((d) => [d.classPath.toLowerCase(), d]));
+export const buildDefinitionForClass = (classPath: string) =>
+  definitions.get(classPath.toLowerCase().replace(/^\/savetheworld\//, '/game/'));
 export const buildDefinition = (p: Placement) =>
-  p.kind === 'structure'
-    ? definitions.get(p.classPath.toLowerCase().replace(/^\/savetheworld\//, '/game/'))
-    : undefined;
+  p.kind === 'structure' ? buildDefinitionForClass(p.classPath) : undefined;
 export const patternOf = (p: Placement) =>
   EDIT_PATTERNS.find((v) => v.id === buildDefinition(p)?.shape);
 export const structureKind = (p: Placement): BuildKind | undefined => patternOf(p)?.kind;

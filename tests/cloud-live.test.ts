@@ -2,7 +2,7 @@ import { it, expect } from 'vitest';
 import { existsSync, readFileSync } from 'node:fs';
 import { convertCloudSave } from '../src/cloud/convert';
 import { attachment, exportDiagnostics } from '../src/core/editor';
-for (const suffix of ['', '-1']) {
+for (const suffix of ['', '-1', '-3']) {
   const file = `artifacts/validation/live-cloud-supports${suffix}.bin`;
   it.skipIf(!existsSync(file))(
     `links every trap in local read-only Epic fixture ${suffix || '0'} without altering poses`,

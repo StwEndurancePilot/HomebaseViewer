@@ -2,6 +2,7 @@ import { ArchiveReader } from './archive-reader';
 import { Quaternion, Vector3 } from 'three';
 import type { Capture, Placement, Pose } from '../core/save';
 import { relativePose } from '../core/editor';
+import { buildDefinitionForClass, EDIT_PATTERNS } from '../core/build-pieces';
 import catalogData from './catalog.json';
 import container from './menu-container.json';
 type ClassInfo = {
@@ -154,6 +155,44 @@ function canonicalPath(path: string) {
 const canonicalClasses = new Map(
   Object.entries(catalog.classes).map(([key, info]) => [canonicalPath(key).toLowerCase(), info]),
 );
+const missingMeshIssue =
+  'No verified primary-mesh mapping for this cloud class. Import its equivalent from a menu capture.';
+function classInfo(classPath: string, mirrored: boolean): ClassInfo | undefined {
+  const key = canonicalPath(classPath).toLowerCase() + '|' + mirrored;
+  const observed = catalog.classes[key] ?? canonicalClasses.get(key);
+  if (observed) return observed;
+  const def = buildDefinitionForClass(classPath);
+  const kind = EDIT_PATTERNS.find((p) => p.id === def?.shape)?.kind;
+  if (!def || !kind) return undefined;
+  return {
+    classPath: def.classPath,
+    meshPath: def.meshPath,
+    meshRelative: identity,
+    attachmentType: 9,
+    buildingType: { wall: 0, floor: 1, stair: 5, roof: 6 }[kind],
+    resourceType: def.material,
+    level: def.tier - 1,
+    variants: 1,
+  };
+}
+export function repairCloudMeshMappings(data: Capture): number {
+  let changed = 0;
+  for (const p of data.placements) {
+    if (!p.cloudImport || p.meshPath || !Array.isArray(p.cloudIssues)) continue;
+    if (!p.cloudIssues.includes(missingMeshIssue)) continue;
+    const info = classInfo(p.classPath, Boolean(p.mirrored));
+    if (!info) continue;
+    p.meshPath = info.meshPath;
+    p.meshTransform = compose(info.meshRelative, p.transform);
+    p.resourceType = info.resourceType;
+    p.level = info.level;
+    p.buildingType = info.buildingType;
+    p.attachmentType = info.attachmentType;
+    p.cloudIssues = p.cloudIssues.filter((issue) => issue !== missingMeshIssue);
+    changed++;
+  }
+  return changed;
+}
 function assetString(r: ArchiveReader, start: number, end: number, prefix: string): string | null {
   const matches = [
     ...r.text.slice(start, end).matchAll(/\/(?:Game|SaveTheWorld)\/[A-Za-z0-9_/]+\.[A-Za-z0-9_]+/g),
@@ -222,15 +261,11 @@ export function convertCloudSave(bytes: Uint8Array, zoneId: string, filename: st
     const { start, end } = record,
       mirror = r.property('bMirrored', start, end)?.bool ?? false,
       classPath = canonicalPath(record.classPath),
-      key = classPath.toLowerCase() + '|' + mirror,
-      info = catalog.classes[key] ?? canonicalClasses.get(key);
+      info = classInfo(classPath, mirror);
     const kind = classPath.includes('/Items/Traps/') ? 'trap' : 'structure',
       issues = [...record.issues];
-    if (!info)
-      issues.push(
-        'No verified primary-mesh mapping for this cloud class. Import its equivalent from a menu capture.',
-      );
-    if (info?.variants > 1)
+    if (!info) issues.push(missingMeshIssue);
+    if (info && info.variants > 1)
       warnings.add(
         'Some classes have multiple observed component variants; the most common captured class default is used for the preview.',
       );
@@ -400,7 +435,7 @@ export function convertCloudSave(bytes: Uint8Array, zoneId: string, filename: st
       unreadableRecords: unreadable,
       warnings: [...warnings],
       meshPolicy:
-        'Observed menu class component defaults; cloud saves do not contain authoritative primary mesh transforms.',
+        'Observed menu class component defaults with verified installed-asset building definitions as fallback; cloud saves do not contain authoritative primary mesh transforms.',
     },
     cloudIssues: unreadable.length
       ? [

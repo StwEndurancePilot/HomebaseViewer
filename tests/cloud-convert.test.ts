@@ -2,7 +2,12 @@ import { it, expect } from 'vitest';
 import { deflateSync, gzipSync } from 'node:zlib';
 import { createRequire } from 'node:module';
 import { writeFileSync, mkdirSync } from 'node:fs';
-import { convertCloudSave, menuContainer, applyCloudTrapLevelFallback } from '../src/cloud/convert';
+import {
+  convertCloudSave,
+  menuContainer,
+  applyCloudTrapLevelFallback,
+  repairCloudMeshMappings,
+} from '../src/cloud/convert';
 import { exportSave } from '../src/core/export';
 import { exportDiagnostics } from '../src/core/editor';
 import { parseCapture, readSaveText } from '../src/core/save';
@@ -335,4 +340,91 @@ it('matches verified legacy /Game trap classes with current /SaveTheWorld aliase
   );
   expect(data.placements[1].meshPath).not.toBe('');
   expect(data.placements[1].cloudIssues).toEqual([]);
+});
+
+it('imports verified roof and wall edits missing from menu observations without losing poses', () => {
+  const shapes = [
+    ['RoofI', 'RoofI', 6],
+    ['ArchwayLargeSupport', 'ArchwayLGSupport', 0],
+    ['QuarterWallHalf', 'QuarterWallHalf', 0],
+  ] as const;
+  for (const [shape, mesh, buildingType] of shapes) {
+    for (const mirrored of [false, true]) {
+      const path = floor.replaceAll('Floor_2', shape);
+      const data = convertCloudSave(
+        cat(
+          Buffer.from('SavedActors'),
+          actor({
+            path,
+            rotation: [0, 0, Math.SQRT1_2, Math.SQRT1_2],
+            scale: [mirrored ? -1 : 1, 1, 1],
+            body: cat(
+              currentProperty(
+                'bMirrored',
+                typeName('BoolProperty'),
+                Buffer.alloc(0),
+                mirrored ? 16 : 0,
+              ),
+              string('None'),
+            ),
+          }),
+        ),
+        'pve_04',
+        'edits.sav',
+      );
+      const p = data.placements[0];
+      expect(p.meshPath).toBe(`/Game/Packages/PBW/Metal/L3/PBW_M3_${mesh}.PBW_M3_${mesh}`);
+      expect(p).toMatchObject({ resourceType: 2, level: 2, buildingType, mirrored });
+      expect(p.meshTransform).toEqual(p.transform);
+      expect(exportDiagnostics(data)).toEqual([]);
+      const roundtrip = parseCapture(exportSave(menuContainer(), data)).placements[0];
+      expect(roundtrip.meshTransform).toEqual(p.meshTransform);
+      expect(roundtrip.transform).toEqual(p.transform);
+    }
+  }
+});
+
+it('repairs old missing-mesh cloud drafts without hiding unrelated errors or changing actor poses', () => {
+  const data = convertCloudSave(
+    cat(Buffer.from('SavedActors'), actor({ path: floor.replaceAll('Floor_2', 'RoofI') })),
+    'pve_04',
+    'old.sav',
+  );
+  const p = data.placements[0],
+    original = structuredClone(p);
+  p.meshPath = '';
+  p.resourceType = 6;
+  p.level = 0;
+  p.buildingType = 10;
+  p.cloudIssues = [
+    'No verified primary-mesh mapping for this cloud class. Import its equivalent from a menu capture.',
+    'Unrelated issue',
+  ];
+  expect(repairCloudMeshMappings(data)).toBe(1);
+  expect(p.meshPath).toBe(original.meshPath);
+  expect(p.transform).toEqual(original.transform);
+  expect(p.meshTransform).toEqual(original.meshTransform);
+  expect(p).toMatchObject({
+    resourceType: 2,
+    level: 2,
+    buildingType: 6,
+    cloudIssues: ['Unrelated issue'],
+  });
+  expect(repairCloudMeshMappings(data)).toBe(0);
+  expect(exportDiagnostics(data).map((i) => i.message)).toEqual(['Unrelated issue']);
+});
+
+it('continues blocking unknown classes instead of guessing a mesh', () => {
+  const data = convertCloudSave(
+    cat(Buffer.from('SavedActors'), actor({ path: floor.replaceAll('Floor_2', 'UnknownEdit') })),
+    'pve_04',
+    'unknown.sav',
+  );
+  expect(repairCloudMeshMappings(data)).toBe(0);
+  expect(data.placements[0].meshPath).toBe('');
+  expect(exportDiagnostics(data).map((i) => i.code)).toEqual([
+    'cloud-conversion',
+    'missing-path',
+    'invalid-material',
+  ]);
 });

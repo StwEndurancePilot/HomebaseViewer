@@ -37,7 +37,11 @@ import { exportSave, exportJson } from '../core/export';
 import { meshStem } from '../core/mesh-identity';
 import { Viewer, type PlacementHit } from '../scene/viewer';
 import { setupAccountPanel } from '../ui/panels/account-panel';
-import { menuContainer, applyCloudTrapLevelFallback } from '../cloud/convert';
+import {
+  menuContainer,
+  applyCloudTrapLevelFallback,
+  repairCloudMeshMappings,
+} from '../cloud/convert';
 import { version } from '../../package.json';
 import { trapName } from '../core/requirements';
 import { RequirementsPanel, renderSelectedPerks } from '../ui/panels/requirements-panel';
@@ -392,8 +396,9 @@ async function open(files: File[]) {
               ? menuContainer()
               : null;
         const defaultedLevels = applyCloudTrapLevelFallback(data);
+        const repairedMeshes = repairCloudMeshMappings(data);
         active = new EditorDocument(file.name, data, template);
-        if (defaultedLevels) active.savedRevision = -1;
+        if (defaultedLevels || repairedMeshes) active.savedRevision = -1;
         docs.push(active);
         added = true;
       } catch (e) {
