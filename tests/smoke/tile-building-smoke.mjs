@@ -2,10 +2,19 @@ import { _electron as electron } from 'playwright';
 import path from 'node:path';
 import assert from 'node:assert/strict';
 
-const app = await electron.launch({ args: ['.', '--smoke-test'] });
+const app = await electron.launch(
+  process.env.VIEWER_EXE
+    ? { executablePath: process.env.VIEWER_EXE, args: ['--smoke-test'] }
+    : { args: ['.', '--smoke-test'] },
+);
 const page = await app.firstWindow();
 const errors = [];
 page.on('pageerror', (e) => errors.push(String(e)));
+await app.evaluate(({ BrowserWindow }) => {
+  const window = BrowserWindow.getAllWindows()[0];
+  window.show();
+  window.focus();
+});
 const settle = () => page.waitForFunction(() => !document.querySelector('#open').disabled);
 const inspect = async () => JSON.parse(await page.locator('#selection').textContent());
 const click = (id) => page.locator('#' + id).click();
@@ -110,10 +119,15 @@ try {
   );
   assert.equal(await page.locator('#place').evaluate((e) => e.disabled), true);
   assert.deepEqual(errors, []);
+  if (process.env.VIEWER_EXE) {
+    const executable = await app.evaluate(() => process.execPath);
+    assert.equal(path.resolve(executable), path.resolve(process.env.VIEWER_EXE));
+  }
   console.log(
-    'PASS: four arrow directions, undo/redo, edit-mode isolation, empty-ground floor/wall/ramp/cone placement, and trap support requirement.',
+    'PASS: four arrow directions, Page Up/Down levels, undo/redo, edit-mode isolation, empty-ground floor/wall/ramp/cone placement, and trap support requirement.',
   );
 } catch (error) {
+  await page.screenshot({ path: 'artifacts/validation/tile-building-failure.png' }).catch(() => {});
   console.error(
     await page.locator('#status').textContent(),
     await page.locator('#placementFeedback').textContent(),
