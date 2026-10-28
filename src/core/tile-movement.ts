@@ -1,7 +1,9 @@
 import type { Placement } from './save';
 import { attachment, placementConflict, relativePose, type Vec3 } from './editor';
 
-export function arrowTileDelta(key: string, sceneRight: Vec3): Vec3 | null {
+export function tileKeyDelta(key: string, sceneRight: Vec3): Vec3 | null {
+  if (key === 'PageUp') return [0, 0, 384];
+  if (key === 'PageDown') return [0, 0, -384];
   const right: Vec3 =
     Math.abs(sceneRight[2]) > Math.abs(sceneRight[0])
       ? [-Math.sign(sceneRight[2]) * 512, 0, 0]

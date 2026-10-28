@@ -279,7 +279,7 @@ export class Viewer {
       );
     else
       this.onHint(
-        'Drag orbit · Right-drag pan · Scroll zoom · Arrow keys move selection one tile · E edit',
+        'Drag orbit · Right-drag pan · Scroll zoom · Arrows move one tile · Page Up/Down move one level · E edit',
       );
   }
   frame(selection = false, preview = false) {

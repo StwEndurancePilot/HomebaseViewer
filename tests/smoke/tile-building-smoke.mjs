@@ -19,6 +19,8 @@ try {
   await page.locator('#cameraView').focus();
   await page.keyboard.press('ArrowDown');
   assert.deepEqual((await inspect()).actorTransform.translation, original);
+  await page.keyboard.press('PageUp');
+  assert.deepEqual((await inspect()).actorTransform.translation, original);
   await page.locator('#cameraView').selectOption('top');
   await page.locator('#cameraView').evaluate((e) => e.blur());
   for (const key of ['ArrowUp', 'ArrowRight', 'ArrowDown', 'ArrowLeft']) {
@@ -38,13 +40,35 @@ try {
   assert.deepEqual((await inspect()).actorTransform.translation, original);
   await page.keyboard.press('e');
   await page.keyboard.press('ArrowRight');
+  await page.keyboard.press('PageUp');
   await page.keyboard.press('Escape');
+  assert.deepEqual((await inspect()).actorTransform.translation, original);
+  await page.keyboard.press('PageUp');
+  await settle();
+  assert.deepEqual((await inspect()).actorTransform.translation, [
+    original[0],
+    original[1],
+    original[2] + 384,
+  ]);
+  await page.keyboard.press('PageDown');
+  await settle();
+  assert.deepEqual((await inspect()).actorTransform.translation, original);
+  await page.keyboard.press('Control+z');
+  await settle();
+  assert.equal((await inspect()).actorTransform.translation[2], original[2] + 384);
+  await page.keyboard.press('Control+y');
+  await settle();
   assert.deepEqual((await inspect()).actorTransform.translation, original);
 
   await click('newBlueprint');
   await settle();
   assert.equal(await page.locator('#structures').textContent(), '0');
   await page.keyboard.press('2');
+  await page.keyboard.press('PageUp');
+  assert.equal(await page.locator('#buildHeight').inputValue(), 'above');
+  await page.keyboard.press('PageDown');
+  assert.equal(await page.locator('#buildHeight').inputValue(), 'below');
+  await page.keyboard.press('Home');
   const box = await page.locator('#viewport>canvas').boundingBox();
   const centre = { x: box.x + box.width / 2, y: box.y + box.height / 2 };
   await page.mouse.move(centre.x, centre.y);

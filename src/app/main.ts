@@ -11,7 +11,7 @@ import { patternOf, editStructure, type BuildKind } from '../core/build-pieces';
 import { cycleColorTheme } from '../ui/theme';
 import { partThumbnail } from '../ui/part-thumbnail';
 import { directionAt, groundSupport, wallFaceAt } from '../core/placement-target';
-import { arrowTileDelta } from '../core/tile-movement';
+import { tileKeyDelta } from '../core/tile-movement';
 import { parseCapture, type Placement } from '../core/save';
 import {
   exportDiagnostics,
@@ -817,11 +817,11 @@ document.addEventListener('keydown', (e) => {
     !e.ctrlKey &&
     !e.metaKey &&
     !e.altKey &&
-    e.key.startsWith('Arrow')
+    (e.key.startsWith('Arrow') || e.key === 'PageUp' || e.key === 'PageDown')
   ) {
     viewer.camera.updateMatrixWorld();
     const matrix = viewer.camera.matrixWorld.elements;
-    const delta = arrowTileDelta(e.key, [matrix[0], matrix[1], matrix[2]]);
+    const delta = tileKeyDelta(e.key, [matrix[0], matrix[1], matrix[2]]);
     if (delta) {
       e.preventDefault();
       guard(async () => {

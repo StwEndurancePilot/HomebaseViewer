@@ -1,5 +1,5 @@
 import { expect, it } from 'vitest';
-import { arrowTileDelta, moveTiles } from '../src/core/tile-movement';
+import { tileKeyDelta, moveTiles } from '../src/core/tile-movement';
 import { attachment, buildingRecord, placeTrap, ZERO_OFFSETS } from '../src/core/editor';
 import { EditorDocument } from '../src/core/editor-document';
 import type { Capture, Placement } from '../src/core/save';
@@ -27,47 +27,60 @@ const documentFor = (placements: Placement[]) =>
   );
 
 it('moves one horizontal tile in camera-relative cardinal directions', () => {
-  expect(arrowTileDelta('ArrowUp', [1, 0, 0])).toEqual([512, 0, 0]);
-  expect(arrowTileDelta('ArrowDown', [1, 0, 0])).toEqual([-512, 0, 0]);
-  expect(arrowTileDelta('ArrowRight', [1, 0, 0])).toEqual([0, 512, 0]);
-  expect(arrowTileDelta('ArrowLeft', [1, 0, 0])).toEqual([0, -512, 0]);
-  expect(arrowTileDelta('ArrowUp', [0, 0, -1])).toEqual([0, -512, 0]);
-  expect(arrowTileDelta('ArrowRight', [0.4, 0, 0.9])).toEqual([-512, 0, 0]);
-  expect(arrowTileDelta('w', [1, 0, 0])).toBeNull();
+  expect(tileKeyDelta('ArrowUp', [1, 0, 0])).toEqual([512, 0, 0]);
+  expect(tileKeyDelta('ArrowDown', [1, 0, 0])).toEqual([-512, 0, 0]);
+  expect(tileKeyDelta('ArrowRight', [1, 0, 0])).toEqual([0, 512, 0]);
+  expect(tileKeyDelta('ArrowLeft', [1, 0, 0])).toEqual([0, -512, 0]);
+  expect(tileKeyDelta('ArrowUp', [0, 0, -1])).toEqual([0, -512, 0]);
+  expect(tileKeyDelta('ArrowRight', [0.4, 0, 0.9])).toEqual([-512, 0, 0]);
+  expect(tileKeyDelta('w', [1, 0, 0])).toBeNull();
+  expect(tileKeyDelta('PageUp', [1, 0, 0])).toEqual([0, 0, 384]);
+  expect(tileKeyDelta('PageDown', [0, 0, -1])).toEqual([0, 0, -384]);
 });
 
-it('moves structures with attached traps, preserving IDs, mesh offsets and undo/redo', () => {
-  const f = floor(0.125);
-  const trap = placeTrap(
-    {
-      ...floor(),
-      kind: 'trap',
-      classPath: '/Trap_Floor_Launcher',
-      itemPath: '/TID_Floor_Launcher',
-    },
-    f,
-    0,
-    0,
-    ZERO_OFFSETS,
-    'standard',
-  );
-  trap.meshTransform.translation[0] += 12;
-  const doc = documentFor([f, trap]);
-  doc.selected.add(f.actorPath);
-  doc.moveSelected([512, 0, 0]);
-  const [movedFloor, movedTrap] = doc.data.placements;
-  expect(movedFloor.transform.translation).toEqual([512.125, 0, 0]);
-  expect(movedTrap.transform.translation[0]).toBe(trap.transform.translation[0] + 512);
-  expect(movedTrap.meshTransform.translation[0]).toBe(trap.meshTransform.translation[0] + 512);
-  expect(attachment(movedTrap)?.supportTransform).toEqual(movedFloor.transform);
-  expect(attachment(movedTrap)?.relativeTransform).toEqual(attachment(trap)?.relativeTransform);
-  expect(movedTrap.actorPath).toBe(trap.actorPath);
-  expect(doc.selected).toEqual(new Set([f.actorPath]));
-  doc.undo();
-  expect(doc.data.placements).toEqual([f, trap]);
-  doc.redo();
-  expect(doc.data.placements).toEqual([movedFloor, movedTrap]);
-});
+it.each([
+  [512, 0, 0],
+  [0, 0, 384],
+  [0, 0, -384],
+] as const)(
+  'moves structures and traps by [%i, %i, %i], preserving offsets and undo/redo',
+  (x, y, z) => {
+    const f = floor(0.125);
+    const trap = placeTrap(
+      {
+        ...floor(),
+        kind: 'trap',
+        classPath: '/Trap_Floor_Launcher',
+        itemPath: '/TID_Floor_Launcher',
+      },
+      f,
+      0,
+      0,
+      ZERO_OFFSETS,
+      'standard',
+    );
+    trap.meshTransform.translation[0] += 12;
+    const doc = documentFor([f, trap]);
+    doc.selected.add(f.actorPath);
+    doc.moveSelected([x, y, z]);
+    const [movedFloor, movedTrap] = doc.data.placements;
+    expect(movedFloor.transform.translation).toEqual([0.125 + x, y, z]);
+    for (const [axis, delta] of [x, y, z].entries()) {
+      expect(movedTrap.transform.translation[axis]).toBe(trap.transform.translation[axis] + delta);
+      expect(movedTrap.meshTransform.translation[axis]).toBe(
+        trap.meshTransform.translation[axis] + delta,
+      );
+    }
+    expect(attachment(movedTrap)?.supportTransform).toEqual(movedFloor.transform);
+    expect(attachment(movedTrap)?.relativeTransform).toEqual(attachment(trap)?.relativeTransform);
+    expect(movedTrap.actorPath).toBe(trap.actorPath);
+    expect(doc.selected).toEqual(new Set([f.actorPath]));
+    doc.undo();
+    expect(doc.data.placements).toEqual([f, trap]);
+    doc.redo();
+    expect(doc.data.placements).toEqual([movedFloor, movedTrap]);
+  },
+);
 
 it('moves an adjacent selection atomically and rejects collisions without changing history', () => {
   const a = floor(),
