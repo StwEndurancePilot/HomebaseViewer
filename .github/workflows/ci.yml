@@ -18,3 +18,11 @@ jobs:
       - run: npm run check
       - run: npm run build
       - run: npm run test:smoke
+      - name: Keep failure screenshots
+        if: failure()
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+        with:
+          name: check-failure-screenshots
+          path: artifacts/validation/*failure.png
+          if-no-files-found: ignore
+          retention-days: 14

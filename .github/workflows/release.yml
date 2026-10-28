@@ -39,6 +39,14 @@ jobs:
         run: npm run test:smoke
       - name: Publish verified release
         run: node scripts/release/publish.mjs
+      - name: Keep failure screenshots
+        if: failure()
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+        with:
+          name: release-failure-screenshots
+          path: artifacts/validation/*failure.png
+          if-no-files-found: ignore
+          retention-days: 14
       - name: Keep build verification
         if: success()
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f

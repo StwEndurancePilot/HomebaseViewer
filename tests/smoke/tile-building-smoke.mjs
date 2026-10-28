@@ -12,12 +12,27 @@ const errors = [];
 page.on('pageerror', (e) => errors.push(String(e)));
 await app.evaluate(({ BrowserWindow }) => {
   const window = BrowserWindow.getAllWindows()[0];
+  window.setSize(1024, 768);
   window.show();
   window.focus();
 });
 const settle = () => page.waitForFunction(() => !document.querySelector('#open').disabled);
 const inspect = async () => JSON.parse(await page.locator('#selection').textContent());
 const click = (id) => page.locator('#' + id).click();
+async function canvasPoint(xFraction, yFraction) {
+  const point = await page.locator('#viewport>canvas').evaluate(
+    (canvas, [xFraction, yFraction]) => {
+      const box = canvas.getBoundingClientRect();
+      const x = box.left + box.width * xFraction;
+      const y = box.top + box.height * yFraction;
+      const target = document.elementFromPoint(x, y);
+      return { x, y, exposed: target === canvas, target: target?.id || target?.tagName };
+    },
+    [xFraction, yFraction],
+  );
+  assert.ok(point.exposed, `Scene point (${point.x}, ${point.y}) is covered by ${point.target}`);
+  return point;
+}
 try {
   await page.locator('#file').setInputFiles(path.resolve('artifacts/validation/build-floor.sav'));
   await settle();
@@ -78,8 +93,7 @@ try {
   await page.keyboard.press('PageDown');
   assert.equal(await page.locator('#buildHeight').inputValue(), 'below');
   await page.keyboard.press('Home');
-  const box = await page.locator('#viewport>canvas').boundingBox();
-  const centre = { x: box.x + box.width / 2, y: box.y + box.height / 2 };
+  const centre = await canvasPoint(0.5, 0.5);
   await page.mouse.move(centre.x, centre.y);
   await page.waitForFunction(
     () =>
@@ -90,20 +104,21 @@ try {
   assert.equal(await page.locator('#structures').textContent(), '1');
   assert.equal((await inspect()).actorTransform.translation[2], 0);
 
-  for (const [key, name, dx, dy] of [
-    ['1', 'wall', -200, 0],
-    ['3', 'ramp', -200, -150],
-    ['4', 'cone', -200, 150],
+  for (const [key, name, xFraction, yFraction] of [
+    ['1', 'wall', 0.8, 0.5],
+    ['3', 'ramp', 0.8, 0.3],
+    ['4', 'cone', 0.8, 0.65],
   ]) {
     await page.keyboard.press(key);
-    await page.mouse.move(centre.x + dx, centre.y + dy);
+    const point = await canvasPoint(xFraction, yFraction);
+    await page.mouse.move(point.x, point.y);
     await page.waitForFunction(
       (name) =>
         document.querySelector('#placementFeedback').textContent ===
         `Click to place a ${name} here.`,
       name,
     );
-    await page.mouse.click(centre.x + dx, centre.y + dy);
+    await page.mouse.click(point.x, point.y);
     await settle();
   }
   assert.equal(await page.locator('#structures').textContent(), '4');
