@@ -47,7 +47,7 @@ function itemLabel(p: Placement) {
 function perkList(p: Placement) {
   const data = trapPerks(p),
     list = element('ol', undefined, 'perk-list');
-  if (data.state !== 'recorded')
+  if (data.state !== 'recorded' && data.state !== 'observed')
     return element(
       'p',
       { empty: 'No perks', unknown: 'Perks not recorded', unreadable: 'Perks could not be read' }[
@@ -78,6 +78,18 @@ function perkList(p: Placement) {
     if (!perk.known) label.append(element('small', 'Unknown perk'));
     row.append(emblem, label);
     list.append(row);
+  }
+  if (data.state === 'observed') {
+    const group = element('div');
+    group.append(
+      element(
+        'p',
+        'Observed perks � the list may be incomplete; slot order is unknown.',
+        'muted perk-note',
+      ),
+      list,
+    );
+    return group;
   }
   return list;
 }

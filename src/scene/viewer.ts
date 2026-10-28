@@ -19,7 +19,7 @@ import { attachment, type Vec3 } from '../core/editor';
 import { structureKind } from '../core/build-pieces';
 import { TrapMover } from './trap-mover';
 export type PlacementHit = {
-  record: Placement;
+  record: Placement | null;
   point: Vec3;
   camera: Vec3;
 };
@@ -279,7 +279,7 @@ export class Viewer {
       );
     else
       this.onHint(
-        'Drag orbit · Right-drag pan · Scroll toward cursor · Double-click focus · E edit selected piece',
+        'Drag orbit · Right-drag pan · Scroll zoom · Arrow keys move selection one tile · E edit',
       );
   }
   frame(selection = false, preview = false) {
@@ -464,13 +464,47 @@ export class Viewer {
       ),
       this.camera,
     );
+    const unreal = (v: THREE.Vector3): Vec3 => [-v.z * 512, v.x * 512, v.y * 512];
+    const terrainHit = this.terrain.visible
+      ? ray.intersectObject(this.terrain, true)[0]
+      : undefined;
+    let ground: PlacementHit | null = null;
+    let groundDistance = Infinity;
+    if (terrainHit) {
+      groundDistance = terrainHit.distance;
+      const matrix = terrainHit.object.matrixWorld.clone();
+      if (terrainHit.object instanceof THREE.InstancedMesh && terrainHit.instanceId !== undefined) {
+        const instance = new THREE.Matrix4();
+        terrainHit.object.getMatrixAt(terrainHit.instanceId, instance);
+        matrix.multiply(instance);
+      }
+      const normal = terrainHit.face?.normal
+        .clone()
+        .applyNormalMatrix(new THREE.Matrix3().getNormalMatrix(matrix));
+      if (terrainHit.object.userData[WALKABLE] && normal && normal.y > 0.5)
+        ground = {
+          record: null,
+          point: unreal(terrainHit.point),
+          camera: unreal(this.camera.position),
+        };
+    } else if (!this.environmentZone && ray.ray.direction.y < -1e-7) {
+      const point = ray.ray.intersectPlane(
+        new THREE.Plane(new THREE.Vector3(0, 1, 0), 0),
+        new THREE.Vector3(),
+      );
+      if (point) {
+        groundDistance = ray.ray.origin.distanceTo(point);
+        ground = { record: null, point: unreal(point), camera: unreal(this.camera.position) };
+      }
+    }
     const hits = ray.intersectObject(this.builds, true);
     for (const hit of hits) {
       const record = (hit.object.userData.records as Placement[] | undefined)?.[
         hit.instanceId ?? 0
       ];
-      if (!record || record.captureRole !== 'placement') continue;
-      const unreal = (v: THREE.Vector3): Vec3 => [-v.z * 512, v.x * 512, v.y * 512];
+      if (!record || record.captureRole !== 'placement' || this.hiddenActors.has(record.actorPath))
+        continue;
+      if (hit.distance > groundDistance + 0.02) break;
       return { record, point: unreal(hit.point), camera: unreal(this.camera.position) };
     }
     const origin = new THREE.Vector3(
@@ -490,7 +524,7 @@ export class Viewer {
     } | null = null;
     for (const record of this.placementRecords) {
       const kind = structureKind(record);
-      if (!kind) continue;
+      if (!kind || this.hiddenActors.has(record.actorPath)) continue;
       const inverse = new THREE.Quaternion(...record.transform.rotation).invert();
       const local = origin
           .clone()
@@ -500,7 +534,12 @@ export class Viewer {
       const denominator = kind === 'wall' ? d.y : d.z;
       if (Math.abs(denominator) < 1e-7) continue;
       const distance = -(kind === 'wall' ? local.y : local.z) / denominator;
-      if (distance <= 0 || (nearest && distance >= nearest.distance)) continue;
+      if (
+        distance <= 0 ||
+        distance > (groundDistance + 0.02) * 512 ||
+        (nearest && distance >= nearest.distance)
+      )
+        continue;
       const at = local.clone().addScaledVector(d, distance);
       if (
         Math.abs(at.x) > 352 ||
@@ -515,7 +554,7 @@ export class Viewer {
     }
     return nearest
       ? { record: nearest.record, point: nearest.point, camera: origin.toArray() as Vec3 }
-      : null;
+      : ground;
   }
   private updateMarquee(e: PointerEvent) {
     const r = this.host.getBoundingClientRect();

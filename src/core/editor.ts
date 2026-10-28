@@ -367,7 +367,7 @@ export function placeTrap(
   result.mirrored = false;
   result.captureRole = 'placement';
   delete result.perkReadProbe;
-  delete result.trapEffectSources;
+  if (result.trapPerksStatus !== 'observed-effects') delete result.trapEffectSources;
   const orientation = q(support.transform).multiply(
     new Quaternion(...unrealRotator(0, category === 'wall' ? side * 180 : turn, 0)),
   );
@@ -531,7 +531,7 @@ export function planPaste(
     p.transform = rigidPose(p.transform, clipboard.anchor, at, rotation);
     p.meshTransform = rigidPose(p.meshTransform, clipboard.anchor, at, rotation);
     delete p.perkReadProbe;
-    delete p.trapEffectSources;
+    if (p.trapPerksStatus !== 'observed-effects') delete p.trapEffectSources;
     p.editorPlacementMode = 'copied';
     return { original, p };
   });

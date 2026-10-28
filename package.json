@@ -16,7 +16,7 @@
     "format:check": "prettier --check .",
     "check:structure": "node scripts/checks/source-structure.mjs",
     "check": "npm run format:check && npm run check:structure && tsc --noEmit && npm test",
-    "test:smoke": "node tests/smoke/export-formats-smoke.mjs && node tests/smoke/building-smoke.mjs && node tests/smoke/requirements-smoke.mjs && node tests/smoke/updater-smoke.mjs",
+    "test:smoke": "node tests/smoke/export-formats-smoke.mjs && node tests/smoke/building-smoke.mjs && node tests/smoke/tile-building-smoke.mjs && node tests/smoke/requirements-smoke.mjs && node tests/smoke/updater-smoke.mjs",
     "setup": "npm run build && node scripts/build/setup.mjs",
     "release:build": "npm run build && node scripts/build/setup.mjs --release"
   },

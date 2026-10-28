@@ -1,0 +1,372 @@
+[
+  {
+    "trapPerks": "",
+    "trapPerksStatus": "unknown",
+    "trapPerksSource": "active-effect-source-v1",
+    "trapEffectSources": {
+      "status": "observed",
+      "complete": false,
+      "order": "active-effects-not-perk-slots",
+      "component": "asc",
+      "count": 1,
+      "read": 1,
+      "effects": [
+        {
+          "source": "",
+          "effect": "/SaveTheWorld/Abilities/Player/Generic/Traits/DefaultPlayer/GE_SharedPlayerTrapStatTransfer.Default__GE_SharedPlayerTrapStatTransfer_C",
+          "effectCauser": "trap",
+          "stackCount": 1,
+          "alteration": ""
+        }
+      ]
+    }
+  },
+  {
+    "trapPerks": "",
+    "trapPerksStatus": "unknown",
+    "trapPerksSource": "active-effect-source-v1",
+    "trapEffectSources": {
+      "status": "observed",
+      "complete": false,
+      "order": "active-effects-not-perk-slots",
+      "component": "asc",
+      "count": 1,
+      "read": 1,
+      "effects": [
+        {
+          "source": "",
+          "effect": "/SaveTheWorld/Abilities/Player/Generic/Traits/DefaultPlayer/GE_SharedPlayerTrapStatTransfer.Default__GE_SharedPlayerTrapStatTransfer_C",
+          "effectCauser": "trap",
+          "stackCount": 1,
+          "alteration": ""
+        }
+      ]
+    }
+  },
+  {
+    "trapPerks": "",
+    "trapPerksStatus": "unknown",
+    "trapPerksSource": "active-effect-source-v1",
+    "trapEffectSources": {
+      "status": "observed",
+      "complete": false,
+      "order": "active-effects-not-perk-slots",
+      "component": "asc",
+      "count": 1,
+      "read": 1,
+      "effects": [
+        {
+          "source": "",
+          "effect": "/SaveTheWorld/Abilities/Player/Generic/Traits/DefaultPlayer/GE_SharedPlayerTrapStatTransfer.Default__GE_SharedPlayerTrapStatTransfer_C",
+          "effectCauser": "trap",
+          "stackCount": 1,
+          "alteration": ""
+        }
+      ]
+    }
+  },
+  {
+    "trapPerks": "",
+    "trapPerksStatus": "unknown",
+    "trapPerksSource": "active-effect-source-v1",
+    "trapEffectSources": {
+      "status": "observed",
+      "complete": false,
+      "order": "active-effects-not-perk-slots",
+      "component": "asc",
+      "count": 1,
+      "read": 1,
+      "effects": [
+        {
+          "source": "",
+          "effect": "/SaveTheWorld/Abilities/Player/Generic/Traits/DefaultPlayer/GE_SharedPlayerTrapStatTransfer.Default__GE_SharedPlayerTrapStatTransfer_C",
+          "effectCauser": "trap",
+          "stackCount": 1,
+          "alteration": ""
+        }
+      ]
+    }
+  },
+  {
+    "trapPerks": "",
+    "trapPerksStatus": "unknown",
+    "trapPerksSource": "active-effect-source-v1",
+    "trapEffectSources": {
+      "status": "observed",
+      "complete": false,
+      "order": "active-effects-not-perk-slots",
+      "component": "asc",
+      "count": 1,
+      "read": 1,
+      "effects": [
+        {
+          "source": "",
+          "effect": "/SaveTheWorld/Abilities/Player/Generic/Traits/DefaultPlayer/GE_SharedPlayerTrapStatTransfer.Default__GE_SharedPlayerTrapStatTransfer_C",
+          "effectCauser": "trap",
+          "stackCount": 1,
+          "alteration": ""
+        }
+      ]
+    }
+  },
+  {
+    "trapPerks": "",
+    "trapPerksStatus": "unknown",
+    "trapPerksSource": "active-effect-source-v1",
+    "trapEffectSources": {
+      "status": "observed",
+      "complete": false,
+      "order": "active-effects-not-perk-slots",
+      "component": "asc",
+      "count": 1,
+      "read": 1,
+      "effects": [
+        {
+          "source": "",
+          "effect": "/SaveTheWorld/Abilities/Player/Generic/Traits/DefaultPlayer/GE_SharedPlayerTrapStatTransfer.Default__GE_SharedPlayerTrapStatTransfer_C",
+          "effectCauser": "trap",
+          "stackCount": 1,
+          "alteration": ""
+        }
+      ]
+    }
+  },
+  {
+    "trapPerks": "",
+    "trapPerksStatus": "unknown",
+    "trapPerksSource": "active-effect-source-v1",
+    "trapEffectSources": {
+      "status": "observed",
+      "complete": false,
+      "order": "active-effects-not-perk-slots",
+      "component": "asc",
+      "count": 1,
+      "read": 1,
+      "effects": [
+        {
+          "source": "",
+          "effect": "/SaveTheWorld/Abilities/Player/Generic/Traits/DefaultPlayer/GE_SharedPlayerTrapStatTransfer.Default__GE_SharedPlayerTrapStatTransfer_C",
+          "effectCauser": "trap",
+          "stackCount": 1,
+          "alteration": ""
+        }
+      ]
+    }
+  },
+  {
+    "trapPerks": "",
+    "trapPerksStatus": "unknown",
+    "trapPerksSource": "active-effect-source-v1",
+    "trapEffectSources": {
+      "status": "observed",
+      "complete": false,
+      "order": "active-effects-not-perk-slots",
+      "component": "asc",
+      "count": 1,
+      "read": 1,
+      "effects": [
+        {
+          "source": "",
+          "effect": "/SaveTheWorld/Abilities/Player/Generic/Traits/DefaultPlayer/GE_SharedPlayerTrapStatTransfer.Default__GE_SharedPlayerTrapStatTransfer_C",
+          "effectCauser": "trap",
+          "stackCount": 1,
+          "alteration": ""
+        }
+      ]
+    }
+  },
+  {
+    "trapPerks": "",
+    "trapPerksStatus": "unknown",
+    "trapPerksSource": "active-effect-source-v1",
+    "trapEffectSources": {
+      "status": "observed",
+      "complete": false,
+      "order": "active-effects-not-perk-slots",
+      "component": "asc",
+      "count": 1,
+      "read": 1,
+      "effects": [
+        {
+          "source": "",
+          "effect": "/SaveTheWorld/Abilities/Player/Generic/Traits/DefaultPlayer/GE_SharedPlayerTrapStatTransfer.Default__GE_SharedPlayerTrapStatTransfer_C",
+          "effectCauser": "trap",
+          "stackCount": 1,
+          "alteration": ""
+        }
+      ]
+    }
+  },
+  {
+    "trapPerks": "perks1;/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/Elemental/Physical/AID_Att_Damage_Physical_T05.AID_Att_Damage_Physical_T05;/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/CritChance/AID_Att_CritChance_T05.AID_Att_CritChance_T05;/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/CritDamage/AID_Att_CritDamage_T05.AID_Att_CritDamage_T05;/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/Damage/AID_Att_Damage_T05.AID_Att_Damage_T05;/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/ReloadSpeed/AID_Att_ReloadSpeed_Trap_T05.AID_Att_ReloadSpeed_Trap_T05;/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/MaxDurability/AID_Att_MaxDurability_Trap_T05.AID_Att_MaxDurability_Trap_T05",
+    "trapPerksStatus": "observed-effects",
+    "trapPerksSource": "active-effect-source-v1",
+    "trapEffectSources": {
+      "status": "observed",
+      "complete": false,
+      "order": "active-effects-not-perk-slots",
+      "component": "asc",
+      "count": 7,
+      "read": 7,
+      "effects": [
+        {
+          "source": "",
+          "effect": "/SaveTheWorld/Abilities/Player/Generic/Traits/DefaultPlayer/GE_SharedPlayerTrapStatTransfer.Default__GE_SharedPlayerTrapStatTransfer_C",
+          "effectCauser": "trap",
+          "stackCount": 1,
+          "alteration": ""
+        },
+        {
+          "source": "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/Elemental/Physical/AS_Att_Damage_Physical_T05.AS_Att_Damage_Physical_T05",
+          "effect": "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/Elemental/Physical/GE_Alteration_Attribute_Damage_Physical.Default__GE_Alteration_Attribute_Damage_Physical_C",
+          "effectCauser": "trap",
+          "stackCount": 1,
+          "alteration": "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/Elemental/Physical/AID_Att_Damage_Physical_T05.AID_Att_Damage_Physical_T05"
+        },
+        {
+          "source": "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/CritChance/AS_Att_CritChance_T05.AS_Att_CritChance_T05",
+          "effect": "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/CritChance/GE_Alteration_Attribute_CritChance.Default__GE_Alteration_Attribute_CritChance_C",
+          "effectCauser": "trap",
+          "stackCount": 1,
+          "alteration": "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/CritChance/AID_Att_CritChance_T05.AID_Att_CritChance_T05"
+        },
+        {
+          "source": "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/CritDamage/AS_Att_CritDamage_T05.AS_Att_CritDamage_T05",
+          "effect": "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/CritDamage/GE_Alteration_Attribute_CritDamage.Default__GE_Alteration_Attribute_CritDamage_C",
+          "effectCauser": "trap",
+          "stackCount": 1,
+          "alteration": "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/CritDamage/AID_Att_CritDamage_T05.AID_Att_CritDamage_T05"
+        },
+        {
+          "source": "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/Damage/AS_Att_Damage_T05.AS_Att_Damage_T05",
+          "effect": "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/Damage/GE_Alteration_Attribute_Damage.Default__GE_Alteration_Attribute_Damage_C",
+          "effectCauser": "trap",
+          "stackCount": 1,
+          "alteration": "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/Damage/AID_Att_Damage_T05.AID_Att_Damage_T05"
+        },
+        {
+          "source": "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/ReloadSpeed/AS_Att_ReloadSpeed_Trap_T05.AS_Att_ReloadSpeed_Trap_T05",
+          "effect": "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/ReloadSpeed/GE_Alteration_Attribute_ReloadSpeed_Trap.Default__GE_Alteration_Attribute_ReloadSpeed_Trap_C",
+          "effectCauser": "trap",
+          "stackCount": 1,
+          "alteration": "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/ReloadSpeed/AID_Att_ReloadSpeed_Trap_T05.AID_Att_ReloadSpeed_Trap_T05"
+        },
+        {
+          "source": "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/MaxDurability/AS_Att_MaxDurability_Trap_T05.AS_Att_MaxDurability_Trap_T05",
+          "effect": "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/MaxDurability/GE_Alteration_Attribute_MaxDurability_Trap.Default__GE_Alteration_Attribute_MaxDurability_Trap_C",
+          "effectCauser": "trap",
+          "stackCount": 1,
+          "alteration": "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/MaxDurability/AID_Att_MaxDurability_Trap_T05.AID_Att_MaxDurability_Trap_T05"
+        }
+      ]
+    }
+  },
+  {
+    "trapPerks": "perks1;/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/Elemental/Physical/AID_Att_Damage_Physical_T05.AID_Att_Damage_Physical_T05;/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/CritChance/AID_Att_CritChance_T05.AID_Att_CritChance_T05;/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/CritDamage/AID_Att_CritDamage_T05.AID_Att_CritDamage_T05;/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/Damage/AID_Att_Damage_T05.AID_Att_Damage_T05;/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/ReloadSpeed/AID_Att_ReloadSpeed_Trap_T05.AID_Att_ReloadSpeed_Trap_T05;/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/MaxDurability/AID_Att_MaxDurability_Trap_T05.AID_Att_MaxDurability_Trap_T05",
+    "trapPerksStatus": "observed-effects",
+    "trapPerksSource": "active-effect-source-v1",
+    "trapEffectSources": {
+      "status": "observed",
+      "complete": false,
+      "order": "active-effects-not-perk-slots",
+      "component": "asc",
+      "count": 7,
+      "read": 7,
+      "effects": [
+        {
+          "source": "",
+          "effect": "/SaveTheWorld/Abilities/Player/Generic/Traits/DefaultPlayer/GE_SharedPlayerTrapStatTransfer.Default__GE_SharedPlayerTrapStatTransfer_C",
+          "effectCauser": "trap",
+          "stackCount": 1,
+          "alteration": ""
+        },
+        {
+          "source": "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/Elemental/Physical/AS_Att_Damage_Physical_T05.AS_Att_Damage_Physical_T05",
+          "effect": "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/Elemental/Physical/GE_Alteration_Attribute_Damage_Physical.Default__GE_Alteration_Attribute_Damage_Physical_C",
+          "effectCauser": "trap",
+          "stackCount": 1,
+          "alteration": "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/Elemental/Physical/AID_Att_Damage_Physical_T05.AID_Att_Damage_Physical_T05"
+        },
+        {
+          "source": "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/CritChance/AS_Att_CritChance_T05.AS_Att_CritChance_T05",
+          "effect": "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/CritChance/GE_Alteration_Attribute_CritChance.Default__GE_Alteration_Attribute_CritChance_C",
+          "effectCauser": "trap",
+          "stackCount": 1,
+          "alteration": "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/CritChance/AID_Att_CritChance_T05.AID_Att_CritChance_T05"
+        },
+        {
+          "source": "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/CritDamage/AS_Att_CritDamage_T05.AS_Att_CritDamage_T05",
+          "effect": "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/CritDamage/GE_Alteration_Attribute_CritDamage.Default__GE_Alteration_Attribute_CritDamage_C",
+          "effectCauser": "trap",
+          "stackCount": 1,
+          "alteration": "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/CritDamage/AID_Att_CritDamage_T05.AID_Att_CritDamage_T05"
+        },
+        {
+          "source": "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/Damage/AS_Att_Damage_T05.AS_Att_Damage_T05",
+          "effect": "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/Damage/GE_Alteration_Attribute_Damage.Default__GE_Alteration_Attribute_Damage_C",
+          "effectCauser": "trap",
+          "stackCount": 1,
+          "alteration": "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/Damage/AID_Att_Damage_T05.AID_Att_Damage_T05"
+        },
+        {
+          "source": "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/ReloadSpeed/AS_Att_ReloadSpeed_Trap_T05.AS_Att_ReloadSpeed_Trap_T05",
+          "effect": "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/ReloadSpeed/GE_Alteration_Attribute_ReloadSpeed_Trap.Default__GE_Alteration_Attribute_ReloadSpeed_Trap_C",
+          "effectCauser": "trap",
+          "stackCount": 1,
+          "alteration": "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/ReloadSpeed/AID_Att_ReloadSpeed_Trap_T05.AID_Att_ReloadSpeed_Trap_T05"
+        },
+        {
+          "source": "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/MaxDurability/AS_Att_MaxDurability_Trap_T05.AS_Att_MaxDurability_Trap_T05",
+          "effect": "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/MaxDurability/GE_Alteration_Attribute_MaxDurability_Trap.Default__GE_Alteration_Attribute_MaxDurability_Trap_C",
+          "effectCauser": "trap",
+          "stackCount": 1,
+          "alteration": "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/MaxDurability/AID_Att_MaxDurability_Trap_T05.AID_Att_MaxDurability_Trap_T05"
+        }
+      ]
+    }
+  },
+  {
+    "trapPerks": "",
+    "trapPerksStatus": "unknown",
+    "trapPerksSource": "active-effect-source-v1",
+    "trapEffectSources": {
+      "status": "observed",
+      "complete": false,
+      "order": "active-effects-not-perk-slots",
+      "component": "asc",
+      "count": 1,
+      "read": 1,
+      "effects": [
+        {
+          "source": "",
+          "effect": "/SaveTheWorld/Abilities/Player/Generic/Traits/DefaultPlayer/GE_SharedPlayerTrapStatTransfer.Default__GE_SharedPlayerTrapStatTransfer_C",
+          "effectCauser": "trap",
+          "stackCount": 1,
+          "alteration": ""
+        }
+      ]
+    }
+  },
+  {
+    "trapPerks": "",
+    "trapPerksStatus": "unknown",
+    "trapPerksSource": "active-effect-source-v1",
+    "trapEffectSources": {
+      "status": "observed",
+      "complete": false,
+      "order": "active-effects-not-perk-slots",
+      "component": "asc",
+      "count": 1,
+      "read": 1,
+      "effects": [
+        {
+          "source": "",
+          "effect": "/SaveTheWorld/Abilities/Player/Generic/Traits/DefaultPlayer/GE_SharedPlayerTrapStatTransfer.Default__GE_SharedPlayerTrapStatTransfer_C",
+          "effectCauser": "trap",
+          "stackCount": 1,
+          "alteration": ""
+        }
+      ]
+    }
+  }
+]

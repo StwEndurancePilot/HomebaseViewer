@@ -1,4 +1,5 @@
 import type { Capture, Placement } from './save';
+import { moveTiles } from './tile-movement';
 import { editStructure, type EditPattern } from './build-pieces';
 import {
   attachment,
@@ -7,6 +8,7 @@ import {
   flipCeilingTrap,
   type PastePlan,
   type Offsets,
+  type Vec3,
 } from './editor';
 export class EditorDocument {
   selected = new Set<string>();
@@ -92,6 +94,9 @@ export class EditorDocument {
   }
   offsetSelected(offsets: Offsets) {
     this.editTraps((p, parent) => withOffsets(p, offsets, parent));
+  }
+  moveSelected(delta: Vec3) {
+    this.commit(moveTiles(this.data.placements, this.selected, delta), new Set(this.selected));
   }
   flipSelectedCeilings() {
     this.editTraps(flipCeilingTrap);

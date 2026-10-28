@@ -10,7 +10,8 @@ import { PieceEditor } from '../ui/panels/piece-editor';
 import { patternOf, editStructure, type BuildKind } from '../core/build-pieces';
 import { cycleColorTheme } from '../ui/theme';
 import { partThumbnail } from '../ui/part-thumbnail';
-import { directionAt, wallFaceAt } from '../core/placement-target';
+import { directionAt, groundSupport, wallFaceAt } from '../core/placement-target';
+import { arrowTileDelta } from '../core/tile-movement';
 import { parseCapture, type Placement } from '../core/save';
 import {
   exportDiagnostics,
@@ -751,7 +752,9 @@ document.addEventListener('keydown', (e) => {
     e
       .composedPath()
       .some(
-        (t) => t instanceof HTMLElement && /^(INPUT|TEXTAREA|SELECT|MD-.*FIELD)$/.test(t.tagName),
+        (t) =>
+          t instanceof HTMLElement &&
+          (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT|MD-.*FIELD)$/.test(t.tagName)),
       ) ||
     document.pointerLockElement
   )
@@ -806,6 +809,30 @@ document.addEventListener('keydown', (e) => {
     return;
   }
   if (viewer?.mover.dragging) return;
+  if (
+    !buildActive &&
+    viewer &&
+    el('orbit').classList.contains('active') &&
+    active.selected.size &&
+    !e.ctrlKey &&
+    !e.metaKey &&
+    !e.altKey &&
+    e.key.startsWith('Arrow')
+  ) {
+    viewer.camera.updateMatrixWorld();
+    const matrix = viewer.camera.matrixWorld.elements;
+    const delta = arrowTileDelta(e.key, [matrix[0], matrix[1], matrix[2]]);
+    if (delta) {
+      e.preventDefault();
+      guard(async () => {
+        stopMoving();
+        cancelPreview();
+        current().moveSelected(delta);
+        await render(true);
+      })();
+      return;
+    }
+  }
   if (buildActive && !e.ctrlKey && !e.metaKey && e.key.toLowerCase() === 'r') {
     e.preventDefault();
     rotatePiece();
@@ -907,11 +934,12 @@ function filterTraps() {
   picker.disabled = first === null;
 }
 function idlePlacementText() {
-  if (['stair', 'roof'].includes(val('pieceKind'))) return 'Point at a build tile. R rotates.';
+  if (['stair', 'roof'].includes(val('pieceKind')))
+    return 'Point at the ground or a build tile. R rotates.';
   return val('pieceKind') === 'wall'
-    ? 'Point at a floor edge or wall to build.'
+    ? 'Point at the ground, a floor edge or a wall to build.'
     : val('pieceKind') === 'floor'
-      ? 'Point at an edge, or choose Above / Below.'
+      ? 'Point at the ground or a floor edge, or choose Above / Below.'
       : 'Point at a matching floor or wall to place a trap.';
 }
 function feedback(text: string, invalid = false) {
@@ -1050,20 +1078,26 @@ function hoverPlacement(hit: PlacementHit | null): boolean {
   }
   const kind = val('pieceKind');
   try {
+    if (!hit.record && kind === 'trap')
+      throw new Error('Place a floor or wall first to support a trap.');
+    const support = hit.record ?? groundSupport(hit.point, current().data.placements);
     const height = val('buildHeight') as 'auto' | 'above' | 'below' | 'beside';
+    if (!hit.record && kind === 'wall' && height === 'above')
+      support.transform.translation[2] += 384;
     const direction = ['stair', 'roof'].includes(kind)
         ? height
         : directionAt(
-            hit.record,
+            support,
             hit.point,
             kind === 'floor' ? 'floor' : 'wall',
             edgeCycle,
             height,
             hit.camera,
           ),
-      side = wallFaceAt(hit.record, hit.camera, faceFlipped);
+      side = wallFaceAt(support, hit.camera, faceFlipped);
     const key = JSON.stringify([
-      hit.record.actorPath,
+      hit.record?.actorPath ?? support.transform,
+      height,
       direction,
       side,
       kind,
@@ -1088,20 +1122,30 @@ function hoverPlacement(hit: PlacementHit | null): boolean {
               (() => {
                 throw new Error('Open a save containing this trap first.');
               })(),
-            hit.record,
+            support,
             number('trapTurn'),
             side,
             offsets(),
             val('placementMode') as 'standard' | 'menu-offset',
             ceilingInverted(),
           )
-        : placeStructure(
-            hit.record,
-            kind as BuildKind,
-            direction,
-            number('material') as 0 | 1 | 2,
-            number('tier') as 1 | 2 | 3,
-          );
+        : !hit.record && kind === 'floor'
+          ? buildingRecord('floor', number('material') as 0 | 1 | 2, number('tier') as 1 | 2 | 3, {
+              ...support.transform,
+              translation: [
+                support.transform.translation[0],
+                support.transform.translation[1],
+                support.transform.translation[2] +
+                  (height === 'above' ? 384 : height === 'below' ? -384 : 0),
+              ],
+            })
+          : placeStructure(
+              support,
+              kind as BuildKind,
+              direction,
+              number('material') as 0 | 1 | 2,
+              number('tier') as 1 | 2 | 3,
+            );
     if (kind === 'stair' || kind === 'roof')
       record = editStructure(record, patternOf(record)!, edgeCycle * 90, false);
     const issue = placementConflict(record, current().data.placements);
@@ -1120,6 +1164,7 @@ function hoverPlacement(hit: PlacementHit | null): boolean {
     return true;
   } catch (e) {
     pendingPiece = null;
+    hoverKey = '';
     el<HTMLButtonElement>('place').disabled = true;
     void viewer?.preview([]);
     feedback(errorText(e), true);

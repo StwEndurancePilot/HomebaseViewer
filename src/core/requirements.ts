@@ -50,7 +50,7 @@ export type SavedPerk = {
   known: boolean;
 };
 export function trapPerks(p: Placement): {
-  state: 'recorded' | 'empty' | 'unknown' | 'unreadable';
+  state: 'recorded' | 'observed' | 'empty' | 'unknown' | 'unreadable';
   perks: SavedPerk[];
 } {
   const raw = typeof p.trapPerks === 'string' ? p.trapPerks : '';
@@ -63,7 +63,13 @@ export function trapPerks(p: Placement): {
   if (!raw.startsWith('perks1;')) return { state: 'unreadable', perks: [] };
   const paths = raw.slice(7).split(';').filter(Boolean);
   return {
-    state: paths.length ? 'recorded' : 'empty',
+    state: paths.length
+      ? p.trapPerksStatus === 'observed-effects'
+        ? 'observed'
+        : 'recorded'
+      : p.trapPerksStatus === 'observed-effects'
+        ? 'unknown'
+        : 'empty',
     perks: paths.map((path) => {
       const leaf = path.split('.').at(-1)!.split('/').at(-1)!,
         known = perkCatalog['alteration:' + leaf.toLowerCase()];

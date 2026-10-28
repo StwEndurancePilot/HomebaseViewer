@@ -1,6 +1,34 @@
 import { Quaternion, Vector3 } from 'three';
 import type { Placement } from './save';
-import { shapeOf, type Vec3 } from './editor';
+import { buildingRecord, shapeOf, type Vec3 } from './editor';
+import { structureKind } from './build-pieces';
+
+export function groundSupport(point: Vec3, records: Placement[]): Placement {
+  const reference = records.find((p) => {
+    if (p.captureRole !== 'placement' || !structureKind(p)) return false;
+    const rotation = new Quaternion(...p.transform.rotation);
+    const up = new Vector3(0, 0, 1).applyQuaternion(rotation);
+    const forward = new Vector3(1, 0, 0).applyQuaternion(rotation);
+    return (
+      p.transform.scale.every((v) => Math.abs(Math.abs(v) - 1) < 1e-6) &&
+      up.z > 1 - 1e-6 &&
+      Math.min(Math.abs(forward.x), Math.abs(forward.y)) < 1e-6
+    );
+  });
+  const origin = new Vector3(...(reference?.transform.translation ?? [0, 0, 0]));
+  const rotation = new Quaternion(...(reference?.transform.rotation ?? [0, 0, 0, 1]));
+  const local = new Vector3(...point).sub(origin).applyQuaternion(rotation.clone().invert());
+  local.set(
+    Math.round(local.x / 512) * 512,
+    Math.floor(local.y / 512) * 512,
+    Math.round(local.z / 384) * 384,
+  );
+  return buildingRecord('floor', 0, 1, {
+    translation: local.applyQuaternion(rotation).add(origin).toArray() as Vec3,
+    rotation: rotation.toArray() as Placement['transform']['rotation'],
+    scale: [1, 1, 1],
+  });
+}
 function localPoint(support: Placement, world: Vec3) {
   return new Vector3(...world)
     .sub(new Vector3(...support.transform.translation))
