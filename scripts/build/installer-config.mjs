@@ -20,6 +20,7 @@ export function installerConfig(repository, version) {
       'package.json',
     ],
     asar: true,
+    extraResources: [{ from: 'electron/homebase-open.json', to: 'homebase-open.json' }],
     extraMetadata: {
       description: 'Fortnite STW homebase viewer and blueprint editor',
       author: 'Homebase Viewer contributors',

@@ -4,11 +4,20 @@ const { existsSync } = require('node:fs');
 const { AppUpdater } = require('./updates/app-updater.cjs');
 let mainWindow;
 let updates;
+const { HomebaseRequests } = require('./homebase-requests.cjs');
+const homebaseRequests = new HomebaseRequests(() => {
+  if (mainWindow && !mainWindow.isDestroyed())
+    mainWindow.webContents.send('homebase-open-available');
+});
+homebaseRequests.enqueue(process.argv);
 const smokeTest = process.argv.includes('--smoke-test');
+if (smokeTest)
+  app.setPath('userData', path.join(app.getPath('temp'), `homebase-handoff-${process.pid}`));
 const ownsInstance = smokeTest || app.requestSingleInstanceLock();
 if (!ownsInstance) app.quit();
-app.on('second-instance', () => {
-  if (mainWindow && !mainWindow.isDestroyed()) {
+app.on('second-instance', (_event, argv) => {
+  homebaseRequests.enqueue(argv);
+  if (!smokeTest && mainWindow && !mainWindow.isDestroyed()) {
     if (mainWindow.isMinimized()) mainWindow.restore();
     mainWindow.show();
     mainWindow.focus();
@@ -93,6 +102,7 @@ if (ownsInstance)
         }
       });
     handle('update-state', () => updates.getState());
+    handle('homebase-open-next', () => homebaseRequests.take());
     handle('update-check', () => updates.check());
     handle('update-restart', () => updates.requestRestart());
     handle('epic-state', () => account.getState());

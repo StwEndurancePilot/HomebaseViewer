@@ -1,3 +1,4 @@
+import { connectLauncherFiles } from './launcher-files';
 import '../styles/updates.css';
 import { setupUpdatePanel } from '../ui/panels/update-panel';
 import { el } from '../ui/dom';
@@ -1486,3 +1487,5 @@ el('cameraView').onchange = () => {
   viewer?.viewFrom(val('cameraView'));
 };
 el('rotateBuild').onclick = rotatePiece;
+
+connectLauncherFiles(open, () => loading, status);

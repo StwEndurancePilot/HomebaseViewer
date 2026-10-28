@@ -20,7 +20,7 @@ const paths = await packager({
   name: 'Homebase Viewer',
   platform: 'win32',
   arch: 'x64',
-  out: path.join('artifacts', manifest.version),
+  out: process.env.HOMEBASE_PORTABLE_OUTPUT || path.join('artifacts', manifest.version),
   overwrite: true,
   asar: true,
   prune: true,
@@ -44,6 +44,7 @@ const paths = await packager({
   executableName: 'Homebase Viewer',
 });
 for (const output of paths) {
+  await copyFile('electron/homebase-open.json', path.join(output, 'resources/homebase-open.json'));
   await mkdir(output, { recursive: true });
   await writeFile(
     path.join(output, 'Start-Homebase-Viewer.cmd'),

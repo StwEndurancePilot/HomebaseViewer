@@ -9,6 +9,14 @@ const invoke = async (channel, ...args) => {
   if (!result.ok) throw new Error(result.error);
   return result.value;
 };
+contextBridge.exposeInMainWorld('homebaseLauncher', {
+  next: () => invoke('homebase-open-next'),
+  onAvailable(callback) {
+    const listener = () => callback();
+    ipcRenderer.on('homebase-open-available', listener);
+    return () => ipcRenderer.removeListener('homebase-open-available', listener);
+  },
+});
 contextBridge.exposeInMainWorld('homebaseAccount', {
   pennyAccounts: () => invoke('penny-list'),
   loginPenny: (id) => invoke('penny-login', id),

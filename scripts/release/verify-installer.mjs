@@ -23,6 +23,15 @@ export async function verifyInstaller(version, repository) {
   const asar = `${root}/win-unpacked/resources/app.asar`;
   const packaged = JSON.parse(extractFile(asar, 'package.json').toString('utf8'));
   if (packaged.version !== version) throw new Error('Packaged version mismatch.');
+  const handoffSource = await readFile('electron/homebase-open.json');
+  const handoffMarker = await readFile(`${root}/win-unpacked/resources/homebase-open.json`);
+  const handoff = JSON.parse(handoffMarker.toString('utf8'));
+  if (
+    !handoffSource.equals(handoffMarker) ||
+    handoff.schema !== 1 ||
+    handoff.argument !== '--open-homebase'
+  )
+    throw new Error('Packaged launcher handoff marker mismatch.');
   const entries = listPackage(asar).map((file) => file.replaceAll('\\', '/'));
   if (
     entries.some(
