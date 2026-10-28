@@ -15,7 +15,7 @@ import { sceneMatrix, scenePoint } from '../core/transforms';
 import { meshIdentity } from '../core/mesh-identity';
 import { pennyTrapPivotOffset } from '../core/trap-pivots';
 import { zoneForCapture, type Capture, type Placement } from '../core/save';
-import type { Vec3 } from '../core/editor';
+import { attachment, type Vec3 } from '../core/editor';
 import { structureKind } from '../core/build-pieces';
 import { TrapMover } from './trap-mover';
 export type PlacementHit = {
@@ -560,6 +560,18 @@ export class Viewer {
   setSelection(ids: ReadonlySet<string>) {
     this.selectionIds = new Set(ids);
     this.clearSelection();
+    const supports = new Set<string>();
+    for (const group of [this.traps, this.markers])
+      group.traverse((o) => {
+        if (!(o instanceof THREE.InstancedMesh)) return;
+        for (const p of o.userData.records as Placement[]) {
+          if (p.kind !== 'trap' || !ids.has(p.actorPath) || this.hiddenActors.has(p.actorPath))
+            continue;
+          const link = attachment(p);
+          if (link?.status === 'resolved' && link.supportActorPath)
+            supports.add(link.supportActorPath);
+        }
+      });
     const bounds = new THREE.Box3(),
       matrix = new THREE.Matrix4();
     this.issueBounds.clear();
@@ -573,8 +585,14 @@ export class Viewer {
             return;
           }
           const selected = ids.has(p.actorPath),
-            invalid = this.issueActors.has(p.actorPath);
-          o.setColorAt(i, new THREE.Color(invalid ? 0xff3535 : selected ? 0x83baff : 0xffffff));
+            invalid = this.issueActors.has(p.actorPath),
+            support = p.kind === 'structure' && supports.has(p.actorPath);
+          o.setColorAt(
+            i,
+            new THREE.Color(
+              invalid ? 0xff3535 : selected ? 0x83baff : support ? 0xffcd80 : 0xffffff,
+            ),
+          );
           if (invalid) {
             o.getMatrixAt(i, matrix);
             const box = o.geometry
