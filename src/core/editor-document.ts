@@ -1,6 +1,7 @@
 import type { Capture, Placement } from './save';
 import { moveTiles } from './tile-movement';
 import { editStructure, type EditPattern } from './build-pieces';
+import { withTrapPerks } from './trap-perks';
 import {
   attachment,
   placementConflict,
@@ -75,6 +76,16 @@ export class EditorDocument {
     if (plan.errors.length) throw new Error(plan.errors.slice(0, 3).join('\n'));
     if (!plan.records.length) throw new Error('Everything in this group already exists here.');
     this.commit([...this.data.placements, ...plan.records], new Set(plan.added));
+  }
+  editTrapPerks(actorPath: string, paths: string[]) {
+    const source = this.data.placements.find((p) => p.actorPath === actorPath);
+    if (!source) throw new Error('The selected trap no longer exists.');
+    const result = withTrapPerks(source, paths);
+    if (result === source) return;
+    this.commit(
+      this.data.placements.map((p) => (p === source ? result : p)),
+      new Set(this.selected),
+    );
   }
   deleteSelected() {
     const ids = new Set(this.selected);

@@ -49,6 +49,16 @@ export type SavedPerk = {
   rarity: string | null;
   known: boolean;
 };
+export function describePerk(path: string): SavedPerk {
+  const leaf = path.split('.').at(-1)!.split('/').at(-1)!,
+    known = perkCatalog['alteration:' + leaf.toLowerCase()];
+  return {
+    path,
+    label: known?.description ?? leaf,
+    rarity: known?.rarity ?? null,
+    known: Boolean(known),
+  };
+}
 export function trapPerks(p: Placement): {
   state: 'recorded' | 'observed' | 'empty' | 'unknown' | 'unreadable';
   perks: SavedPerk[];
@@ -70,16 +80,7 @@ export function trapPerks(p: Placement): {
       : p.trapPerksStatus === 'observed-effects'
         ? 'unknown'
         : 'empty',
-    perks: paths.map((path) => {
-      const leaf = path.split('.').at(-1)!.split('/').at(-1)!,
-        known = perkCatalog['alteration:' + leaf.toLowerCase()];
-      return {
-        path,
-        label: known?.description ?? leaf,
-        rarity: known?.rarity ?? null,
-        known: Boolean(known),
-      };
-    }),
+    perks: paths.map(describePerk),
   };
 }
 export function trapVariantKey(p: Placement): string {

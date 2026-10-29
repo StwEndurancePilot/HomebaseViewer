@@ -1,0 +1,124 @@
+{
+  "gameBuild": "42.40-59247843",
+  "groups": [
+    {
+      "label": "Damage",
+      "paths": [
+        "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/Damage/AID_Att_Damage_T01.AID_Att_Damage_T01",
+        "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/Damage/AID_Att_Damage_T02.AID_Att_Damage_T02",
+        "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/Damage/AID_Att_Damage_T03.AID_Att_Damage_T03",
+        "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/Damage/AID_Att_Damage_T04.AID_Att_Damage_T04",
+        "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/Damage/AID_Att_Damage_T05.AID_Att_Damage_T05"
+      ]
+    },
+    {
+      "label": "Critical rating",
+      "paths": [
+        "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/CritChance/AID_Att_CritChance_T01.AID_Att_CritChance_T01",
+        "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/CritChance/AID_Att_CritChance_T02.AID_Att_CritChance_T02",
+        "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/CritChance/AID_Att_CritChance_T03.AID_Att_CritChance_T03",
+        "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/CritChance/AID_Att_CritChance_T04.AID_Att_CritChance_T04",
+        "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/CritChance/AID_Att_CritChance_T05.AID_Att_CritChance_T05"
+      ]
+    },
+    {
+      "label": "Critical damage",
+      "paths": [
+        "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/CritDamage/AID_Att_CritDamage_T01.AID_Att_CritDamage_T01",
+        "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/CritDamage/AID_Att_CritDamage_T02.AID_Att_CritDamage_T02",
+        "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/CritDamage/AID_Att_CritDamage_T03.AID_Att_CritDamage_T03",
+        "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/CritDamage/AID_Att_CritDamage_T04.AID_Att_CritDamage_T04",
+        "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/CritDamage/AID_Att_CritDamage_T05.AID_Att_CritDamage_T05"
+      ]
+    },
+    {
+      "label": "Reload speed",
+      "paths": [
+        "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/ReloadSpeed/AID_Att_ReloadSpeed_Trap_T01.AID_Att_ReloadSpeed_Trap_T01",
+        "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/ReloadSpeed/AID_Att_ReloadSpeed_Trap_T02.AID_Att_ReloadSpeed_Trap_T02",
+        "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/ReloadSpeed/AID_Att_ReloadSpeed_Trap_T03.AID_Att_ReloadSpeed_Trap_T03",
+        "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/ReloadSpeed/AID_Att_ReloadSpeed_Trap_T04.AID_Att_ReloadSpeed_Trap_T04",
+        "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/ReloadSpeed/AID_Att_ReloadSpeed_Trap_T05.AID_Att_ReloadSpeed_Trap_T05"
+      ]
+    },
+    {
+      "label": "Durability",
+      "paths": [
+        "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/MaxDurability/AID_Att_MaxDurability_Trap_T01.AID_Att_MaxDurability_Trap_T01",
+        "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/MaxDurability/AID_Att_MaxDurability_Trap_T02.AID_Att_MaxDurability_Trap_T02",
+        "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/MaxDurability/AID_Att_MaxDurability_Trap_T03.AID_Att_MaxDurability_Trap_T03",
+        "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/MaxDurability/AID_Att_MaxDurability_Trap_T04.AID_Att_MaxDurability_Trap_T04",
+        "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/MaxDurability/AID_Att_MaxDurability_Trap_T05.AID_Att_MaxDurability_Trap_T05"
+      ]
+    },
+    {
+      "label": "Impact and knockback",
+      "paths": [
+        "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/Impact/AID_Att_KnockbackImpact_T01.AID_Att_KnockbackImpact_T01",
+        "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/Impact/AID_Att_KnockbackImpact_T02.AID_Att_KnockbackImpact_T02",
+        "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/Impact/AID_Att_KnockbackImpact_T03.AID_Att_KnockbackImpact_T03",
+        "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/Impact/AID_Att_KnockbackImpact_T04.AID_Att_KnockbackImpact_T04",
+        "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/Impact/AID_Att_KnockbackImpact_T05.AID_Att_KnockbackImpact_T05"
+      ]
+    },
+    {
+      "label": "Effect duration",
+      "paths": [
+        "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/EffectDuration/AID_Att_EffectDuration_T01.AID_Att_EffectDuration_T01",
+        "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/EffectDuration/AID_Att_EffectDuration_T02.AID_Att_EffectDuration_T02",
+        "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/EffectDuration/AID_Att_EffectDuration_T03.AID_Att_EffectDuration_T03",
+        "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/EffectDuration/AID_Att_EffectDuration_T04.AID_Att_EffectDuration_T04",
+        "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/EffectDuration/AID_Att_EffectDuration_T05.AID_Att_EffectDuration_T05"
+      ]
+    },
+    {
+      "label": "Range",
+      "paths": [
+        "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/TrapRange/AID_Att_TrapRange_T01.AID_Att_TrapRange_T01",
+        "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/TrapRange/AID_Att_TrapRange_T02.AID_Att_TrapRange_T02",
+        "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/TrapRange/AID_Att_TrapRange_T03.AID_Att_TrapRange_T03",
+        "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/TrapRange/AID_Att_TrapRange_T04.AID_Att_TrapRange_T04",
+        "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/TrapRange/AID_Att_TrapRange_T05.AID_Att_TrapRange_T05"
+      ]
+    },
+    {
+      "label": "Healing amount",
+      "paths": [
+        "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/Healing/AID_Att_Healing_T01.AID_Att_Healing_T01",
+        "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/Healing/AID_Att_Healing_T02.AID_Att_Healing_T02",
+        "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/Healing/AID_Att_Healing_T03.AID_Att_Healing_T03",
+        "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/Healing/AID_Att_Healing_T04.AID_Att_Healing_T04",
+        "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/Healing/AID_Att_Healing_T05.AID_Att_Healing_T05"
+      ]
+    },
+    {
+      "label": "Building healing",
+      "paths": [
+        "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/BuildingHeal/AID_Att_BuildingHeal_T01.AID_Att_BuildingHeal_T01",
+        "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/BuildingHeal/AID_Att_BuildingHeal_T02.AID_Att_BuildingHeal_T02",
+        "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/BuildingHeal/AID_Att_BuildingHeal_T03.AID_Att_BuildingHeal_T03",
+        "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/BuildingHeal/AID_Att_BuildingHeal_T04.AID_Att_BuildingHeal_T04",
+        "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/BuildingHeal/AID_Att_BuildingHeal_T05.AID_Att_BuildingHeal_T05"
+      ]
+    },
+    {
+      "label": "Building health",
+      "paths": [
+        "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/BuildingMaxHealth/AID_Att_BuildingMaxHealth_T01.AID_Att_BuildingMaxHealth_T01",
+        "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/BuildingMaxHealth/AID_Att_BuildingMaxHealth_T02.AID_Att_BuildingMaxHealth_T02",
+        "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/BuildingMaxHealth/AID_Att_BuildingMaxHealth_T03.AID_Att_BuildingMaxHealth_T03",
+        "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/BuildingMaxHealth/AID_Att_BuildingMaxHealth_T04.AID_Att_BuildingMaxHealth_T04",
+        "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/BuildingMaxHealth/AID_Att_BuildingMaxHealth_T05.AID_Att_BuildingMaxHealth_T05"
+      ]
+    },
+    {
+      "label": "Physical element",
+      "paths": [
+        "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/Elemental/Physical/AID_Att_Damage_Physical_T02.AID_Att_Damage_Physical_T02",
+        "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/Elemental/Physical/AID_Att_Damage_Physical_T03.AID_Att_Damage_Physical_T03",
+        "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/Elemental/Physical/AID_Att_Damage_Physical_T04.AID_Att_Damage_Physical_T04",
+        "/SaveTheWorld/Items/Alteration_v2/AttributeAlterations/Elemental/Physical/AID_Att_Damage_Physical_T05.AID_Att_Damage_Physical_T05"
+      ]
+    }
+  ]
+}

@@ -7,6 +7,7 @@ import '../styles/app.css';
 import '../styles/requirements.css';
 import '../styles/building.css';
 import { PieceEditor } from '../ui/panels/piece-editor';
+import { openTrapPerkEditor } from '../ui/panels/trap-perk-editor';
 import { patternOf, editStructure, type BuildKind } from '../core/build-pieces';
 import { cycleColorTheme } from '../ui/theme';
 import { partThumbnail } from '../ui/part-thumbnail';
@@ -211,7 +212,18 @@ function selectionUI() {
   const rows = selected();
   viewer?.setSelection(active.selected);
   syncExportIssueSelection();
-  renderSelectedPerks(rows);
+  renderSelectedPerks(rows, (p) => {
+    if (loading) return;
+    stopMoving();
+    const doc = current(),
+      revision = doc.revision;
+    openTrapPerkEditor(p, (paths) => {
+      if (loading || current() !== doc || doc.revision !== revision)
+        throw new Error('The blueprint changed. Reopen this edit.');
+      doc.editTrapPerks(p.actorPath, paths);
+      if (doc.revision !== revision) void render(true).catch((e) => status(errorText(e)));
+    });
+  });
   el<HTMLButtonElement>('editPiece').disabled =
     rows.length !== 1 || !patternOf(rows[0]) || rows[0].captureRole !== 'placement';
   el<HTMLButtonElement>('moveTraps').disabled =

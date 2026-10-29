@@ -112,7 +112,7 @@ function trapArt(p: Placement, mixed = false) {
   }
   return host;
 }
-export function renderSelectedPerks(rows: Placement[]) {
+export function renderSelectedPerks(rows: Placement[], edit?: (p: Placement) => void) {
   let host = el('selectedTrapPerks');
   if (!host) {
     host = element('section');
@@ -128,6 +128,7 @@ export function renderSelectedPerks(rows: Placement[]) {
   copy.append(element('h3', trapName(p)), element('p', `${level(p)} · ${itemLabel(p)}`, 'muted'));
   heading.append(trapArt(p), copy);
   host.append(heading, perkList(p));
+  if (edit && p.captureRole === 'placement') host.append(button('Edit perks', () => edit(p)));
 }
 type FilterState = {
   hidden: Set<string>;
