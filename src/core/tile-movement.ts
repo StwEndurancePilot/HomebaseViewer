@@ -1,3 +1,4 @@
+import { isBuildingSupport } from './support';
 import type { Placement } from './save';
 import { attachment, placementConflict, relativePose, type Vec3 } from './editor';
 
@@ -42,7 +43,7 @@ export function moveTiles(
     const link = attachment(p);
     const parent =
       changes.get(link?.supportActorPath ?? '') ?? byId.get(link?.supportActorPath ?? '');
-    if (!parent || parent.kind !== 'structure' || parent.captureRole !== 'placement')
+    if (!isBuildingSupport(parent))
       throw new Error('Selected traps need captured building supports.');
     p.attachment = {
       ...link,

@@ -89,8 +89,8 @@ describe('Fortnite support placement', () => {
     const tilted = { ...f, transform: { ...f.transform, rotation: unrealRotator(45, 0, 0) } };
     expect(() => placeStructure(tilted, 'wall', 'north', 0, 1)).toThrow(/upright/);
     expect(() =>
-      placeStructure({ ...f, captureRole: 'existing-world' }, 'wall', 'north', 0, 1),
-    ).toThrow(/player-built/);
+      placeStructure({ ...f, captureRole: 'unavailable' }, 'wall', 'north', 0, 1),
+    ).toThrow(/supported building/);
   });
   it('centres each rotated floor trap on its support and supports opposite faces', () => {
     const f = floor(),
@@ -248,7 +248,7 @@ describe('bulk groups and history', () => {
     expect(() => copyGroup(capture([p]), new Set([p.actorPath]))).toThrow(/support/);
     f.captureRole = 'existing-world';
     expect(() => copyGroup(capture([f]), new Set([f.actorPath]))).toThrow(/scenery/);
-    expect(exportIssues(capture([f, p])).length).toBeGreaterThan(0);
+    expect(exportIssues(capture([f, p]))).toEqual([]);
   });
 });
 const directory = path.join(process.env.LOCALAPPDATA ?? '', 'FortniteGame/Saved/SaveGames');
@@ -505,7 +505,7 @@ describe('cone trap supports', () => {
       }
     for (const kind of ['Floor', 'Ceiling'])
       expect(() => trap(buildingRecord('stair', 2, 3, pose()), kind)).toThrow(
-        /supported player-built piece/,
+        /supported building piece/,
       );
   });
   it('exports offset ceiling traps with their edited cone attachment and supports undo', () => {

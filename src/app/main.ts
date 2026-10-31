@@ -11,13 +11,14 @@ import { openTrapPerkEditor } from '../ui/panels/trap-perk-editor';
 import { patternOf, editStructure, type BuildKind } from '../core/build-pieces';
 import { cycleColorTheme } from '../ui/theme';
 import { partThumbnail } from '../ui/part-thumbnail';
-import { directionAt, groundSupport, wallFaceAt } from '../core/placement-target';
+import { directionAt, groundSupport, surfaceSupport, wallFaceAt } from '../core/placement-target';
 import { tileKeyDelta } from '../core/tile-movement';
 import { parseCapture, type Placement } from '../core/save';
 import {
   exportDiagnostics,
   shapeOf,
   attachment,
+  relativePose,
   selectionZDeltaRange,
   OFFSET_LIMITS,
   ZERO_OFFSETS,
@@ -35,6 +36,7 @@ import {
   type Offsets,
   type Vec3,
 } from '../core/editor';
+import { isBuildingSupport } from '../core/support';
 import { EditorDocument } from '../core/editor-document';
 import { exportSave, exportJson } from '../core/export';
 import { meshStem } from '../core/mesh-identity';
@@ -74,6 +76,7 @@ let active: EditorDocument | null = null,
 let clipboard: Clipboard | null = null,
   clipboardName = '',
   pendingPiece: Placement | null = null,
+  pendingSupport: Placement | null = null,
   pendingPaste: PastePlan | null = null;
 let templates: Placement[] = [];
 let buildActive = false,
@@ -167,6 +170,7 @@ function current() {
 function cancelPreview() {
   hoverKey = '';
   pendingPiece = null;
+  pendingSupport = null;
   pendingPaste = null;
   el<HTMLButtonElement>('place').disabled = true;
   el<HTMLButtonElement>('commitPaste').disabled = true;
@@ -679,7 +683,7 @@ el('exportMenuJson').onclick = guard(() => {
 el('previewPlace').onclick = guard(previewPlace);
 el('place').onclick = guard(async () => {
   if (!pendingPiece) throw new Error('Preview the piece first.');
-  current().add(pendingPiece);
+  current().add(pendingPiece, pendingSupport);
   await render(true);
 });
 el('applyOffsets').onclick = guard(async () => {
@@ -1111,10 +1115,18 @@ function hoverPlacement(hit: PlacementHit | null): boolean {
   const kind = val('pieceKind');
   try {
     if (!hit.record && kind === 'trap')
-      throw new Error('Place a floor, ramp-shaped cone, or wall first to support a trap.');
-    const support = hit.record ?? groundSupport(hit.point, current().data.placements);
+      throw new Error(
+        hit.mapStructure
+          ? 'This map surface has no captured support reference. Open a menu capture containing this support, or place a floor or wall here first.'
+          : 'Place a floor, ramp-shaped cone, or wall first to support a trap.',
+      );
+    const mapSurface = !hit.record || hit.record.captureRole === 'existing-world';
+    const support =
+      mapSurface && hit.normal
+        ? surfaceSupport(hit.point, hit.normal, current().data.placements)
+        : (hit.record ?? groundSupport(hit.point, current().data.placements));
     const height = val('buildHeight') as 'auto' | 'above' | 'below' | 'beside';
-    if (!hit.record && kind === 'wall' && height === 'above')
+    if (mapSurface && shapeOf(support) === 'floor' && kind === 'wall' && height === 'above')
       support.transform.translation[2] += 384;
     const direction = ['stair', 'roof'].includes(kind)
         ? height
@@ -1128,7 +1140,8 @@ function hoverPlacement(hit: PlacementHit | null): boolean {
           ),
       side = wallFaceAt(support, hit.camera, faceFlipped);
     const key = JSON.stringify([
-      hit.record?.actorPath ?? support.transform,
+      hit.record?.actorPath,
+      support.transform,
       height,
       direction,
       side,
@@ -1163,16 +1176,21 @@ function hoverPlacement(hit: PlacementHit | null): boolean {
             ceilingInverted(),
             el<HTMLInputElement>('autoFitCone').checked,
           )
-        : !hit.record && kind === 'floor'
-          ? buildingRecord('floor', number('material') as 0 | 1 | 2, number('tier') as 1 | 2 | 3, {
-              ...support.transform,
-              translation: [
-                support.transform.translation[0],
-                support.transform.translation[1],
-                support.transform.translation[2] +
-                  (height === 'above' ? 384 : height === 'below' ? -384 : 0),
-              ],
-            })
+        : mapSurface && shapeOf(support) === kind
+          ? buildingRecord(
+              kind as BuildKind,
+              number('material') as 0 | 1 | 2,
+              number('tier') as 1 | 2 | 3,
+              {
+                ...support.transform,
+                translation: [
+                  support.transform.translation[0],
+                  support.transform.translation[1],
+                  support.transform.translation[2] +
+                    (height === 'above' ? 384 : height === 'below' ? -384 : 0),
+                ],
+              },
+            )
           : placeStructure(
               support,
               kind as BuildKind,
@@ -1180,6 +1198,14 @@ function hoverPlacement(hit: PlacementHit | null): boolean {
               number('material') as 0 | 1 | 2,
               number('tier') as 1 | 2 | 3,
             );
+    if (kind === 'trap' && hit.record?.captureRole === 'existing-world') {
+      record.attachment = {
+        ...attachment(record),
+        supportActorPath: hit.record.actorPath,
+        supportTransform: structuredClone(hit.record.transform),
+        relativeTransform: relativePose(record.transform, hit.record.transform),
+      };
+    }
     if (kind === 'stair' || kind === 'roof')
       record = editStructure(record, patternOf(record)!, edgeCycle * 90, false);
     const issue = placementConflict(record, current().data.placements);
@@ -1189,6 +1215,8 @@ function hoverPlacement(hit: PlacementHit | null): boolean {
       return false;
     }
     pendingPiece = record;
+    pendingSupport =
+      kind === 'trap' && hit.record?.captureRole === 'existing-world' ? hit.record : null;
     el<HTMLButtonElement>('place').disabled = false;
     feedback(
       kind === 'trap'
@@ -1210,7 +1238,7 @@ function hoverPlacement(hit: PlacementHit | null): boolean {
 async function clickPlacement(hit: PlacementHit | null) {
   if (loading || !buildActive || !hoverPlacement(hit) || !pendingPiece) return;
   try {
-    current().add(pendingPiece);
+    current().add(pendingPiece, pendingSupport);
     await render(true);
     buildHint();
   } catch (e) {
@@ -1337,10 +1365,7 @@ function startMoving(showPanel = true) {
     rows.some(
       (p) =>
         !doc.data.placements.some(
-          (s) =>
-            s.actorPath === attachment(p)?.supportActorPath &&
-            s.kind === 'structure' &&
-            s.captureRole === 'placement',
+          (s) => s.actorPath === attachment(p)?.supportActorPath && isBuildingSupport(s),
         ),
     )
   )

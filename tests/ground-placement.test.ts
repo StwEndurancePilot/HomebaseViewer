@@ -1,6 +1,6 @@
 import { expect, it } from 'vitest';
 import * as THREE from 'three';
-import { groundSupport } from '../src/core/placement-target';
+import { groundSupport, surfaceSupport } from '../src/core/placement-target';
 import { buildingRecord, unrealRotator } from '../src/core/editor';
 import { Viewer, type PlacementHit } from '../src/scene/viewer';
 import { WALKABLE } from '../src/penny/walk';
@@ -31,11 +31,13 @@ function scene(zone: string | null = 'pve_01') {
   camera.position.set(0, 5, 0);
   camera.lookAt(0, 0, 0);
   const terrain = new THREE.Group(),
+    scenery = new THREE.Group(),
     builds = new THREE.Group();
   const viewer = Object.assign(Object.create(Viewer.prototype), {
     camera,
-    scene: new THREE.Scene().add(terrain, builds),
+    scene: new THREE.Scene().add(terrain, scenery, builds),
     terrain,
+    scenery,
     builds,
     renderer: {
       domElement: { getBoundingClientRect: () => ({ left: 0, top: 0, width: 100, height: 100 }) },
@@ -56,7 +58,7 @@ function scene(zone: string | null = 'pve_01') {
     mesh.userData[WALKABLE] = walkable;
     return mesh;
   };
-  return { terrain, builds, viewer, hit, plane };
+  return { terrain, scenery, builds, viewer, hit, plane };
 }
 
 it('targets bare terrain and respects terrain occlusion and unbuildable water', () => {
@@ -88,4 +90,59 @@ it('provides a ground plane for custom blueprints but never fills gaps in real t
   expect(s.hit()?.point[2]).toBeCloseTo(0);
   s.viewer.camera.lookAt(0, 10, 0);
   expect(s.hit()).toBeNull();
+});
+
+it('targets building scenery above terrain and ignores hidden scenery', () => {
+  const s = scene('pve_03');
+  s.terrain.add(s.plane(0));
+  const roof = s.plane(3);
+  roof.name = 'FORT_LogCabin_Roof2';
+  s.scenery.add(roof);
+  expect(s.hit()?.point[2]).toBeCloseTo(1536);
+  s.scenery.visible = false;
+  expect(s.hit()?.point[2]).toBeCloseTo(0);
+});
+
+it('targets tunnel ceilings and walls, without turning water into a support', () => {
+  const s = scene('pve_03');
+  const ceiling = s.plane(6);
+  ceiling.name = 'S_Cave_Tunnel_Straight';
+  s.terrain.add(ceiling);
+  s.viewer.camera.lookAt(0, 6, 0);
+  expect(s.hit()?.point[2]).toBeCloseTo(3072);
+  ceiling.rotation.x = 0;
+  ceiling.position.set(0, 5, -2);
+  s.viewer.camera.lookAt(0, 5, -2);
+  expect(s.hit()?.point[0]).toBeCloseTo(1024);
+  expect(Math.abs(s.hit()!.normal![0])).toBeCloseTo(1);
+  ceiling.name = 'S_Water_Shallow_3x3';
+  ceiling.userData[WALKABLE] = false;
+  expect(s.hit()).toBeNull();
+});
+
+it('returns captured world supports when picking their rendered mesh', () => {
+  const s = scene('pve_03');
+  const mesh = s.plane(3);
+  const record = buildingRecord('floor', 2, 3, {
+    translation: [0, 0, 1536],
+    rotation: [0, 0, 0, 1],
+    scale: [1, 1, 1],
+  });
+  record.captureRole = 'existing-world';
+  mesh.userData.records = [record];
+  s.builds.add(mesh);
+  expect(s.hit()?.record).toBe(record);
+  record.captureRole = 'unavailable';
+  expect(s.hit()).toBeNull();
+});
+
+it('snaps both horizontal and vertical map surfaces to building tiles', () => {
+  expect(surfaceSupport([1100, 700, 770], [0, 0, -1], []).transform.translation).toEqual([
+    1024, 512, 768,
+  ]);
+  const wall = surfaceSupport([1280, 700, 500], [1, 0, 0], []);
+  expect(wall.buildingType).toBe(0);
+  expect(wall.transform.translation).toEqual([1280, 768, 384]);
+  const negative = surfaceSupport([-256, -100, -10], [-1, 0, 0], []);
+  expect(negative.transform.translation).toEqual([-256, -256, -384]);
 });

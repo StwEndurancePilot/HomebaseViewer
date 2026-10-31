@@ -1,6 +1,7 @@
 import { parseCapture, readSaveText, type Capture, type Placement, type Pose } from './save';
 import { attachment, exportIssues, relativePose } from './editor';
 import { validateReplayRows } from './replay-validation';
+import { referencedWorldSupports } from './support';
 export function exportCapture(source: Capture): Capture {
   const issues = exportIssues(source);
   if (issues.length) throw new Error(`Export blocked: ${issues.join('\n')}`);
@@ -24,13 +25,14 @@ export function exportCapture(source: Capture): Capture {
     purpose: 'custom-blueprint',
     validation: 'offline-support-and-placement-checks; game-server-acceptance-unverified',
   };
+  const worldSupports = referencedWorldSupports(data.placements);
   data.placements = data.placements
-    .filter((p) => p.captureRole === 'placement')
+    .filter((p) => p.captureRole === 'placement' || worldSupports.has(p.actorPath))
     .sort((a, b) => Number(a.kind === 'trap') - Number(b.kind === 'trap'));
   const byId = new Map(data.placements.map((p) => [p.actorPath, p]));
   for (const p of data.placements) {
     p.mirrored = Boolean(p.mirrored);
-    p.savedActorGuid = '00000000000000000000000000000000';
+    if (p.captureRole === 'placement') p.savedActorGuid = '00000000000000000000000000000000';
     if (p.kind === 'trap') {
       const a = attachment(p)!,
         parent = byId.get(a.supportActorPath)!;
@@ -125,6 +127,10 @@ export function replayRow(p: Placement): string {
 export function exportSave(template: Uint8Array, source: Capture): Uint8Array {
   readSaveText(template);
   const data = exportCapture(source);
+  if (referencedWorldSupports(data.placements).size)
+    throw new Error(
+      'This blueprint uses valid existing map supports. Save it as JSON to preserve them; the current menu .sav replay only resolves player-built supports.',
+    );
   const rows = data.placements.map(replayRow);
   validateReplayRows(rows);
   const document = JSON.stringify(data);

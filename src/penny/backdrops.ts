@@ -138,6 +138,7 @@ function placeBackdrops(
             const material = distant ? hazed(part.material) : foliage(part.material);
             const mesh = new THREE.InstancedMesh(part.geometry, material, matrices.length);
             matrices.forEach((values, index) => mesh.setMatrixAt(index, matrix.fromArray(values)));
+            mesh.name = key;
             mesh.computeBoundingSphere();
             mesh.castShadow = !distant;
             mesh.receiveShadow = !distant;

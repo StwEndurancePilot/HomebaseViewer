@@ -8,7 +8,7 @@ import {
   applyCloudTrapLevelFallback,
   repairCloudMeshMappings,
 } from '../src/cloud/convert';
-import { exportSave } from '../src/core/export';
+import { exportJson, exportSave } from '../src/core/export';
 import { exportDiagnostics } from '../src/core/editor';
 import { parseCapture, readSaveText } from '../src/core/save';
 const { decodeCloudBytes } = createRequire(import.meta.url)(
@@ -192,6 +192,63 @@ it('skips destroyed/map actors and refuses unreadable archives without producing
       (i) => !i.actorPaths.length && i.message.includes('could not be decoded'),
     ),
   ).toBe(true);
+});
+
+it('resolves traps against referenced non-spawned map actors instead of discarding them', () => {
+  const body = cat(
+    property('TrapData', 'ObjectProperty', string(item)),
+    property('AttachedTo', 'StructProperty', guid(1), cat(string('Guid'), Buffer.alloc(16))),
+    string('None'),
+  );
+  const bytes = cat(
+    Buffer.from('SavedActors'),
+    actor({ spawned: 0 }),
+    actor({ id: 2, path: ceiling, body }),
+    actor({ id: 3, spawned: 0 }),
+  );
+  const data = convertCloudSave(bytes, 'pve_03', 'map-supported.sav');
+  expect(data.placements).toHaveLength(2);
+  expect(data.capturedCount).toBe(2);
+  expect(data.placements[0].captureRole).toBe('existing-world');
+  expect(data.placements[1].attachment).toMatchObject({
+    status: 'resolved',
+    supportActorPath: data.placements[0].actorPath,
+  });
+  expect(exportDiagnostics(data)).toEqual([]);
+  expect(parseCapture(new TextEncoder().encode(exportJson(data))).placements[0].captureRole).toBe(
+    'existing-world',
+  );
+  const destroyed = convertCloudSave(
+    cat(
+      Buffer.from('SavedActors'),
+      actor({ spawned: 0, state: 3 }),
+      actor({ id: 2, path: ceiling, body }),
+    ),
+    'pve_03',
+    'destroyed-support.sav',
+  );
+  expect(exportDiagnostics(destroyed).some((issue) => issue.code === 'missing-support')).toBe(true);
+});
+
+it('keeps non-player support classes as map references and reports missing mesh evidence separately', () => {
+  const body = cat(
+    property('TrapData', 'ObjectProperty', string(item)),
+    property('AttachedTo', 'StructProperty', guid(1), cat(string('Guid'), Buffer.alloc(16))),
+    string('None'),
+  );
+  const data = convertCloudSave(
+    cat(
+      Buffer.from('SavedActors'),
+      actor({ path: '/Game/Building/ActorBlueprints/Map/Tunnel.Tunnel_C', spawned: 0 }),
+      actor({ id: 2, path: ceiling, body }),
+    ),
+    'pve_03',
+    'tunnel.sav',
+  );
+  expect(data.placements[0].captureRole).toBe('existing-world');
+  expect(data.placements[1].attachment).toMatchObject({ status: 'resolved' });
+  expect(exportDiagnostics(data).some((issue) => issue.code === 'missing-support')).toBe(false);
+  expect(exportDiagnostics(data).some((issue) => issue.message.includes('mesh'))).toBe(true);
 });
 it('decodes ECFD and gzip while keeping malformed archives distinct from empty saves', () => {
   const raw = cloud(),

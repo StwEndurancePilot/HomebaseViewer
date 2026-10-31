@@ -1,6 +1,8 @@
 import { Euler, Quaternion, Vector3 } from 'three';
 import type { Capture, Placement, Pose } from './save';
+import { zoneForCapture } from './save';
 import { meshStem } from './mesh-identity';
+import { isBuildingSupport, mapSurfaceReference, referencedWorldSupports } from './support';
 import { structureKind, patternOf, definitionFor, type BuildKind } from './build-pieces';
 export type Attachment = {
   status: string;
@@ -28,6 +30,7 @@ export const ESTIMATED_TRAP_Z = {
   wall: [-345, 720],
 } as const;
 export function trapZDeltaRange(record: Placement, support: Placement): [number, number] {
+  if (support.captureRole === 'existing-world') return [-Infinity, Infinity];
   const category = trapCategory(record);
   if (category === 'unknown') return [0, 0];
   const [min, max] = ESTIMATED_TRAP_Z[category],
@@ -40,7 +43,7 @@ export function selectionZDeltaRange(records: Placement[], all: Placement[]): [n
   const byId = new Map(all.map((p) => [p.actorPath, p]));
   for (const record of records) {
     const support = byId.get(attachment(record)?.supportActorPath ?? '');
-    if (!support || support.kind !== 'structure' || support.captureRole !== 'placement')
+    if (!isBuildingSupport(support))
       throw new Error('Selected traps need captured building supports.');
     const range = trapZDeltaRange(record, support);
     min = Math.max(min, range[0]);
@@ -199,12 +202,8 @@ function standardSupport(p: Placement, full = true) {
     throw new Error(
       'Edit the cone into a ramp (Sloped roof: two adjacent raised corners) before placing a trap.',
     );
-  if (
-    p.kind !== 'structure' ||
-    p.captureRole !== 'placement' ||
-    (shapeOf(p) === 'other' && !cone && (full || !structureKind(p)))
-  )
-    throw new Error('Point at a supported player-built piece.');
+  if (!isBuildingSupport(p) || (shapeOf(p) === 'other' && !cone && (full || !structureKind(p))))
+    throw new Error('Point at a supported building piece.');
   if (full && !cone && patternOf(p) && !['Solid', 'Floor'].includes(patternOf(p)!.id))
     throw new Error('Traps require a full floor, a cone edited into a ramp, or a solid wall.');
   const up = vec([0, 0, 1]).applyQuaternion(q(p.transform));
@@ -463,6 +462,19 @@ function buildingCentre(p: Placement) {
     : vec(p.transform.translation);
 }
 export function placementConflict(p: Placement, rows: Placement[]): string | null {
+  const mapSupport = rows.some(
+    (support) =>
+      support.actorPath === attachment(p)?.supportActorPath &&
+      support.captureRole === 'existing-world',
+  );
+  const trapCentre = (trap: Placement) =>
+    vec(
+      trapCategory(trap) === 'wall' || /patrol_ward_trap/i.test(trap.meshPath)
+        ? [0, 0, 0]
+        : [0, 256, 0],
+    )
+      .applyQuaternion(q(trap.transform))
+      .add(vec(trap.transform.translation));
   for (const other of rows) {
     if (
       other.actorPath === p.actorPath ||
@@ -497,7 +509,10 @@ export function placementConflict(p: Placement, rows: Placement[]): string | nul
       p.kind === 'trap' &&
       p.editorPlacementMode === 'standard' &&
       attachment(p)?.supportActorPath === attachment(other)?.supportActorPath &&
-      attachment(p)?.side === attachment(other)?.side
+      attachment(p)?.side === attachment(other)?.side &&
+      (!mapSupport ||
+        (trapCategory(p) === trapCategory(other) &&
+          trapCentre(p).distanceTo(trapCentre(other)) < 0.01))
     )
       return 'That support face already has a trap. Choose the other face or use Menu offsets for a distinct offset placement.';
   }
@@ -621,7 +636,8 @@ export type ExportIssue = {
 };
 export function exportDiagnostics(data: Capture): ExportIssue[] {
   const issues: ExportIssue[] = [],
-    byId = new Map(data.placements.map((p) => [p.actorPath, p]));
+    byId = new Map(data.placements.map((p) => [p.actorPath, p])),
+    worldSupports = referencedWorldSupports(data.placements);
   const add = (code: string, message: string, ...actorPaths: string[]) =>
     issues.push({ code, message, actorPaths: [...new Set(actorPaths)] });
   if (Array.isArray(data.cloudIssues))
@@ -644,15 +660,26 @@ export function exportDiagnostics(data: Capture): ExportIssue[] {
   if (trapTypes.size > 64)
     add('trap-row-limit', `${trapTypes.size} trap definitions; the menu supports at most 64.`);
   for (const p of data.placements) {
-    if (p.captureRole !== 'placement') continue;
+    if (p.captureRole !== 'placement' && !worldSupports.has(p.actorPath)) continue;
     if (Array.isArray(p.cloudIssues))
       for (const message of p.cloudIssues)
         if (typeof message === 'string') add('cloud-conversion', message, p.actorPath);
-    if (!p.classPath || !p.meshPath)
+    const mapReference = mapSurfaceReference(p);
+    if ((!p.classPath || !p.meshPath) && !mapReference)
       add('missing-path', 'Missing class or mesh path.', p.actorPath);
+    if (p.editorMapSupport && (!mapReference || mapReference.zoneId !== zoneForCapture(data)))
+      add(
+        'invalid-map-support',
+        'The map surface reference does not match this blueprint zone.',
+        p.actorPath,
+      );
     if (p.mirrored !== undefined && typeof p.mirrored !== 'boolean')
       add('invalid-mirror', 'Invalid mirrored state.', p.actorPath);
-    if (p.kind === 'structure' && ![0, 1, 2].includes(Number(p.resourceType ?? 0)))
+    if (
+      p.kind === 'structure' &&
+      p.captureRole === 'placement' &&
+      ![0, 1, 2].includes(Number(p.resourceType ?? 0))
+    )
       add('invalid-material', 'Building material must be wood, brick or metal.', p.actorPath);
     for (const [name, pose] of [
       ['Actor', p.transform],
@@ -673,15 +700,10 @@ export function exportDiagnostics(data: Capture): ExportIssue[] {
         Number(p.attachmentType) > 255
       )
         add('invalid-attachment-type', 'Missing or invalid trap attachment type.', p.actorPath);
-      if (
-        a?.status !== 'resolved' ||
-        !parent ||
-        parent.kind !== 'structure' ||
-        parent.captureRole !== 'placement'
-      )
+      if (a?.status !== 'resolved' || !isBuildingSupport(parent))
         add(
           'missing-support',
-          'Missing player-built support; menu replay cannot resolve it.',
+          'Missing building support; include the captured player build or existing map structure.',
           p.actorPath,
         );
       else if (parent.transform.scale.some((v) => Math.abs(v) < 1e-12))

@@ -1,6 +1,6 @@
 import { Quaternion, Vector3 } from 'three';
 import type { Placement } from './save';
-import { buildingRecord, shapeOf, type Vec3 } from './editor';
+import { buildingRecord, shapeOf, unrealRotator, type Vec3 } from './editor';
 import { structureKind } from './build-pieces';
 
 export function groundSupport(point: Vec3, records: Placement[]): Placement {
@@ -26,6 +26,31 @@ export function groundSupport(point: Vec3, records: Placement[]): Placement {
   return buildingRecord('floor', 0, 1, {
     translation: local.applyQuaternion(rotation).add(origin).toArray() as Vec3,
     rotation: rotation.toArray() as Placement['transform']['rotation'],
+    scale: [1, 1, 1],
+  });
+}
+export function surfaceSupport(point: Vec3, normal: Vec3, records: Placement[]): Placement {
+  const floor = groundSupport(point, records);
+  if (Math.abs(normal[2]) > 0.5) return floor;
+  const rotation = new Quaternion(...floor.transform.rotation);
+  const localNormal = new Vector3(...normal).applyQuaternion(rotation.clone().invert());
+  const local = new Vector3(...point)
+    .sub(new Vector3(...floor.transform.translation))
+    .applyQuaternion(rotation.clone().invert());
+  const alongX = Math.abs(localNormal.x) > Math.abs(localNormal.y);
+  const offset = new Vector3(
+    alongX ? (local.x >= 0 ? 256 : -256) : 0,
+    alongX ? 256 : Math.round(local.y / 512) * 512,
+    local.z < 0 ? -384 : 0,
+  );
+  return buildingRecord('wall', 0, 1, {
+    translation: offset
+      .applyQuaternion(rotation)
+      .add(new Vector3(...floor.transform.translation))
+      .toArray() as Vec3,
+    rotation: rotation
+      .multiply(new Quaternion(...unrealRotator(0, alongX ? 90 : 0, 0)))
+      .toArray() as Placement['transform']['rotation'],
     scale: [1, 1, 1],
   });
 }

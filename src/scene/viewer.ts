@@ -17,11 +17,15 @@ import { pennyTrapPivotOffset } from '../core/trap-pivots';
 import { zoneForCapture, type Capture, type Placement } from '../core/save';
 import { attachment, type Vec3 } from '../core/editor';
 import { structureKind } from '../core/build-pieces';
+import { worldSupportAt } from './world-support';
+import { isBuildingSupport, isMapBuilding, mapSurfaceReference } from '../core/support';
 import { TrapMover } from './trap-mover';
 export type PlacementHit = {
   record: Placement | null;
   point: Vec3;
   camera: Vec3;
+  normal?: Vec3;
+  mapStructure?: boolean;
 };
 export type FidelityReport = {
   file: string;
@@ -471,9 +475,10 @@ export class Viewer {
       this.camera,
     );
     const unreal = (v: THREE.Vector3): Vec3 => [-v.z * 512, v.x * 512, v.y * 512];
-    const terrainHit = this.terrain.visible
-      ? ray.intersectObject(this.terrain, true)[0]
-      : undefined;
+    const terrainHit = ray.intersectObjects(
+      [this.terrain, this.scenery].filter((group) => group?.visible),
+      true,
+    )[0];
     let ground: PlacementHit | null = null;
     let groundDistance = Infinity;
     if (terrainHit) {
@@ -487,11 +492,23 @@ export class Viewer {
       const normal = terrainHit.face?.normal
         .clone()
         .applyNormalMatrix(new THREE.Matrix3().getNormalMatrix(matrix));
-      if (terrainHit.object.userData[WALKABLE] && normal && normal.y > 0.5)
+      const record = worldSupportAt(
+        terrainHit.object.name,
+        matrix,
+        this.placementRecords,
+        this.environmentZone,
+      );
+      if (
+        terrainHit.object.userData[WALKABLE] &&
+        normal &&
+        (normal.y > 0.5 || record || isMapBuilding(terrainHit.object.name))
+      )
         ground = {
-          record: null,
+          record,
           point: unreal(terrainHit.point),
           camera: unreal(this.camera.position),
+          normal: [-normal.z, normal.x, normal.y],
+          mapStructure: Boolean(record || isMapBuilding(terrainHit.object.name)),
         };
     } else if (!this.environmentZone && ray.ray.direction.y < -1e-7) {
       const point = ray.ray.intersectPlane(
@@ -508,10 +525,23 @@ export class Viewer {
       const record = (hit.object.userData.records as Placement[] | undefined)?.[
         hit.instanceId ?? 0
       ];
-      if (!record || record.captureRole !== 'placement' || this.hiddenActors.has(record.actorPath))
-        continue;
+      if (!isBuildingSupport(record) || this.hiddenActors.has(record.actorPath)) continue;
       if (hit.distance > groundDistance + 0.02) break;
-      return { record, point: unreal(hit.point), camera: unreal(this.camera.position) };
+      const matrix = hit.object.matrixWorld.clone();
+      if (hit.object instanceof THREE.InstancedMesh && hit.instanceId !== undefined) {
+        const instance = new THREE.Matrix4();
+        hit.object.getMatrixAt(hit.instanceId, instance);
+        matrix.multiply(instance);
+      }
+      const normal = hit.face?.normal
+        .clone()
+        .applyNormalMatrix(new THREE.Matrix3().getNormalMatrix(matrix));
+      return {
+        record,
+        point: unreal(hit.point),
+        camera: unreal(this.camera.position),
+        ...(normal ? { normal: [-normal.z, normal.x, normal.y] as Vec3 } : {}),
+      };
     }
     const origin = new THREE.Vector3(
       -ray.ray.origin.z * 512,
@@ -785,9 +815,7 @@ export class Viewer {
   }
   async load(data: Capture, file: string, preserveView = false) {
     this.setEditTarget(null);
-    this.placementRecords = data.placements.filter(
-      (p) => p.kind === 'structure' && p.captureRole === 'placement',
-    );
+    this.placementRecords = data.placements.filter(isBuildingSupport);
     this.mover.detach();
     this.issueActors.clear();
     this.selectionIds.clear();
@@ -860,6 +888,7 @@ export class Viewer {
         continue;
       }
       if (p.captureRole === 'existing-world') report.existingWorld++;
+      if (mapSurfaceReference(p)) continue;
       this.bounds.expandByPoint(scenePoint(p.meshTransform.translation));
       const identity = meshIdentity(p.meshPath);
       const parts = identity

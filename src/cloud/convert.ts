@@ -2,6 +2,7 @@ import { ArchiveReader } from './archive-reader';
 import { Quaternion, Vector3 } from 'three';
 import type { Capture, Placement, Pose } from '../core/save';
 import { relativePose } from '../core/editor';
+import { referencedWorldSupports } from '../core/support';
 import { buildDefinitionForClass, EDIT_PATTERNS } from '../core/build-pieces';
 import catalogData from './catalog.json';
 import container from './menu-container.json';
@@ -211,7 +212,10 @@ export function convertCloudSave(bytes: Uint8Array, zoneId: string, filename: st
       'This cloud archive has no supported actor stream. It was not imported as an empty base.',
     );
   const pattern =
-    /\/(?:Game\/Building\/ActorBlueprints\/Player\/[A-Za-z0-9_/]+\.PBWA_[A-Za-z0-9_]+_C|(?:SaveTheWorld|Game)\/Items\/Traps\/Blueprints\/Trap_[A-Za-z0-9_]+\.Trap_[A-Za-z0-9_]+_C)/g;
+    /\/(?:Game\/Building\/ActorBlueprints\/[A-Za-z0-9_/]+\.[A-Za-z0-9_]+_C|(?:SaveTheWorld|Game)\/Items\/Traps\/Blueprints\/Trap_[A-Za-z0-9_]+\.Trap_[A-Za-z0-9_]+_C)/g;
+  const isPlayerRecord = (record: RecordData) =>
+    record.spawned &&
+    (record.classPath.includes('/Player/') || record.classPath.includes('/Items/Traps/'));
   const records: RecordData[] = [],
     unreadable: number[] = [],
     spans: {
@@ -226,8 +230,13 @@ export function convertCloudSave(bytes: Uint8Array, zoneId: string, filename: st
     if (record) {
       consumed = record.end;
       spans.push({ start: match.index, end: record.end });
-      if (record.spawned && record.state !== 3) records.push(record);
-    } else if (r.string(match.index - 4)?.value === match[0] && r.bytes[match.index - 5] <= 5)
+      if (record.state !== 3 && (record.spawned || !record.classPath.includes('/Items/Traps/')))
+        records.push(record);
+    } else if (
+      (match[0].includes('/Player/') || match[0].includes('/Items/Traps/')) &&
+      r.string(match.index - 4)?.value === match[0] &&
+      r.bytes[match.index - 5] <= 5
+    )
       unreadable.push(match.index);
     if (records.length > 100000) throw new Error('Cloud archive contains too many actor records.');
   }
@@ -244,7 +253,7 @@ export function convertCloudSave(bytes: Uint8Array, zoneId: string, filename: st
         unreadable.push(at);
     }
   }
-  if (!records.length)
+  if (!records.some(isPlayerRecord))
     throw new Error(
       unreadable.length
         ? 'The cloud actor format could not be decoded. No empty blueprint was created.'
@@ -274,7 +283,7 @@ export function convertCloudSave(bytes: Uint8Array, zoneId: string, filename: st
         actorPath: `/CloudImport/${session}/${record.guid ?? record.offset}.Placement`,
         classPath: info?.classPath ?? classPath,
         kind,
-        captureRole: 'placement',
+        captureRole: isPlayerRecord(record) ? 'placement' : 'existing-world',
         meshPath: info?.meshPath ?? '',
         transform: pose,
         meshTransform: compose(info?.meshRelative ?? identity, pose),
@@ -418,6 +427,10 @@ export function convertCloudSave(bytes: Uint8Array, zoneId: string, filename: st
           : null,
     };
   }
+  const worldSupports = referencedWorldSupports(placements);
+  const retainedPlacements = placements.filter(
+    (p) => p.captureRole === 'placement' || worldSupports.has(p.actorPath),
+  );
   return {
     schemaVersion: 6,
     format: 'stw-homebase-capture',
@@ -425,8 +438,8 @@ export function convertCloudSave(bytes: Uint8Array, zoneId: string, filename: st
     rotationEncoding: 'quaternion-xyzw',
     worldPath: `/STW_Zones/Maps/Zones/Outpost/Zone_Outpost_${zones[zoneId]}.Zone_Outpost_${zones[zoneId]}`,
     completeHomebase: false,
-    capturedCount: placements.length,
-    placements,
+    capturedCount: retainedPlacements.length,
+    placements: retainedPlacements,
     cloudImport: {
       filename,
       zoneId,

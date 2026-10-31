@@ -1,3 +1,4 @@
+import { isBuildingSupport } from './support';
 import type { Capture, Placement } from './save';
 import { moveTiles } from './tile-movement';
 import { editStructure, type EditPattern } from './build-pieces';
@@ -50,10 +51,21 @@ export class EditorDocument {
     this.selected = selected;
     this.revision++;
   }
-  add(p: Placement) {
-    const issue = placementConflict(p, this.data.placements);
+  add(p: Placement, support?: Placement | null) {
+    const rows = [...this.data.placements];
+    if (support && !rows.some((row) => row.actorPath === support.actorPath)) {
+      if (
+        !isBuildingSupport(support) ||
+        support.captureRole !== 'existing-world' ||
+        p.kind !== 'trap' ||
+        attachment(p)?.supportActorPath !== support.actorPath
+      )
+        throw new Error('The new trap must reference its map support.');
+      rows.push(structuredClone(support));
+    }
+    const issue = placementConflict(p, rows);
     if (issue) throw new Error(issue);
-    this.commit([...this.data.placements, p], new Set([p.actorPath]));
+    this.commit([...rows, p], new Set([p.actorPath]));
   }
   editBuilding(actorPath: string, pattern: EditPattern, turn = 0, mirror = false) {
     const source = this.data.placements.find((p) => p.actorPath === actorPath);
@@ -124,8 +136,8 @@ export class EditorDocument {
       const parent = this.data.placements.find(
         (t) => t.actorPath === attachment(p)?.supportActorPath,
       );
-      if (!parent || parent.kind !== 'structure' || parent.captureRole !== 'placement')
-        throw new Error('A selected trap has no player-built support.');
+      if (!isBuildingSupport(parent))
+        throw new Error('A selected trap has no captured building support.');
       changes.set(p.actorPath, edit(p, parent));
     }
     const untouched = this.data.placements.filter((p) => !changes.has(p.actorPath));
