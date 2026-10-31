@@ -130,7 +130,7 @@ try {
   await page.waitForFunction(
     () =>
       document.querySelector('#placementFeedback').textContent ===
-      'Place a floor or wall first to support a trap.',
+      'Place a floor, ramp-shaped cone, or wall first to support a trap.',
   );
   assert.equal(await page.locator('#place').evaluate((e) => e.disabled), true);
   assert.deepEqual(errors, []);
