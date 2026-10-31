@@ -7,11 +7,11 @@
       http-equiv="Content-Security-Policy"
       content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data:; connect-src 'self' blob:; worker-src 'self' blob:; object-src 'none'; base-uri 'self'"
     />
-    <title>Homebase Viewer</title>
+    <title>Homebase Designer</title>
   </head>
   <body>
     <header class="app-bar">
-      <div class="brand"><span class="brand-mark">H</span><strong>Homebase</strong></div>
+      <div class="brand"><span class="brand-mark">H</span><strong>Homebase Designer</strong></div>
       <div id="filename" class="filename"></div>
       <md-text-button id="newBlueprint" disabled>New blueprint</md-text-button>
       <md-text-button id="saveDraft" disabled>Save draft</md-text-button>
@@ -262,6 +262,13 @@
                   face</md-text-button
                 >
               </div>
+              <label class="check-row"
+                ><input id="autoFitCone" type="checkbox" checked />Auto-fit ramp cones</label
+              >
+              <p class="muted">
+                Auto-fit places the trap one tile in front of the ramp cone and below its base. You
+                can adjust it after placing.
+              </p>
               <label id="ceilingFlipRow" class="check-row" hidden
                 ><input id="ceilingFlip" type="checkbox" />Upside down on floor</label
               ><label class="check-row"
@@ -489,7 +496,10 @@
               <md-text-button id="zeroOffsets">Reset values</md-text-button
               ><md-filled-button id="applyOffsets">Apply to selection</md-filled-button>
             </div>
-            <p id="offsetContext" class="muted">New traps: enable Use trap offsets.</p>
+            <p id="offsetContext" class="muted">
+              New traps: enable Use trap offsets. These adjustments are added after ramp cone
+              auto-fit.
+            </p>
           </section>
           <section
             id="pastePanel"

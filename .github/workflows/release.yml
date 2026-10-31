@@ -35,7 +35,7 @@ jobs:
         run: npm run release:build
       - name: Test packaged viewer
         env:
-          VIEWER_EXE: ${{ github.workspace }}/artifacts/releases/${{ steps.version.outputs.version }}/win-unpacked/Homebase Viewer.exe
+          VIEWER_EXE: ${{ github.workspace }}/artifacts/releases/${{ steps.version.outputs.version }}/win-unpacked/Homebase Designer.exe
         run: npm run test:smoke
       - name: Publish verified release
         run: node scripts/release/publish.mjs

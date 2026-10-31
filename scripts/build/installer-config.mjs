@@ -4,11 +4,11 @@ export function installerConfig(repository, version) {
   const publisher = process.env.WINDOWS_PUBLISHER_NAME;
   return {
     appId: 'io.homebaseviewer.desktop',
-    productName: 'Homebase Viewer',
-    executableName: 'Homebase Viewer',
+    productName: 'Homebase Designer',
+    executableName: 'Homebase Designer',
     icon: 'assets/branding/icon.png',
     directories: { output: releaseDirectory(version), buildResources: 'assets/branding' },
-    artifactName: 'Homebase-Viewer-Setup-${version}.${ext}',
+    artifactName: 'Homebase-Designer-Setup-${version}.${ext}',
     files: [
       'dist/**/*',
       'electron/**/*',
@@ -22,8 +22,8 @@ export function installerConfig(repository, version) {
     asar: true,
     extraResources: [{ from: 'electron/homebase-open.json', to: 'homebase-open.json' }],
     extraMetadata: {
-      description: 'Fortnite STW homebase viewer and blueprint editor',
-      author: 'Homebase Viewer contributors',
+      description: 'Fortnite STW homebase designer and blueprint editor',
+      author: 'Homebase Designer contributors',
     },
     publish: repository
       ? [{ provider: 'github', ...repository, releaseType: 'release', vPrefixedTagName: false }]
@@ -40,8 +40,8 @@ export function installerConfig(repository, version) {
       allowToChangeInstallationDirectory: false,
       createDesktopShortcut: true,
       createStartMenuShortcut: true,
-      shortcutName: 'Homebase Viewer',
-      uninstallDisplayName: 'Homebase Viewer',
+      shortcutName: 'Homebase Designer',
+      uninstallDisplayName: 'Homebase Designer',
       deleteAppDataOnUninstall: false,
       differentialPackage: true,
     },

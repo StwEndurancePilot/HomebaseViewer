@@ -17,7 +17,7 @@ await prepareNotices();
 const manifest = JSON.parse(await readFile('package.json', 'utf8'));
 const paths = await packager({
   dir: '.',
-  name: 'Homebase Viewer',
+  name: 'Homebase Designer',
   platform: 'win32',
   arch: 'x64',
   out: process.env.HOMEBASE_PORTABLE_OUTPUT || path.join('artifacts', manifest.version),
@@ -41,14 +41,14 @@ const paths = await packager({
     );
   },
   appVersion: manifest.version,
-  executableName: 'Homebase Viewer',
+  executableName: 'Homebase Designer',
 });
 for (const output of paths) {
   await copyFile('electron/homebase-open.json', path.join(output, 'resources/homebase-open.json'));
   await mkdir(output, { recursive: true });
   await writeFile(
-    path.join(output, 'Start-Homebase-Viewer.cmd'),
-    '@echo off\r\ncd /d "%~dp0"\r\nstart "" "%~dp0Homebase Viewer.exe"\r\n',
+    path.join(output, 'Start-Homebase-Designer.cmd'),
+    '@echo off\r\ncd /d "%~dp0"\r\nstart "" "%~dp0Homebase Designer.exe"\r\n',
   );
   await copyFile('README.md', path.join(output, 'README.md'));
   await copyFile('THIRD-PARTY.md', path.join(output, 'THIRD-PARTY.md'));

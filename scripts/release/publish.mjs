@@ -20,7 +20,7 @@ const release = await (
     body: JSON.stringify({
       tag_name: version,
       target_commitish: process.env.GITHUB_SHA,
-      name: `Homebase Viewer ${version}`,
+      name: `Homebase Designer ${version}`,
       draft: true,
       prerelease: false,
       generate_release_notes: true,

@@ -14,7 +14,7 @@ export function setupUpdatePanel() {
   const progress = el<HTMLProgressElement>('updatesProgress');
   function render(state: UpdateState) {
     const busy = ['checking', 'available', 'downloading', 'installing'].includes(state.status);
-    el('updatesVersion').textContent = `Homebase Viewer ${state.currentVersion}`;
+    el('updatesVersion').textContent = `Homebase Designer ${state.currentVersion}`;
     el('updatesStatus').textContent = {
       unavailable: 'Updates are available in the installed version.',
       idle: 'Check for a newer version.',

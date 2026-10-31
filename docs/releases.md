@@ -22,7 +22,7 @@ GitHub Actions uses its built-in `GITHUB_TOKEN` with release-write permission. N
 
 ## What users install
 
-Download `Homebase-Viewer-Setup-X.Y.Z.exe` from Releases. Setup installs for the current Windows user, creates shortcuts and upgrades the existing installation in place. It preserves app data and does not modify saved blueprints. Users switching from the old portable folder should install Setup once and use the new shortcut.
+Download `Homebase-Designer-Setup-X.Y.Z.exe` from Releases. Setup installs for the current Windows user, creates shortcuts and upgrades the existing installation in place. It preserves app data and does not modify saved blueprints. Users switching from the old portable folder should install Setup once and use the new shortcut.
 
 The installed app checks GitHub three seconds after each launch. New stable releases download in the background. A dot on the Updates button indicates that an update is ready. It installs on a normal close, or immediately after **Restart & update** closes the window. The existing unsaved-edit prompt can cancel that close. Installation is deferred if Windows reports session shutdown. Offline or failed checks leave the editor usable; **Check for updates** retries.
 
@@ -30,8 +30,8 @@ Downloads use electron-updater's SHA-512 verification and its Windows publisher 
 
 Each GitHub release contains three assets:
 
-- `Homebase-Viewer-Setup-X.Y.Z.exe`
-- `Homebase-Viewer-Setup-X.Y.Z.exe.blockmap`
+- `Homebase-Designer-Setup-X.Y.Z.exe`
+- `Homebase-Designer-Setup-X.Y.Z.exe.blockmap`
 - `latest.yml`
 
 Keep all three together. `latest.yml` contains the installer version, size and checksum. The build verification report stays in the Actions artifacts instead of the public release assets.
@@ -60,6 +60,6 @@ The setup and verification report are written under `artifacts/releases/<version
 
 For another output disk, set `HOMEBASE_BUILD_OUTPUT` to an absolute output directory. Electron's download cache can be moved with `ELECTRON_CACHE`, and installer tools with `ELECTRON_BUILDER_CACHE`. Standard `TEMP`/`TMP` control build scratch space.
 
-Run the packaged smoke checks by setting `VIEWER_EXE` to the output folder's `win-unpacked/Homebase Viewer.exe` and running `npm run test:smoke`. The updater smoke uses a local fixture feed and never executes the downloaded installer.
+Run the packaged smoke checks by setting `VIEWER_EXE` to the output folder's `win-unpacked/Homebase Designer.exe` and running `npm run test:smoke`. The updater smoke uses a local fixture feed and never executes the downloaded installer.
 
 The installer uses electron-builder NSIS and electron-updater. Their [update documentation](https://www.electron.build/docs/features/auto-update/) describes the release metadata and supported installer target. This project pins its dependencies in `package-lock.json`.

@@ -194,18 +194,25 @@ export function trapCategory(p: Placement): 'floor' | 'wall' | 'ceiling' | 'unkn
         : 'unknown';
 }
 function standardSupport(p: Placement, full = true) {
+  const cone = patternOf(p)?.id === 'RoofS';
+  if (full && structureKind(p) === 'roof' && !cone)
+    throw new Error(
+      'Edit the cone into a ramp (Sloped roof: two adjacent raised corners) before placing a trap.',
+    );
   if (
     p.kind !== 'structure' ||
     p.captureRole !== 'placement' ||
-    (shapeOf(p) === 'other' && (full || !structureKind(p)))
+    (shapeOf(p) === 'other' && !cone && (full || !structureKind(p)))
   )
     throw new Error('Point at a supported player-built piece.');
-  if (full && patternOf(p) && !['Solid', 'Floor'].includes(patternOf(p)!.id))
-    throw new Error('Traps require a full floor or solid wall. Reset the edit first.');
+  if (full && !cone && patternOf(p) && !['Solid', 'Floor'].includes(patternOf(p)!.id))
+    throw new Error('Traps require a full floor, a cone edited into a ramp, or a solid wall.');
   const up = vec([0, 0, 1]).applyQuaternion(q(p.transform));
   const forward = vec([1, 0, 0]).applyQuaternion(q(p.transform));
   if (
-    p.transform.scale.some((v, i) => Math.abs((!full && i === 0 ? Math.abs(v) : v) - 1) > 1e-6) ||
+    p.transform.scale.some(
+      (v, i) => Math.abs(((!full || cone) && i === 0 ? Math.abs(v) : v) - 1) > 1e-6,
+    ) ||
     up.distanceTo(vec([0, 0, 1])) > 1e-6 ||
     Math.min(Math.abs(forward.x), Math.abs(forward.y)) > 1e-6
   )
@@ -345,10 +352,13 @@ export function placeTrap(
   offsets: Offsets,
   mode: 'standard' | 'menu-offset',
   inverted = false,
+  autoFitCone = true,
 ): Placement {
   standardSupport(support);
   const category = trapCategory(template),
-    shape = shapeOf(support);
+    rampCone = patternOf(support)?.id === 'RoofS',
+    fitCone = rampCone && autoFitCone,
+    shape = rampCone ? 'floor' : shapeOf(support);
   if (template.kind !== 'trap' || !template.itemPath)
     throw new Error('Choose a captured trap variant with a valid item definition.');
   if (category === 'unknown')
@@ -357,7 +367,7 @@ export function placeTrap(
     );
   if (category === 'wall' ? shape !== 'wall' : shape !== 'floor')
     throw new Error(
-      `${category} traps require a full ${category === 'wall' ? 'wall' : 'floor'} support.`,
+      `${category} traps require a ${category === 'wall' ? 'solid wall support' : 'full floor support or cone edited into a ramp'}.`,
     );
   if (!Number.isFinite(turn) || turn % 90 !== 0)
     throw new Error('Standard trap orientation must use 90° steps.');
@@ -371,7 +381,7 @@ export function placeTrap(
   const orientation = q(support.transform).multiply(
     new Quaternion(...unrealRotator(0, category === 'wall' ? side * 180 : turn, 0)),
   );
-  if (inverted) {
+  if (inverted && !fitCone) {
     if (category !== 'ceiling') throw new Error('The upside-down preset requires a ceiling trap.');
     orientation.multiply(new Quaternion(0, -1, 0, 0));
   }
@@ -401,7 +411,17 @@ export function placeTrap(
   result.editorPlacementMode = inverted ? 'menu-offset' : mode;
   if (mode === 'standard' && [...offsets.position, ...offsets.angles].some((v) => v !== 0))
     throw new Error('Enable Menu offsets to apply XYZ or angle offsets.');
-  return mode === 'menu-offset' ? withOffsets(result, offsets, support) : result;
+  const fitted = fitCone
+    ? withOffsets(
+        result,
+        {
+          position: arr(vec([0, -512, 0]).applyQuaternion(q(support.transform)).setZ(-91)),
+          angles: [0, 180, 180],
+        },
+        support,
+      )
+    : result;
+  return mode === 'menu-offset' ? withOffsets(fitted, offsets, support) : fitted;
 }
 export function flipCeilingTrap(record: Placement, support: Placement): Placement {
   if (record.kind !== 'trap' || trapCategory(record) !== 'ceiling')

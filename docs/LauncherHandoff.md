@@ -1,6 +1,6 @@
 # Opening a menu homebase from OSS STW
 
-Homebase Viewer 1.7.1 accepts `--open-homebase <absolute local .sav path>`.
+Homebase Designer 1.7.1 accepts `--open-homebase <absolute local .sav path>`.
 OSS STW finds the installed Viewer through Windows installation records and
 checks `resources/homebase-open.json` for this capability before opening it.
 In OSS STW, use Homebases, choose a saved homebase, then Open in viewer. The

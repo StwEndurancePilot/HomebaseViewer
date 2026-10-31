@@ -20,7 +20,7 @@ export function exportCapture(source: Capture): Capture {
   data.attachmentReference = 'actorPath';
   data.relativeTransformConvention = 'Unreal-MakeRelativeTransform-child-parent';
   data.editor = {
-    application: 'Homebase Viewer',
+    application: 'Homebase Designer',
     purpose: 'custom-blueprint',
     validation: 'offline-support-and-placement-checks; game-server-acceptance-unverified',
   };

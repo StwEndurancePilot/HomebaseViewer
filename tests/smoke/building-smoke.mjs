@@ -155,6 +155,79 @@ try {
     await settle();
     assert.match((await inspect()).mesh, new RegExp(shape));
   }
+  await open('cone-trap');
+  await page.keyboard.press('Control+a');
+  await click('selectionChip');
+  await click('structuresOnly');
+  await click('frameSelection');
+  await click('buildTool');
+  await page.keyboard.press('5');
+  assert.equal(await page.locator('#useOffsets').isChecked(), false);
+  assert.equal(await page.locator('#autoFitCone').isChecked(), true);
+  await page.locator('#cameraView').selectOption('top');
+  await page.mouse.move(point.x, point.y);
+  await page.waitForFunction(() => document.querySelector('#place').disabled === false);
+  await page.mouse.click(point.x, point.y);
+  await settle();
+  assert.equal(await page.locator('#traps').textContent(), '2');
+  assert.equal((await inspect()).actorTransform.translation[2], -91);
+  assert.ok(Math.abs((await inspect()).attachment.relativeTransform.translation[0]) < 1e-8);
+  assert.ok(Math.abs((await inspect()).attachment.relativeTransform.translation[1] + 512) < 1e-8);
+  await page.keyboard.press('Escape');
+  await click('selectionChip');
+  await click('selectionOffsets');
+  await page.locator('#offsetZ').fill('-20');
+  await click('applyOffsets');
+  await settle();
+  assert.equal((await inspect()).actorTransform.translation[2], -111);
+  await click('undo');
+  await settle();
+  assert.equal((await inspect()).actorTransform.translation[2], -91);
+  assert.ok(Math.abs((await inspect()).attachment.relativeTransform.translation[0]) < 1e-8);
+  assert.ok(Math.abs((await inspect()).attachment.relativeTransform.translation[1] + 512) < 1e-8);
+  await page.keyboard.press('Escape');
+
+  await open('floor');
+  await page.keyboard.press('Control+a');
+  await click('frameSelection');
+  await page.locator('#cameraView').selectOption('top');
+  await click('fly');
+  await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0].focus());
+  await page.mouse.click(point.x, point.y);
+  await page.waitForFunction(() => Boolean(document.pointerLockElement));
+  await page.keyboard.press('2');
+  await page.keyboard.press('PageDown');
+  await page.waitForFunction(() => document.querySelector('#place').disabled === false);
+  assert.equal(await page.locator('#fly').evaluate((e) => e.classList.contains('active')), true);
+  await page.mouse.click(point.x, point.y);
+  await settle();
+  assert.equal(await page.locator('#structures').textContent(), '2');
+  assert.equal((await inspect()).actorTransform.translation[2], -384);
+  assert.equal(await page.evaluate(() => Boolean(document.pointerLockElement)), true);
+  assert.equal(await page.locator('#fly').evaluate((e) => e.classList.contains('active')), true);
+  await page.keyboard.press('4');
+  await page.keyboard.press('Home');
+  await page.keyboard.press('r');
+  await page.waitForFunction(() => document.querySelector('#place').disabled === false);
+  await page.mouse.click(point.x, point.y);
+  await settle();
+  assert.equal(await page.locator('#structures').textContent(), '3');
+  assert.match((await inspect()).mesh, /RoofC/);
+  assert.equal(await page.locator('#fly').evaluate((e) => e.classList.contains('active')), true);
+  await page.evaluate(() => document.exitPointerLock());
+  await page.waitForFunction(() => !document.pointerLockElement);
+  await click('closeBuild');
+  assert.equal(await page.locator('#fly').evaluate((e) => e.classList.contains('active')), true);
+  await click('buildTool');
+  assert.equal(await page.locator('#fly').evaluate((e) => e.classList.contains('active')), true);
+  await click('orbit');
+  assert.equal(await page.locator('#placePanel').isVisible(), true);
+  await click('fly');
+  assert.equal(await page.locator('#placePanel').isVisible(), true);
+  await click('closeBuild');
+  await click('orbit');
+  await open('roof');
+  await page.keyboard.press('Control+a');
   await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0].setSize(960, 640));
   await page.keyboard.press('e');
   await page.waitForTimeout(200);
@@ -170,7 +243,7 @@ try {
   assert.equal(await page.locator('#undo').evaluate((e) => e.disabled), true);
   assert.deepEqual(errors, []);
   console.log(
-    'PASS: grid edits, invalid masks, reset/cancel, mirror, undo/redo, native export, pointer placement underneath, explicit below from above, floor/ramp/cone edits and compact layout.',
+    'PASS: grid edits, invalid masks, reset/cancel, mirror, undo/redo, native export, pointer placement underneath, explicit below from above, floor/ramp/cone edits, ceiling traps on ramp-shaped cones, repeated crosshair building in fly mode and compact layout.',
   );
 } catch (e) {
   await page.screenshot({ path: 'artifacts/validation/building-failure.png' });

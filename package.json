@@ -1,6 +1,6 @@
 {
-  "name": "homebase-viewer",
-  "productName": "Homebase Viewer",
+  "name": "homebase-designer",
+  "productName": "Homebase Designer",
   "version": "1.7.1",
   "private": true,
   "license": "GPL-3.0",
@@ -46,8 +46,8 @@
   "engines": {
     "node": "^22.12.0 || >=24.0.0"
   },
-  "description": "Fortnite STW homebase viewer and blueprint editor",
-  "author": "Homebase Viewer contributors",
+  "description": "Fortnite STW homebase designer and blueprint editor",
+  "author": "Homebase Designer contributors",
   "repository": {
     "type": "git",
     "url": "https://github.com/StwEndurancePilot/HomebaseViewer.git"

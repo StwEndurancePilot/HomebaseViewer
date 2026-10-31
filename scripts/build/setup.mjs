@@ -16,7 +16,7 @@ await build({
 });
 await verifyInstaller(manifest.version, repository);
 console.log(
-  `Setup: ${releaseDirectory(manifest.version)}/Homebase-Viewer-Setup-${manifest.version}.exe`,
+  `Setup: ${releaseDirectory(manifest.version)}/Homebase-Designer-Setup-${manifest.version}.exe`,
 );
 if (!repository)
   console.log('Local installer: configure a GitHub repository for automatic updates.');

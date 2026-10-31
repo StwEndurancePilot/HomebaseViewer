@@ -88,6 +88,9 @@ export class Viewer {
   }[] = [];
   private walker: ReturnType<typeof createWalker> | null = null;
   private mode: 'orbit' | 'walk' | 'fly' = 'orbit';
+  get cameraMode() {
+    return this.mode;
+  }
   private generation = 0;
   private spawn = new THREE.Vector3();
   private bounds = new THREE.Box3();
@@ -245,6 +248,7 @@ export class Viewer {
           Number(this.pressed.has('KeyQ'))) *
         speed;
       this.camera.position.add(motion);
+      this.queueHover();
     }
     this.renderer.render(this.scene, this.camera);
   }
@@ -443,25 +447,27 @@ export class Viewer {
     this.setSelection(this.selectionIds);
   }
   private queueHover() {
-    if (!this.placing || !this.pointer || this.hoverQueued) return;
+    if (!this.placing || (!this.pointer && this.mode !== 'fly') || this.hoverQueued) return;
     this.hoverQueued = true;
     requestAnimationFrame(() => {
       this.hoverQueued = false;
-      if (this.placing && this.pointer)
-        this.onPlacementHover(this.placementHit(this.pointer.x, this.pointer.y));
+      if (this.placing && (this.pointer || this.mode === 'fly'))
+        this.onPlacementHover(this.placementHit(this.pointer?.x ?? 0, this.pointer?.y ?? 0));
     });
   }
   private placementHit(x: number, y: number): PlacementHit | null {
-    if (!this.builds.visible || this.mode !== 'orbit') return null;
+    if (!this.builds.visible || this.mode === 'walk') return null;
     this.scene.updateMatrixWorld(true);
     this.camera.updateMatrixWorld();
     const rect = this.renderer.domElement.getBoundingClientRect(),
       ray = new THREE.Raycaster();
     ray.setFromCamera(
-      new THREE.Vector2(
-        ((x - rect.left) / rect.width) * 2 - 1,
-        (-(y - rect.top) / rect.height) * 2 + 1,
-      ),
+      this.mode === 'fly'
+        ? new THREE.Vector2()
+        : new THREE.Vector2(
+            ((x - rect.left) / rect.width) * 2 - 1,
+            (-(y - rect.top) / rect.height) * 2 + 1,
+          ),
       this.camera,
     );
     const unreal = (v: THREE.Vector3): Vec3 => [-v.z * 512, v.x * 512, v.y * 512];
@@ -736,7 +742,10 @@ export class Viewer {
   private pick(e: MouseEvent) {
     if (this.editTarget) return;
     if (this.mode === 'fly') {
-      void this.renderer.domElement.requestPointerLock().catch(() => {});
+      if (document.pointerLockElement !== this.renderer.domElement)
+        void this.renderer.domElement.requestPointerLock().catch(() => {});
+      else if (this.placing && e.button === 0)
+        this.onPlacementClick(this.placementHit(e.clientX, e.clientY));
       return;
     }
     if (
@@ -786,7 +795,7 @@ export class Viewer {
     this.issueBounds.clear();
     this.updateIssueOverlays();
     const generation = ++this.generation;
-    this.setMode('orbit');
+    if (!preserveView || this.mode === 'walk') this.setMode('orbit');
     this.clearSelection();
     void this.preview([]);
     for (const r of this.resources) r.dispose();

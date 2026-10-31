@@ -17,7 +17,7 @@ async function files(root) {
 
 export async function verifyInstaller(version, repository) {
   const root = releaseDirectory(version);
-  const name = `Homebase-Viewer-Setup-${version}.exe`;
+  const name = `Homebase-Designer-Setup-${version}.exe`;
   const bytes = await readFile(`${root}/${name}`);
   if (bytes[0] !== 0x4d || bytes[1] !== 0x5a) throw new Error('Setup is not a Windows executable.');
   const asar = `${root}/win-unpacked/resources/app.asar`;

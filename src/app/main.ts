@@ -20,6 +20,7 @@ import {
   attachment,
   selectionZDeltaRange,
   OFFSET_LIMITS,
+  ZERO_OFFSETS,
   type OffsetLimit,
   copyGroup,
   planPaste,
@@ -48,7 +49,7 @@ import { version } from '../../package.json';
 import { trapName } from '../core/requirements';
 import { RequirementsPanel, renderSelectedPerks } from '../ui/panels/requirements-panel';
 setupUpdatePanel();
-document.title = `Homebase Viewer ${version}`;
+document.title = `Homebase Designer ${version}`;
 const val = (id: string) => el<HTMLInputElement>(id).value;
 const number = (id: string) => {
   const s = val(id);
@@ -270,13 +271,17 @@ function setMode(mode: 'orbit' | 'walk' | 'fly', spawn = false) {
   if (!viewer?.report) return;
   if (mode !== 'orbit') {
     stopMoving();
-    stopBuilding();
+    if (mode === 'walk') stopBuilding();
     viewer.setBoxSelection(false);
     el('boxSelect').classList.remove('active');
   }
   viewer.setMode(mode, spawn);
   for (const m of ['orbit', 'walk', 'fly']) el(m).classList.toggle('active', m === mode);
   el('crosshair').hidden = mode !== 'fly';
+  if (buildActive) {
+    buildHint();
+    viewer.refreshPlacement();
+  }
 }
 function syncVisibility() {
   if (!viewer) return;
@@ -342,8 +347,9 @@ async function render(preserveView: boolean) {
     syncVisibility();
     const report = await viewer.load(doc.data, doc.name, preserveView);
     if (!report) return;
-    for (const m of ['orbit', 'walk', 'fly']) el(m).classList.toggle('active', m === 'orbit');
-    el('crosshair').hidden = true;
+    for (const m of ['orbit', 'walk', 'fly'])
+      el(m).classList.toggle('active', m === viewer.cameraMode);
+    el('crosshair').hidden = viewer.cameraMode !== 'fly';
     el('filename').textContent = doc.name;
     el('zone').textContent = names[report.zone ?? ''] ?? 'Custom blueprint';
     el('structures').textContent = doc.data.placements
@@ -434,6 +440,9 @@ function offsets(): Offsets {
     constrainZ: el<HTMLInputElement>('constrainZ').checked,
   };
 }
+function placementOffsets(): Offsets {
+  return val('placementMode') === 'menu-offset' ? offsets() : ZERO_OFFSETS;
+}
 function support() {
   const rows = selected();
   if (rows.length !== 1 || rows[0].kind !== 'structure')
@@ -455,9 +464,10 @@ function previewPlace() {
           parent,
           number('trapTurn'),
           number('trapSide') as 0 | 1,
-          offsets(),
+          placementOffsets(),
           val('placementMode') as 'standard' | 'menu-offset',
           ceilingInverted(),
+          el<HTMLInputElement>('autoFitCone').checked,
         )
       : placeStructure(
           parent,
@@ -768,7 +778,7 @@ document.addEventListener('keydown', (e) => {
           t instanceof HTMLElement &&
           (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT|MD-.*FIELD)$/.test(t.tagName)),
       ) ||
-    document.pointerLockElement
+    (document.pointerLockElement && viewer?.cameraMode !== 'fly')
   )
     return;
   if (pieceEditor.active && e.key !== 'Escape') {
@@ -781,7 +791,8 @@ document.addEventListener('keydown', (e) => {
     }
     return;
   }
-  if (!e.ctrlKey && !e.metaKey && e.key.toLowerCase() === 'e') {
+  if (document.pointerLockElement && ['e', 'q', 'Escape'].includes(e.key)) return;
+  if (!e.ctrlKey && !e.metaKey && e.key.toLowerCase() === 'e' && viewer?.cameraMode !== 'fly') {
     e.preventDefault();
     guard(() =>
       pieceEditor.start(
@@ -952,7 +963,7 @@ function idlePlacementText() {
     ? 'Point at the ground, a floor edge or a wall to build.'
     : val('pieceKind') === 'floor'
       ? 'Point at the ground or a floor edge, or choose Above / Below.'
-      : 'Point at a matching floor or wall to place a trap.';
+      : 'Point at a floor, cone edited into a ramp, or matching wall to place a trap.';
 }
 function feedback(text: string, invalid = false) {
   el('placementFeedback').textContent = text;
@@ -960,7 +971,9 @@ function feedback(text: string, invalid = false) {
 }
 function buildHint() {
   el('hint').textContent =
-    'Click place · Drag orbit · Right-drag pan · 1–5 pieces · R rotate · E edit · PgUp / PgDn height';
+    viewer?.cameraMode === 'fly'
+      ? 'Click scene to look · Click place at crosshair · WASD fly · E / Q up / down · 1–5 pieces · R rotate · PgUp / PgDn height · Esc release mouse'
+      : 'Click place · Drag orbit · Right-drag pan · 1–5 pieces · R rotate · E edit · PgUp / PgDn height';
 }
 function stopBuilding() {
   pieceEditor.cancel();
@@ -980,7 +993,7 @@ function startBuilding() {
   current();
   stopMoving();
   closePanels();
-  setMode('orbit');
+  if (viewer?.cameraMode === 'walk') setMode('orbit');
   viewer?.setBoxSelection(false);
   el('boxSelect').classList.remove('active');
   el('boxSelect').setAttribute('aria-pressed', 'false');
@@ -1075,6 +1088,7 @@ function ceilingInverted() {
   return Boolean(p && trapCategory(p) === 'ceiling' && el<HTMLInputElement>('ceilingFlip').checked);
 }
 el('ceilingFlip').onchange = placementChanged;
+el('autoFitCone').onchange = placementChanged;
 function flipPiece() {
   faceFlipped = !faceFlipped;
   el('flipPiece').setAttribute('aria-pressed', String(faceFlipped));
@@ -1083,6 +1097,12 @@ function flipPiece() {
 function hoverPlacement(hit: PlacementHit | null): boolean {
   if (!buildActive || loading) return false;
   lastHit = hit;
+  const autoFit = Boolean(
+    hit?.record &&
+      patternOf(hit.record)?.id === 'RoofS' &&
+      el<HTMLInputElement>('autoFitCone').checked,
+  );
+  el<HTMLInputElement>('ceilingFlip').disabled = autoFit;
   if (!hit) {
     if (pendingPiece || hoverKey) cancelPreview();
     feedback(idlePlacementText());
@@ -1091,7 +1111,7 @@ function hoverPlacement(hit: PlacementHit | null): boolean {
   const kind = val('pieceKind');
   try {
     if (!hit.record && kind === 'trap')
-      throw new Error('Place a floor or wall first to support a trap.');
+      throw new Error('Place a floor, ramp-shaped cone, or wall first to support a trap.');
     const support = hit.record ?? groundSupport(hit.point, current().data.placements);
     const height = val('buildHeight') as 'auto' | 'above' | 'below' | 'beside';
     if (!hit.record && kind === 'wall' && height === 'above')
@@ -1120,6 +1140,7 @@ function hoverPlacement(hit: PlacementHit | null): boolean {
       val('trapTurn'),
       val('placementMode'),
       ceilingInverted(),
+      el<HTMLInputElement>('autoFitCone').checked,
       offsets(),
       current().revision,
     ]);
@@ -1137,9 +1158,10 @@ function hoverPlacement(hit: PlacementHit | null): boolean {
             support,
             number('trapTurn'),
             side,
-            offsets(),
+            placementOffsets(),
             val('placementMode') as 'standard' | 'menu-offset',
             ceilingInverted(),
+            el<HTMLInputElement>('autoFitCone').checked,
           )
         : !hit.record && kind === 'floor'
           ? buildingRecord('floor', number('material') as 0 | 1 | 2, number('tier') as 1 | 2 | 3, {
@@ -1170,7 +1192,9 @@ function hoverPlacement(hit: PlacementHit | null): boolean {
     el<HTMLButtonElement>('place').disabled = false;
     feedback(
       kind === 'trap'
-        ? `Click to place ${trapName(record)}.`
+        ? autoFit
+          ? `Click to place ${trapName(record)} · Auto-fit: one tile in front of the ramp cone, lowered. Adjust after placing if needed.`
+          : `Click to place ${trapName(record)}.`
         : `Click to place ${kind === 'wall' ? 'a wall' : kind === 'floor' ? 'a floor' : kind === 'stair' ? 'a ramp' : 'a cone'} here.`,
     );
     return true;
@@ -1197,7 +1221,7 @@ el('theme').onclick = cycleColorTheme;
 el('buildTool').onclick = guard(() => {
   if (buildActive) {
     stopBuilding();
-    setMode('orbit');
+    if (viewer) setMode(viewer.cameraMode);
   } else startBuilding();
 });
 el('selectTool').onclick = () => {
@@ -1209,7 +1233,7 @@ el('selectTool').onclick = () => {
 };
 el('closeBuild').onclick = () => {
   stopBuilding();
-  setMode('orbit');
+  if (viewer) setMode(viewer.cameraMode);
 };
 for (const kind of ['Wall', 'Floor', 'Stair', 'Roof', 'Trap'])
   el(`choose${kind}`).onclick = () => choosePiece(kind.toLowerCase() as BuildKind | 'trap');

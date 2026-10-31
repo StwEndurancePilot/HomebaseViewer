@@ -11,6 +11,7 @@ const homebaseRequests = new HomebaseRequests(() => {
 });
 homebaseRequests.enqueue(process.argv);
 const smokeTest = process.argv.includes('--smoke-test');
+app.setPath('userData', path.join(app.getPath('appData'), 'Homebase Viewer'));
 if (smokeTest)
   app.setPath('userData', path.join(app.getPath('temp'), `homebase-handoff-${process.pid}`));
 const ownsInstance = smokeTest || app.requestSingleInstanceLock();
@@ -25,7 +26,7 @@ app.on('second-instance', (_event, argv) => {
 });
 const { EpicAccount, decodeCloudBytes } = require('./accounts/epic-account.cjs');
 const { PennyAccounts } = require('./accounts/penny-accounts.cjs');
-app.setName('Homebase Viewer');
+app.setName('Homebase Designer');
 if (ownsInstance)
   app.whenReady().then(() => {
     app.setAppUserModelId('io.homebaseviewer.desktop');
@@ -41,7 +42,7 @@ if (ownsInstance)
       minWidth: 960,
       minHeight: 640,
       show: !process.argv.includes('--smoke-test'),
-      title: 'Homebase Viewer',
+      title: 'Homebase Designer',
       backgroundColor: '#121418',
       autoHideMenuBar: true,
       webPreferences: {

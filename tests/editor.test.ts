@@ -16,6 +16,7 @@ import {
   placeTrap,
   unrealRotator,
   ZERO_OFFSETS,
+  type Vec3,
   withOffsets,
   copyGroup,
   planPaste,
@@ -23,6 +24,8 @@ import {
   relativePose,
   exportIssues,
 } from '../src/core/editor';
+import { EDIT_PATTERNS, editStructure } from '../src/core/build-pieces';
+import { menuContainer } from '../src/cloud/convert';
 import { EditorDocument } from '../src/core/editor-document';
 import { exportSave, exportCapture, replayRow } from '../src/core/export';
 const pose = (translation: Pose['translation'] = [0, 0, 0], yaw = 0): Pose => ({
@@ -325,4 +328,216 @@ it('escapes 17 replay fields and refreshes stale attachment snapshots', () => {
   const row = replayRow(data.placements[1]);
   expect(row.split('|')).toHaveLength(17);
   expect(row).toContain('Actor%257C%7C二%0Aline');
+});
+
+describe('cone trap supports', () => {
+  for (const pattern of EDIT_PATTERNS.filter((p) => p.id === 'RoofS')) {
+    it(`uses the floor base and pivot for ${pattern.id} at all quarter turns`, () => {
+      for (const material of [0, 1, 2] as const)
+        for (const yaw of [0, 90, 180, 270])
+          for (const mirror of [false, true]) {
+            const cone = editStructure(
+              buildingRecord('roof', material, 3, pose([128, 256, 768])),
+              pattern,
+              yaw,
+              mirror,
+            );
+            const base = buildingRecord('floor', material, 3, {
+              ...cone.transform,
+              scale: [1, 1, 1],
+            });
+            for (const kind of ['Floor', 'Ceiling']) {
+              const a = placeTrap(
+                  template(kind),
+                  cone,
+                  0,
+                  0,
+                  ZERO_OFFSETS,
+                  'standard',
+                  false,
+                  false,
+                ),
+                b = trap(base, kind);
+              expect(a.transform).toEqual(b.transform);
+              expect(a.meshTransform).toEqual(b.meshTransform);
+              expect(a.transform.translation[2]).toBe(768);
+              expect(attachment(a)?.supportActorPath).toBe(cone.actorPath);
+              const automatic = trap(cone, kind);
+              const forwardOffset = new Vector3(0, -512, 0)
+                .applyQuaternion(new Quaternion(...cone.transform.rotation))
+                .setZ(-91)
+                .toArray() as Vec3;
+              const expected = withOffsets(
+                b,
+                { position: forwardOffset, angles: [0, 180, 180] },
+                base,
+              );
+              expect(automatic.transform).toEqual(expected.transform);
+              expect(automatic.meshTransform).toEqual(expected.meshTransform);
+              expect(automatic.editorPlacementMode).toBe('menu-offset');
+              expect(attachment(automatic)?.supportActorPath).toBe(cone.actorPath);
+              expect(placementConflict(trap(cone, kind), [automatic])).toMatch(/exact position/);
+
+              for (const z of [0, -91, -256, -472]) {
+                for (const angles of [
+                  [0, 180, 0],
+                  [0, 180, 180],
+                  [180, 180, 0],
+                ] as Vec3[]) {
+                  const offsets = { position: [0, 0, z] as Vec3, angles, constrainZ: true };
+                  const moved = placeTrap(
+                    template(kind),
+                    cone,
+                    0,
+                    0,
+                    offsets,
+                    'menu-offset',
+                    false,
+                    false,
+                  );
+                  expect(moved.transform).toEqual(
+                    placeTrap(template(kind), base, 0, 0, offsets, 'menu-offset').transform,
+                  );
+                  expect(moved.transform.translation[2]).toBe(768 + z);
+                  expect(attachment(moved)?.relativeTransform).toEqual(
+                    relativePose(moved.transform, cone.transform),
+                  );
+                }
+              }
+              const center = (p: Placement) =>
+                new Vector3(0, 256, 0)
+                  .applyQuaternion(new Quaternion(...p.meshTransform.rotation))
+                  .add(new Vector3(...p.meshTransform.translation));
+              const yawed = withOffsets(a, { position: [0, 0, 0], angles: [0, 180, 0] }, cone);
+              const displacement = center(yawed).sub(center(a));
+              const forward = new Vector3(0, -512, 0).applyQuaternion(
+                new Quaternion(...cone.transform.rotation),
+              );
+              near(displacement.toArray(), forward.toArray());
+              near(
+                center(withOffsets(a, { position: [-500, 0, 0], angles: [0, 0, 0] }, cone))
+                  .sub(center(a))
+                  .toArray(),
+                [-500, 0, 0],
+              );
+            }
+            expect(() => trap(cone, 'Wall')).toThrow(/wall support/);
+          }
+    });
+  }
+  it('places the trap one tile in front of the cone at the same lowered height regardless of trap rotation', () => {
+    const directions: Vec3[] = [
+      [0, -512, -91],
+      [512, 0, -91],
+      [0, 512, -91],
+      [-512, 0, -91],
+    ];
+    for (const [index, yaw] of [0, 90, 180, 270].entries())
+      for (const turn of [0, 90, 180, 270])
+        for (const kind of ['Floor', 'Ceiling'])
+          for (const centrePivot of [false, true]) {
+            const cone = editStructure(
+              buildingRecord('roof', 2, 3, pose([123.125, -456.75, 768])),
+              EDIT_PATTERNS.find((p) => p.id === 'RoofS')!,
+              yaw,
+            );
+            const source = template(kind);
+            if (centrePivot) source.meshPath = '/patrol_ward_trap.patrol_ward_trap';
+            const placed = placeTrap(source, cone, turn, 0, ZERO_OFFSETS, 'standard');
+            const supportCenter = new Vector3(0, 256, 0)
+              .applyQuaternion(new Quaternion(...cone.transform.rotation))
+              .add(new Vector3(...cone.transform.translation));
+            const trapCenter = new Vector3(0, centrePivot ? 0 : 256, 0)
+              .applyQuaternion(new Quaternion(...placed.meshTransform.rotation))
+              .add(new Vector3(...placed.meshTransform.translation));
+            near(trapCenter.sub(supportCenter).toArray(), directions[index]);
+            expect(placed.transform.translation[2]).toBe(677);
+            expect(attachment(placed)?.relativeTransform).toEqual(
+              relativePose(placed.transform, cone.transform),
+            );
+          }
+  });
+  it('adds adjustments after auto-fit and lets placed traps be edited without reapplying it', () => {
+    const cone = editStructure(
+      buildingRecord('roof', 2, 3, pose()),
+      EDIT_PATTERNS.find((p) => p.id === 'RoofS')!,
+      270,
+    );
+    const automatic = trap(cone, 'Ceiling');
+    const offsets = {
+      position: [17, -8, -381] as Vec3,
+      angles: [0, 90, 0] as Vec3,
+      constrainZ: true,
+    };
+    const adjusted = placeTrap(template('Ceiling'), cone, 0, 0, offsets, 'menu-offset');
+    expect(adjusted.transform).toEqual(withOffsets(automatic, offsets, cone).transform);
+    expect(adjusted.transform.translation[2]).toBe(-472);
+    expect(() =>
+      placeTrap(
+        template('Ceiling'),
+        cone,
+        0,
+        0,
+        { ...offsets, position: [0, 0, -382] },
+        'menu-offset',
+      ),
+    ).toThrow(/Z limit/);
+    const doc = new EditorDocument('auto cone', capture([cone]), null);
+    doc.add(automatic);
+    doc.offsetSelected({ position: [0, 0, -20], angles: [0, 0, 0], constrainZ: true });
+    expect(doc.data.placements[1].transform.translation[2]).toBe(-111);
+    const loaded = parseCapture(exportSave(menuContainer(), doc.data));
+    expect(loaded.placements[1].transform).toEqual(doc.data.placements[1].transform);
+    expect(attachment(loaded.placements[1])?.relativeTransform).toEqual(
+      relativePose(doc.data.placements[1].transform, cone.transform),
+    );
+    doc.undo();
+    expect(doc.data.placements[1].transform).toEqual(automatic.transform);
+    doc.redo();
+    expect(doc.data.placements[1].transform.translation[2]).toBe(-111);
+  });
+  it('requires the ramp edit and rejects other cone shapes and ordinary ramps', () => {
+    for (const pattern of EDIT_PATTERNS.filter((p) => p.kind === 'roof' && p.id !== 'RoofS'))
+      for (const turn of [0, 90, 180, 270]) {
+        const cone = editStructure(buildingRecord('roof', 2, 3, pose()), pattern, turn);
+        for (const kind of ['Floor', 'Ceiling'])
+          expect(() => trap(cone, kind)).toThrow(/Edit the cone into a ramp/);
+      }
+    for (const kind of ['Floor', 'Ceiling'])
+      expect(() => trap(buildingRecord('stair', 2, 3, pose()), kind)).toThrow(
+        /supported player-built piece/,
+      );
+  });
+  it('exports offset ceiling traps with their edited cone attachment and supports undo', () => {
+    const cone = editStructure(
+      buildingRecord('roof', 2, 3, pose()),
+      EDIT_PATTERNS.find((p) => p.id === 'RoofS')!,
+      90,
+    );
+    const t = placeTrap(
+      template('Ceiling'),
+      cone,
+      0,
+      0,
+      { position: [0, 0, -472], angles: [0, 180, 180], constrainZ: true },
+      'menu-offset',
+      false,
+      false,
+    );
+    mkdirSync('artifacts/validation', { recursive: true });
+    writeFileSync(
+      'artifacts/validation/build-cone-trap.sav',
+      exportSave(menuContainer(), { ...capture([cone, t]), worldPath: 'Building edit fixture' }),
+    );
+    const doc = new EditorDocument('cone', capture([cone]), null);
+    doc.add(t);
+    const loaded = parseCapture(exportSave(menuContainer(), doc.data));
+    expect(exportIssues(loaded)).toEqual([]);
+    expect(loaded.placements[1].transform).toEqual(t.transform);
+    expect(attachment(loaded.placements[1])?.supportActorPath).toBe(cone.actorPath);
+    doc.undo();
+    expect(doc.data.placements).toEqual([cone]);
+    doc.redo();
+    expect(doc.data.placements).toEqual([cone, t]);
+  });
 });

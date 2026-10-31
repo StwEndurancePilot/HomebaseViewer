@@ -1,16 +1,16 @@
-# Homebase Viewer
+# Homebase Designer
 
 Open a Fortnite STW homebase, walk through it, edit structures and traps, and export a menu-compatible blueprint. Local saves work offline. Epic sign-in and Penny account import are optional.
 
 ## Run
 
-Install `Homebase-Viewer-Setup-X.Y.Z.exe` from [GitHub Releases](https://github.com/StwEndurancePilot/HomebaseViewer/releases), then open Homebase Viewer from its shortcut. Existing portable builds still work through `Start-Homebase-Viewer.cmd`.
+Install `Homebase-Designer-Setup-X.Y.Z.exe` from [GitHub Releases](https://github.com/StwEndurancePilot/HomebaseViewer/releases), then open Homebase Designer from its shortcut. New portable builds use `Start-Homebase-Designer.cmd`; older builds retain `Start-Homebase-Viewer.cmd`. The rename preserves the existing app data and installer identity.
 
 Choose **Open homebases** or drop a `.sav`, `.asv` or capture `.json` onto the window. Original files are never overwritten automatically.
 
 - **Orbit:** drag to rotate, right-drag to pan, scroll to zoom. Double-click a piece to frame it.
 - **Walk / Fly:** click the scene to capture the mouse; use WASD and Shift. Escape releases the mouse.
-- **Build:** use 1–5 to choose a wall, floor, ramp, cone or trap. Point at bare ground to start a build, or extend existing pieces. Traps require a floor or wall. R rotates. Page Up / Page Down changes placement height; Home restores automatic placement.
+- **Build:** use 1–5 to choose a wall, floor, ramp, cone or trap. Point at bare ground to start a build, or extend existing pieces. Floor and ceiling traps attach to full floors or cones edited into ramps; wall traps require a solid wall. R rotates. Page Up / Page Down changes placement height; Home restores automatic placement. In Fly, click once to capture the mouse, then aim with the crosshair and click to place. WASD moves, E / Q moves up / down, and 1–5 and R work while flying. Escape releases the mouse for panel controls.
 - **Edit:** select a structure and press E. Choose an edit, then Enter to apply or Escape to cancel.
 - **Move:** select pieces and use the arrow keys to move one horizontal tile relative to the camera. Page Up / Page Down moves the selection up / down one building level (384 Unreal units). Attached traps follow their structures. Ctrl+Z undoes a move. Select traps to use the XYZ handles or numeric offsets; support links are retained.
 - **Requirements:** inspect material totals, trap quantities and saved perks, or filter trap visibility.
@@ -18,6 +18,8 @@ Choose **Open homebases** or drop a `.sav`, `.asv` or capture `.json` onto the w
 - **Export .sav:** create a menu blueprint. The arrow also offers formatted JSON. **Save draft** retains the full editable document.
 
 Export issues appear in a list and highlight affected pieces. Click an issue to select and frame it.
+
+To support traps on a cone, edit it using **Sloped roof** (raise two adjacent corners) to make a ramp. Unedited cones and other cone shapes cannot support new traps. With **Auto-fit ramp cones** enabled (the default), aim at the ramp-shaped cone and click to place: a one-tile (512 cm) shift in front of the cone plus Z −91, Yaw 180 and Roll 180 are applied automatically relative to its base and direction. Rotating the trap does not change which side of the cone it is placed on. The preview shows the fitted trap. Optional trap offsets are additional adjustments; after placement, select the trap and use **Trap offsets** to refine it without reapplying auto-fit. Disable auto-fit for entirely manual placement. Ramp-shaped cone traps use the same base height and edge pivot as floor traps, regardless of the raised geometry. The Rotate control keeps traps centred; **Use trap offsets → Yaw 180** rotates about the actor pivot, moving edge-pivot traps one tile in the support's forward direction. Cone edits retain their own orientation. Z offsets such as −91 through −472 are literal centimetres from the base, and can be combined with Yaw 180 and Roll 180 (or Pitch 180). XYZ offsets use world axes; X −500 moves 500 cm along negative world X (a full tile is 512 cm).
 
 ## Updates and releases
 
