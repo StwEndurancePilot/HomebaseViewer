@@ -14,7 +14,11 @@ function button(text: string, action: () => void) {
   return node;
 }
 
-export function openTrapPerkEditor(source: Placement, apply: (paths: string[]) => void) {
+export function openTrapPerkEditor(
+  source: Placement,
+  apply: (paths: string[]) => void,
+  bundleCount?: number,
+) {
   const saved = trapPerks(source),
     paths = saved.perks.map((p) => p.path),
     maxSlots = Math.max(6, paths.length),
@@ -36,15 +40,20 @@ export function openTrapPerkEditor(source: Placement, apply: (paths: string[]) =
   error.hidden = true;
   actions.className = 'trap-perk-actions';
   const cancel = button('Cancel', () => dialog.close()),
-    save = button('Apply perks', () => {
-      try {
-        apply([...paths]);
-        dialog.close();
-      } catch (e) {
-        error.textContent = (e as Error).message;
-        error.hidden = false;
-      }
-    }),
+    save = button(
+      bundleCount === undefined
+        ? 'Apply perks'
+        : `Apply to ${bundleCount} ${bundleCount === 1 ? 'trap' : 'traps'}`,
+      () => {
+        try {
+          apply([...paths]);
+          dialog.close();
+        } catch (e) {
+          error.textContent = (e as Error).message;
+          error.hidden = false;
+        }
+      },
+    ),
     add = button('Add perk', () => {
       paths.push('');
       refresh();
@@ -111,6 +120,14 @@ export function openTrapPerkEditor(source: Placement, apply: (paths: string[]) =
     save.disabled = paths.some((p) => !p);
   }
   dialog.append(title, help);
+  if (bundleCount !== undefined) {
+    const scope = element(
+      'p',
+      `Editing all ${bundleCount} ${bundleCount === 1 ? 'trap' : 'traps'} in this requirements bundle. Other perk setups stay unchanged. Undo restores the entire bundle.`,
+    );
+    scope.className = 'perk-note';
+    dialog.append(scope);
+  }
   if (saved.state === 'observed' || saved.state === 'unknown' || saved.state === 'unreadable') {
     const note = element(
       'p',

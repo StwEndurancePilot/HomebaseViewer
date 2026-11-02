@@ -142,6 +142,7 @@ export class RequirementsPanel {
     private callbacks: {
       filter: (ids: Set<string>, interactive: boolean) => void;
       focus: (records: Placement[]) => void;
+      editPerks: (records: Placement[]) => void;
       busy: () => boolean;
     },
   ) {
@@ -234,6 +235,12 @@ export class RequirementsPanel {
           }),
         );
         entry.append(heading, perkList(variant.sample));
+        entry.append(
+          button('Edit bundle perks', () => {
+            if (this.callbacks.busy()) return;
+            this.callbacks.editPerks(variant.records);
+          }),
+        );
         const definition = element('small', itemLabel(variant.sample), 'trap-definition');
         definition.title = variant.sample.itemPath ?? '';
         entry.append(definition);

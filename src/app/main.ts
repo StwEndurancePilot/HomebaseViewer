@@ -111,6 +111,23 @@ const saves = new Map<
 >();
 const requirementsPanel = new RequirementsPanel({
   busy: () => loading,
+  editPerks: (records) => {
+    if (!records.length || loading) return;
+    stopBuilding();
+    stopMoving();
+    const doc = current(),
+      revision = doc.revision;
+    openTrapPerkEditor(
+      records[0],
+      (paths) => {
+        if (loading || current() !== doc || doc.revision !== revision)
+          throw new Error('The blueprint changed. Reopen this edit.');
+        doc.editTrapPerkBundle(records[0].actorPath, paths);
+        if (doc.revision !== revision) void render(true).catch((e) => status(errorText(e)));
+      },
+      records.length,
+    );
+  },
   filter: (ids, interactive) => {
     stopMoving();
     if (interactive) {

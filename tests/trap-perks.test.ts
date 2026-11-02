@@ -144,3 +144,121 @@ it('round-trips edited perks in JSON, GVAS and menu replay rows', () => {
   const cleared = parseCapture(exportSave(menuContainer(), doc.data)).placements[1];
   expect(trapPerks(cleared).state).toBe('empty');
 });
+
+function bundleFixture() {
+  const { doc, trap, floor } = fixture();
+  const copy = { ...structuredClone(trap), actorPath: 'matching-copy' },
+    otherPerks = { ...trap, actorPath: 'other-perks', trapPerks: `perks1;${reload}` },
+    otherLevel = { ...trap, actorPath: 'other-level', trapLevel: 40 },
+    otherItem = { ...trap, actorPath: 'other-item', itemPath: '/TID_Other.TID_Other' },
+    otherType = {
+      ...trap,
+      actorPath: 'other-type',
+      classPath: '/Trap_Wall_Launcher.Trap_Wall_Launcher_C',
+    },
+    otherState = { ...trap, actorPath: 'other-state', trapPerksStatus: 'captured' },
+    world = { ...trap, actorPath: 'world', captureRole: 'existing-world' as const };
+  doc.data.placements.push(copy, otherPerks, otherLevel, otherItem, otherType, otherState, world);
+  return {
+    doc,
+    trap,
+    copy,
+    untouched: [
+      floor,
+      otherPerks,
+      otherLevel,
+      otherItem,
+      otherType,
+      otherState,
+      world,
+    ] as Placement[],
+  };
+}
+
+it('edits only the requirements bundle, preserves selection and placement data, and undoes as one change', () => {
+  const { doc, trap, copy, untouched } = bundleFixture(),
+    before = structuredClone(doc.data.placements),
+    selection = new Set([untouched[0].actorPath]);
+  doc.selected = selection;
+  doc.editTrapPerkBundle(trap.actorPath, [reload, unknown, reload]);
+  expect(doc.revision).toBe(1);
+  expect(doc.selected).toEqual(selection);
+  for (const original of [trap, copy]) {
+    const edited = doc.data.placements.find((p) => p.actorPath === original.actorPath)!;
+    expect(edited).toEqual(withTrapPerks(original, [reload, unknown, reload]));
+  }
+  for (const original of untouched)
+    expect(doc.data.placements.find((p) => p.actorPath === original.actorPath)).toBe(original);
+  const after = structuredClone(doc.data.placements);
+  for (const data of [
+    parseCapture(exportSave(menuContainer(), doc.data)),
+    parseCapture(new TextEncoder().encode(exportJson(doc.data))),
+  ]) {
+    for (const original of [trap, copy])
+      expect(data.placements.find((p) => p.actorPath === original.actorPath)?.trapPerks).toBe(
+        `perks1;${reload};${unknown};${reload}`,
+      );
+    for (const original of untouched.filter(
+      (p) => p.kind === 'trap' && p.captureRole === 'placement',
+    ))
+      expect(data.placements.find((p) => p.actorPath === original.actorPath)?.trapPerks).toBe(
+        original.trapPerks,
+      );
+  }
+  doc.undo();
+  expect(doc.data.placements).toEqual(before);
+  expect(doc.canUndo).toBe(false);
+  doc.redo();
+  expect(doc.data.placements).toEqual(after);
+});
+
+it('does not create history for unchanged bundles and validates all changes before committing', () => {
+  const { doc, trap } = bundleFixture(),
+    before = structuredClone(doc.data.placements);
+  doc.editTrapPerkBundle(trap.actorPath, [unknown, damage]);
+  expect(doc.canUndo).toBe(false);
+  for (const [actor, paths] of [
+    ['missing', [damage]],
+    ['world', [damage]],
+    [trap.actorPath, ['']],
+    [trap.actorPath, Array(7).fill(damage)],
+    [trap.actorPath, ['/Game/Injected.Injected']],
+  ] as [string, string[]][])
+    expect(() => doc.editTrapPerkBundle(actor, paths)).toThrow();
+  expect(doc.data.placements).toEqual(before);
+  expect(doc.revision).toBe(0);
+});
+
+it('preserves each member’s imported asset paths when equivalent spellings share a bundle', () => {
+  const { doc, trap } = fixture(),
+    alias = '/Other/UNKNOWNPERK.UNKNOWNPERK',
+    copy = { ...trap, actorPath: 'alias', trapPerks: `perks1;${alias};${damage}` };
+  doc.data.placements.push(copy);
+  expect(requirements(doc.data).types[0].variants).toHaveLength(1);
+  doc.editTrapPerkBundle(trap.actorPath, [unknown, damage]);
+  expect(doc.canUndo).toBe(false);
+  doc.editTrapPerkBundle(trap.actorPath, [reload, unknown]);
+  expect(doc.data.placements[2].trapPerks).toBe(`perks1;${reload};${alias}`);
+});
+
+it('merges identical resulting bundles and restores the original groups on undo', () => {
+  const { doc, trap } = fixture(),
+    copy = { ...trap, actorPath: 'matching' },
+    other = {
+      ...trap,
+      actorPath: 'other',
+      trapPerks: `perks1;${reload}`,
+      trapPerksStatus: 'captured',
+      trapPerksSource: 'editor',
+    };
+  doc.data.placements.push(copy, other);
+  expect(requirements(doc.data).types[0].variants).toHaveLength(2);
+  doc.editTrapPerkBundle(trap.actorPath, [reload]);
+  expect(requirements(doc.data).types[0].variants.map((v) => v.records.length)).toEqual([3]);
+  expect(doc.data.placements[3]).toBe(other);
+  doc.undo();
+  expect(requirements(doc.data).types[0].variants.map((v) => v.records.length)).toEqual([2, 1]);
+  doc.editTrapPerkBundle(trap.actorPath, []);
+  expect(doc.data.placements.slice(1, 3).every((p) => trapPerks(p).state === 'empty')).toBe(true);
+  expect(doc.data.placements[3]).toBe(other);
+});

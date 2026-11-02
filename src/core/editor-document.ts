@@ -3,6 +3,7 @@ import type { Capture, Placement } from './save';
 import { moveTiles } from './tile-movement';
 import { editStructure, type EditPattern } from './build-pieces';
 import { withTrapPerks } from './trap-perks';
+import { trapPerks, trapTypeKey, trapVariantKey } from './requirements';
 import {
   attachment,
   placementConflict,
@@ -98,6 +99,35 @@ export class EditorDocument {
       this.data.placements.map((p) => (p === source ? result : p)),
       new Set(this.selected),
     );
+  }
+  editTrapPerkBundle(actorPath: string, paths: string[]) {
+    const source = this.data.placements.find((p) => p.actorPath === actorPath);
+    if (!source) throw new Error('The selected trap no longer exists.');
+    withTrapPerks(source, paths);
+    const type = trapTypeKey(source),
+      variant = trapVariantKey(source),
+      original = trapPerks(source).perks.map((p) => p.path);
+    let changed = false;
+    const rows = this.data.placements.map((p) => {
+      if (
+        p.kind !== 'trap' ||
+        p.captureRole !== 'placement' ||
+        trapTypeKey(p) !== type ||
+        trapVariantKey(p) !== variant
+      )
+        return p;
+      const saved = trapPerks(p).perks,
+        result = withTrapPerks(
+          p,
+          paths.map((path) => {
+            const slot = original.indexOf(path);
+            return slot < 0 ? path : saved[slot].path;
+          }),
+        );
+      changed ||= result !== p;
+      return result;
+    });
+    if (changed) this.commit(rows, new Set(this.selected));
   }
   deleteSelected() {
     const ids = new Set(this.selected);
