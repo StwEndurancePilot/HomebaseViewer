@@ -1,5 +1,11 @@
 # Local validation — 2026-10-27
 
+## CI trap regression checks
+
+The ramp-cone smoke test selects Ceiling Electric Field and Legendary rarity explicitly, then verifies the placed mesh and support-relative offsets. It does not depend on the picker default or imported trap order. The selector smoke test honors `VIEWER_EXE` so release jobs exercise the packaged application.
+
+The optional local ceiling-capture comparison accepts recorded side 1 or unknown side 255; newly placed ceiling traps must use side 1. It checks every matching record and requires at least one, rather than assuming a particular developer's collection contains over 1,000 records. Actor and mesh transforms and native attachment types must still match.
+
 ## Version 1.7.0 — installer and GitHub updates
 
 111 tests pass, with two optional cloud fixtures skipped. TypeScript, formatting and the ten-class file structure checks pass. The dependency audit reports zero known vulnerabilities. GitHub repository metadata confirms StwEndurancePilot/HomebaseViewer is public with main as its default branch.

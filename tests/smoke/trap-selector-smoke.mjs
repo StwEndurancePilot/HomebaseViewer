@@ -36,7 +36,11 @@ await writeFile(
     ],
   }),
 );
-const app = await electron.launch({ args: ['.', '--smoke-test'] });
+const app = await electron.launch(
+  process.env.VIEWER_EXE
+    ? { executablePath: process.env.VIEWER_EXE, args: ['--smoke-test'] }
+    : { args: ['.', '--smoke-test'] },
+);
 const page = await app.firstWindow(),
   errors = [];
 await app.evaluate(({ BrowserWindow }) =>

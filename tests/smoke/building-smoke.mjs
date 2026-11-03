@@ -163,6 +163,8 @@ try {
   await click('frameSelection');
   await click('buildTool');
   await page.keyboard.press('5');
+  await page.locator('#trapTemplate').selectOption('ceiling_electric_aoe');
+  await page.locator('#trapRarity').selectOption('Legendary');
   assert.equal(await page.locator('#useOffsets').isChecked(), false);
   assert.equal(await page.locator('#autoFitCone').isChecked(), true);
   await page.locator('#cameraView').selectOption('top');
@@ -171,6 +173,7 @@ try {
   await page.mouse.click(point.x, point.y);
   await settle();
   assert.equal(await page.locator('#traps').textContent(), '2');
+  assert.match((await inspect()).mesh, /electric_ceiling_Trap/i);
   assert.equal((await inspect()).actorTransform.translation[2], -91);
   assert.ok(Math.abs((await inspect()).attachment.relativeTransform.translation[0]) < 1e-8);
   assert.ok(Math.abs((await inspect()).attachment.relativeTransform.translation[1] + 512) < 1e-8);
