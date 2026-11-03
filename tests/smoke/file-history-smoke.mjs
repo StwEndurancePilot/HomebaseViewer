@@ -89,10 +89,76 @@ try {
   await page.waitForFunction(() => document.querySelectorAll('.document-name').length === 0);
   assert.equal(await page.locator('#welcome').isVisible(), true);
 
+  const previewsReady = () =>
+    page.waitForFunction(() => {
+      const images = [...document.querySelectorAll('.home-history-entry img')];
+      return (
+        images.length === 2 && images.every((image) => image.complete && image.naturalWidth === 480)
+      );
+    });
+  await previewsReady();
+  const gallery = page.locator('.home-history-entry').filter({ hasText: 'Fresh base' });
+  const originalPreview = await gallery.locator('img').getAttribute('src');
+  await page.setViewportSize({ width: 960, height: 640 });
+  assert.equal(
+    await page
+      .locator('#welcome')
+      .evaluate((element) => element.scrollWidth <= element.clientWidth),
+    true,
+  );
+  await page.screenshot({ path: 'artifacts/validation/home-history-gallery.png' });
+  await page.evaluate(
+    () =>
+      new Promise((resolve, reject) => {
+        const request = indexedDB.open('homebase-drafts', 1);
+        request.onsuccess = () => {
+          const db = request.result;
+          const transaction = db.transaction('history', 'readwrite');
+          const store = transaction.objectStore('history');
+          const rows = store.getAll();
+          rows.onsuccess = () => {
+            for (const entry of rows.result) {
+              delete entry.preview;
+              delete entry.revision;
+              store.put(entry);
+            }
+          };
+          transaction.oncomplete = () => {
+            db.close();
+            resolve();
+          };
+          transaction.onerror = () => reject(transaction.error);
+        };
+        request.onerror = () => reject(request.error);
+      }),
+  );
   await page.reload();
-  await click('historyOpen');
-  await page.waitForFunction(() => document.querySelectorAll('.history-entry').length === 2);
-  await page.locator('.history-entry').filter({ hasText: 'Fresh base' }).click();
+  await previewsReady();
+  assert.equal(await gallery.locator('img').getAttribute('src'), originalPreview);
+  await gallery.click();
+  await count(2);
+  await page.keyboard.press('Control+a');
+  await page.keyboard.press('Control+c');
+  await page.keyboard.press('Delete');
+  await count(0);
+  await page.keyboard.press('Control+w');
+  await page.waitForFunction(() => !document.querySelector('#welcome').hidden);
+  await previewsReady();
+  assert.notEqual(await gallery.locator('img').getAttribute('src'), originalPreview);
+  await gallery.click();
+  await count(0);
+  await click('paste');
+  await click('commitPaste');
+  await count(2);
+  await page.keyboard.press('Control+w');
+  await page.waitForFunction(() => !document.querySelector('#welcome').hidden);
+  await previewsReady();
+  const savedPreview = await gallery.locator('img').getAttribute('src');
+
+  await page.reload();
+  await previewsReady();
+  assert.equal(await gallery.locator('img').getAttribute('src'), savedPreview);
+  await gallery.click();
   await count(2);
   assert.equal(await page.locator('.document-name').count(), 1);
   await click('historyOpen');

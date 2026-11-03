@@ -7,6 +7,8 @@ export type HistoryEntry = {
   updatedAt: number;
   pieces: number;
   dirty: boolean;
+  revision?: number;
+  preview?: string;
 };
 type Draft = HistoryEntry & {
   data: Capture;
@@ -44,10 +46,16 @@ export class DraftHistory {
       updatedAt: Date.now(),
       pieces: doc.data.placements.length,
       dirty: doc.dirty,
+      revision: doc.revision,
     };
     await new Promise<void>((resolve, reject) => {
       const transaction = db.transaction(['drafts', 'history'], 'readwrite');
-      transaction.objectStore('history').put(entry);
+      const metadata = transaction.objectStore('history');
+      const previous = metadata.get(doc.id);
+      previous.onsuccess = () => {
+        if (previous.result?.revision === doc.revision) entry.preview = previous.result.preview;
+        metadata.put(entry);
+      };
       transaction.objectStore('drafts').put({
         ...entry,
         data: doc.data,
@@ -69,6 +77,23 @@ export class DraftHistory {
       request.onsuccess = () =>
         resolve((request.result as HistoryEntry[]).sort((a, b) => b.updatedAt - a.updatedAt));
       request.onerror = () => reject(request.error);
+    });
+  }
+
+  async savePreview(id: string, revision: number, preview: string) {
+    const db = await this.db();
+    await new Promise<void>((resolve, reject) => {
+      const transaction = db.transaction('history', 'readwrite');
+      const store = transaction.objectStore('history');
+      const request = store.get(id);
+      request.onsuccess = () => {
+        const entry = request.result as HistoryEntry | undefined;
+        if (entry && (entry.revision === undefined || entry.revision === revision))
+          store.put({ ...entry, revision, preview });
+      };
+      transaction.oncomplete = () => resolve();
+      transaction.onabort = () => reject(transaction.error);
+      transaction.onerror = () => reject(transaction.error);
     });
   }
 

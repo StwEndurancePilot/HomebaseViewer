@@ -114,21 +114,30 @@
     <main>
       <section id="viewport" aria-label="Interactive homebase scene">
         <div id="welcome">
-          <div class="welcome-copy">
-            <h1>Open a homebase</h1>
-            <md-filled-button id="choose"
-              ><i slot="icon" class="ph ph-folder-open" aria-hidden="true"></i>Choose a
-              save</md-filled-button
-            ><md-text-button id="welcomeAccount">Import from Epic account</md-text-button
-            ><md-text-button id="welcomeNew">Create a new base</md-text-button
-            ><span class="local-note">.sav · .asv · .json</span>
+          <div class="welcome-intro">
+            <div class="welcome-copy">
+              <h1>Open a homebase</h1>
+              <div class="welcome-actions">
+                <md-filled-button id="choose"
+                  ><i slot="icon" class="ph ph-folder-open" aria-hidden="true"></i>Choose a
+                  save</md-filled-button
+                ><md-text-button id="welcomeAccount">Import from Epic account</md-text-button
+                ><md-text-button id="welcomeNew">Create a new base</md-text-button>
+              </div>
+              <span class="local-note">.sav · .asv · .json</span>
+            </div>
+            <div class="welcome-model">
+              <img
+                id="welcomeModel"
+                alt="A metal floor and wall from the viewer's building library"
+              />
+            </div>
           </div>
-          <div class="welcome-model">
-            <img
-              id="welcomeModel"
-              alt="A metal floor and wall from the viewer's building library"
-            />
-          </div>
+          <section class="home-history" aria-labelledby="homeHistoryTitle">
+            <h2 id="homeHistoryTitle">Your homebases</h2>
+            <p id="homeHistoryStatus" role="status">Loading saved bases…</p>
+            <div id="homeHistoryList"></div>
+          </section>
         </div>
         <div id="tools" hidden>
           <div class="view-controls surface">

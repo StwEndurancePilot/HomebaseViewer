@@ -1,7 +1,7 @@
 import { connectLauncherFiles } from './launcher-files';
 import { DraftHistory } from './draft-history';
+import { HomeHistory } from '../ui/home-history';
 import { BASE_ZONES, newBase } from '../core/new-base';
-import '../styles/files.css';
 import '../styles/updates.css';
 import { setupUpdatePanel } from '../ui/panels/update-panel';
 import { el } from '../ui/dom';
@@ -9,6 +9,7 @@ import '../ui/theme';
 import '../styles/app.css';
 import '../styles/requirements.css';
 import '../styles/building.css';
+import '../styles/files.css';
 import { PieceEditor } from '../ui/panels/piece-editor';
 import { openTrapPerkEditor } from '../ui/panels/trap-perk-editor';
 import { patternOf, editStructure, type BuildKind } from '../core/build-pieces';
@@ -74,6 +75,7 @@ const status = (text: string) => {
 const fileInput = el<HTMLInputElement>('file');
 const docs: EditorDocument[] = [];
 const history = new DraftHistory();
+const homeHistory = new HomeHistory(history, (id) => guard(() => restoreHistory(id))());
 let active: EditorDocument | null = null,
   viewer: Viewer | null = null,
   loading = false;
@@ -268,6 +270,7 @@ async function closeDocument(doc: EditorDocument) {
       else {
         if (viewer) viewer.renderer.domElement.hidden = true;
         el('welcome').hidden = false;
+        void homeHistory.refresh();
         el('tools').hidden = true;
         el('editor').hidden = true;
         el('crosshair').hidden = true;
@@ -754,6 +757,25 @@ el<HTMLFormElement>('newBaseForm').onsubmit = (event) => {
   })();
 };
 const historyDialog = el<HTMLDialogElement>('historyDialog');
+async function restoreHistory(id: string) {
+  loading = true;
+  try {
+    const existing = docs.find((doc) => doc.id === id);
+    const doc = existing ?? (await history.restore(id));
+    if (!doc) throw new Error('This draft is no longer available.');
+    if (!existing) docs.push(doc);
+    stopBuilding();
+    closePanels();
+    active = doc;
+    await saveAutomaticDraft(doc, true);
+    historyDialog.close();
+    await render(false);
+    status('Restored the latest draft.');
+  } finally {
+    loading = false;
+    tabs();
+  }
+}
 el('closeHistory').onclick = () => historyDialog.close();
 el('historyOpen').onclick = guard(async () => {
   const list = el('historyList');
@@ -773,25 +795,7 @@ el('historyOpen').onclick = guard(async () => {
       const detail = document.createElement('span');
       detail.textContent = `${entry.pieces.toLocaleString()} pieces · ${new Date(entry.updatedAt).toLocaleString()}${entry.dirty ? ' · Unexported edits' : ''}`;
       button.append(name, detail);
-      button.onclick = guard(async () => {
-        loading = true;
-        try {
-          const existing = docs.find((doc) => doc.id === entry.id);
-          const doc = existing ?? (await history.restore(entry.id));
-          if (!doc) throw new Error('This draft is no longer available.');
-          if (!existing) docs.push(doc);
-          stopBuilding();
-          closePanels();
-          active = doc;
-          await saveAutomaticDraft(doc, true);
-          historyDialog.close();
-          await render(false);
-          status('Restored the latest draft.');
-        } finally {
-          loading = false;
-          tabs();
-        }
-      });
+      button.onclick = guard(() => restoreHistory(entry.id));
       list.append(button);
     }
   } catch (error) {
@@ -1769,3 +1773,4 @@ el('cameraView').onchange = () => {
 el('rotateBuild').onclick = rotatePiece;
 
 connectLauncherFiles(open, () => loading, status);
+void homeHistory.refresh();
