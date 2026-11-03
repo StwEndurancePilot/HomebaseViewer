@@ -196,7 +196,7 @@ export function trapCategory(p: Placement): 'floor' | 'wall' | 'ceiling' | 'unkn
         ? 'floor'
         : 'unknown';
 }
-function standardSupport(p: Placement, full = true, lowWall = false) {
+function standardSupport(p: Placement, full = true, editedWall = false) {
   const cone = patternOf(p)?.id === 'RoofS';
   if (full && structureKind(p) === 'roof' && !cone)
     throw new Error(
@@ -204,15 +204,21 @@ function standardSupport(p: Placement, full = true, lowWall = false) {
     );
   if (!isBuildingSupport(p) || (shapeOf(p) === 'other' && !cone && (full || !structureKind(p))))
     throw new Error('Point at a supported building piece.');
-  if (full && !cone && !lowWall && patternOf(p) && !['Solid', 'Floor'].includes(patternOf(p)!.id))
+  if (
+    full &&
+    !cone &&
+    !editedWall &&
+    patternOf(p) &&
+    !['Solid', 'Floor'].includes(patternOf(p)!.id)
+  )
     throw new Error(
-      'This trap requires a full floor, a cone edited into a ramp, or a solid wall. Electric wall traps also fit full-width low and half walls.',
+      'This trap requires a full floor, a cone edited into a ramp, or a solid or windowed wall. Electric wall traps also fit full-width low and half walls.',
     );
   const up = vec([0, 0, 1]).applyQuaternion(q(p.transform));
   const forward = vec([1, 0, 0]).applyQuaternion(q(p.transform));
   if (
     p.transform.scale.some(
-      (v, i) => Math.abs(((!full || cone || lowWall) && i === 0 ? Math.abs(v) : v) - 1) > 1e-6,
+      (v, i) => Math.abs(((!full || cone || editedWall) && i === 0 ? Math.abs(v) : v) - 1) > 1e-6,
     ) ||
     up.distanceTo(vec([0, 0, 1])) > 1e-6 ||
     Math.min(Math.abs(forward.x), Math.abs(forward.y)) > 1e-6
@@ -359,20 +365,23 @@ export function placeTrap(
     /(?:trap_wall_electric|tid_wall_electric)(?:[._\s]|$)/i.test(
       `${template.classPath} ${template.itemPath ?? ''}`,
     ) && ['HalfWall', 'QuarterWallS'].includes(patternOf(support)?.id ?? '');
-  standardSupport(support, true, lowWall);
+  const windowWall =
+    trapCategory(template) === 'wall' &&
+    ['WindowC', 'WindowSide', 'Windows'].includes(patternOf(support)?.id ?? '');
+  standardSupport(support, true, lowWall || windowWall);
   const category = trapCategory(template),
     rampCone = patternOf(support)?.id === 'RoofS',
     fitCone = rampCone && autoFitCone,
     shape = rampCone ? 'floor' : shapeOf(support);
   if (template.kind !== 'trap' || !template.itemPath)
-    throw new Error('Choose a captured trap variant with a valid item definition.');
+    throw new Error('Choose a trap with a valid item definition.');
   if (category === 'unknown')
     throw new Error(
       'This trap family has no verified floor/wall/ceiling rule. Copy its existing placement instead.',
     );
   if (category === 'wall' ? shape !== 'wall' : shape !== 'floor')
     throw new Error(
-      `${category} traps require a ${category === 'wall' ? 'solid wall support' : 'full floor support or cone edited into a ramp'}.`,
+      `${category} traps require a ${category === 'wall' ? 'solid or windowed wall support' : 'full floor support or cone edited into a ramp'}.`,
     );
   if (!Number.isFinite(turn) || turn % 90 !== 0)
     throw new Error('Standard trap orientation must use 90° steps.');

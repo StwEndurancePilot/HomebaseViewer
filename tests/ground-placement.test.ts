@@ -4,6 +4,37 @@ import { groundSupport, surfaceSupport } from '../src/core/placement-target';
 import { buildingRecord, unrealRotator } from '../src/core/editor';
 import { Viewer, type PlacementHit } from '../src/scene/viewer';
 import { WALKABLE } from '../src/penny/walk';
+import { EDIT_PATTERNS, editStructure } from '../src/core/build-pieces';
+
+it('targets the window opening ahead of builds behind it and respects closer obstructions', () => {
+  const s = scene(),
+    wall = editStructure(
+      buildingRecord('wall', 2, 3, {
+        translation: [0, 0, 0],
+        rotation: [0, 0, 0, 1],
+        scale: [1, 1, 1],
+      }),
+      EDIT_PATTERNS.find((p) => p.id === 'WindowC')!,
+    );
+  s.viewer.placementRecords = [wall];
+  s.viewer.camera.position.set(2, 192 / 512, 0);
+  s.viewer.camera.lookAt(0, 192 / 512, 0);
+  const behind = new THREE.Mesh(
+    new THREE.PlaneGeometry(2, 2),
+    new THREE.MeshBasicMaterial({ side: THREE.DoubleSide }),
+  );
+  behind.rotation.y = Math.PI / 2;
+  behind.position.set(-1, 192 / 512, 0);
+  const backWall = { ...wall, actorPath: 'behind' };
+  behind.userData.records = [backWall];
+  s.builds.add(behind);
+  expect(s.hit()?.record).toBe(wall);
+  s.viewer.hiddenActors.add(wall.actorPath);
+  expect(s.hit()?.record).toBe(backWall);
+  s.viewer.hiddenActors.clear();
+  behind.position.x = 1;
+  expect(s.hit()?.record).toBe(backWall);
+});
 
 it('snaps an empty blueprint to tiles, including negative coordinates', () => {
   expect(groundSupport([1100, 700, 390], []).transform.translation).toEqual([1024, 512, 384]);

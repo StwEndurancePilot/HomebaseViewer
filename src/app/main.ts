@@ -54,6 +54,7 @@ import {
 } from '../cloud/convert';
 import { version } from '../../package.json';
 import { trapName } from '../core/requirements';
+import { trapCatalog, trapTemplate } from '../core/trap-catalog';
 import { RequirementsPanel, renderSelectedPerks } from '../ui/panels/requirements-panel';
 setupUpdatePanel();
 document.title = `Homebase Designer ${version}`;
@@ -85,7 +86,6 @@ let clipboard: Clipboard | null = null,
   pendingPiece: Placement | null = null,
   pendingSupport: Placement | null = null,
   pendingPaste: PastePlan | null = null;
-let templates: Placement[] = [];
 let buildActive = false,
   edgeCycle = 0,
   faceFlipped = false,
@@ -394,35 +394,32 @@ function syncVisibility() {
     group.visible = el<HTMLInputElement>(id).checked;
 }
 function refreshTemplates() {
-  const previous = templates[Number(val('trapTemplate'))];
-  const byVariant = new Map<string, Placement>();
-  for (const doc of docs)
-    for (const p of doc.data.placements)
-      if (p.kind === 'trap' && p.captureRole === 'placement' && p.itemPath) {
-        const key = variantKey(p);
-        if (!byVariant.has(key)) byVariant.set(key, p);
-      }
-  templates = [...byVariant.values()].sort((a, b) =>
-    (a.itemPath ?? '').localeCompare(b.itemPath ?? ''),
-  );
+  const previous = val('trapTemplate');
   const select = el<HTMLSelectElement>('trapTemplate');
-  select.replaceChildren();
-  templates.forEach((p, i) => {
-    const option = document.createElement('option');
-    option.value = String(i);
-    option.textContent = `${trapName(p)} / Lv ${p.trapLevel ?? '?'} / ${i + 1}`;
-    select.append(option);
-  });
-  const index = previous ? templates.findIndex((p) => variantKey(p) === variantKey(previous)) : -1;
-  if (index >= 0) select.value = String(index);
+  select.replaceChildren(...trapCatalog.map((trap) => new Option(trap.name, trap.id)));
+  if (trapCatalog.some((trap) => trap.id === previous)) select.value = previous;
   filterTraps();
+  refreshTrapRarities();
   trapInfo();
 }
+function refreshTrapRarities() {
+  const picker = el<HTMLSelectElement>('trapRarity'),
+    previous = picker.value,
+    trap = trapCatalog.find((trap) => trap.id === val('trapTemplate'));
+  picker.replaceChildren(...(trap?.variants.map((v) => new Option(v.rarity, v.rarity)) ?? []));
+  if (trap?.variants.some((v) => v.rarity === previous)) picker.value = previous;
+  picker.disabled = !trap;
+}
+function chosenTrap() {
+  return val('trapTemplate') && val('trapRarity')
+    ? trapTemplate(val('trapTemplate'), val('trapRarity'))
+    : undefined;
+}
 function trapInfo() {
-  const p = val('trapTemplate') !== '' ? templates[Number(val('trapTemplate'))] : undefined;
+  const p = chosenTrap();
   el('trapInfo').textContent = p
-    ? `Level ${p.trapLevel ?? 'unknown'}. Perks: ${p.trapPerks || 'none captured'}`
-    : 'No captured trap variants. Open a save containing traps.';
+    ? `Level ${p.trapLevel}. Default perks included. Select the placed trap to edit its perks.`
+    : 'Choose a trap and rarity.';
 }
 async function render(preserveView: boolean) {
   const doc = current();
@@ -559,9 +556,9 @@ function previewPlace() {
   const record =
     kind === 'trap'
       ? placeTrap(
-          (val('trapTemplate') !== '' ? templates[Number(val('trapTemplate'))] : undefined) ??
+          chosenTrap() ??
             (() => {
-              throw new Error('Choose a captured trap first.');
+              throw new Error('Choose a trap and rarity first.');
             })(),
           parent,
           number('trapTurn'),
@@ -917,6 +914,12 @@ el('cancelPreview').onclick = () => {
 };
 el('pieceKind').onchange = () => choosePiece(val('pieceKind') as BuildKind | 'trap');
 el('trapTemplate').onchange = () => {
+  refreshTrapRarities();
+  trapInfo();
+  refreshPieceImage();
+  placementChanged();
+};
+el('trapRarity').onchange = () => {
   trapInfo();
   refreshPieceImage();
   placementChanged();
@@ -1138,25 +1141,13 @@ function togglePanel(id: string) {
   closePanels();
   if (!visible) el(id).hidden = false;
 }
-function variantKey(p: Placement) {
-  return JSON.stringify([
-    p.classPath,
-    p.itemPath,
-    p.meshPath,
-    p.trapLevel,
-    p.trapPerks,
-    p.attachmentType,
-  ]);
-}
 function filterTraps() {
   const search = val('trapSearch').trim().toLowerCase(),
     picker = el<HTMLSelectElement>('trapTemplate');
   let first: string | null = null;
   for (const option of picker.options) {
-    const p = templates[Number(option.value)],
-      show =
-        Boolean(p) &&
-        `${trapName(p)} ${p.itemPath} ${p.trapPerks ?? ''}`.toLowerCase().includes(search);
+    const trap = trapCatalog.find((trap) => trap.id === option.value),
+      show = Boolean(trap) && `${trap!.name} ${trap!.id}`.toLowerCase().includes(search);
     option.hidden = !show;
     if (show && first === null) first = option.value;
   }
@@ -1230,7 +1221,7 @@ function choosePiece(kind: BuildKind | 'trap') {
     button.setAttribute('aria-pressed', String(chosen));
     button.classList.toggle('chosen', chosen);
   }
-  const chosen = templates[Number(val('trapTemplate'))];
+  const chosen = chosenTrap();
   el('flipPiece').hidden = kind !== 'trap' || !chosen || trapCategory(chosen) !== 'wall';
   feedback(idlePlacementText());
   refreshPieceImage();
@@ -1241,7 +1232,7 @@ async function refreshPieceImage() {
     kind = val('pieceKind');
   let record: Placement | undefined;
   if (kind === 'trap') {
-    const source = val('trapTemplate') !== '' ? templates[Number(val('trapTemplate'))] : undefined;
+    const source = chosenTrap();
     if (source)
       record = {
         ...source,
@@ -1293,7 +1284,7 @@ function rotatePiece() {
   placementChanged();
 }
 function ceilingInverted() {
-  const p = templates[Number(val('trapTemplate'))];
+  const p = chosenTrap();
   return Boolean(p && trapCategory(p) === 'ceiling' && el<HTMLInputElement>('ceilingFlip').checked);
 }
 el('ceilingFlip').onchange = placementChanged;
@@ -1355,6 +1346,7 @@ function hoverPlacement(hit: PlacementHit | null): boolean {
       val('material'),
       val('tier'),
       val('trapTemplate'),
+      val('trapRarity'),
       val('trapTurn'),
       val('placementMode'),
       ceilingInverted(),
@@ -1365,13 +1357,13 @@ function hoverPlacement(hit: PlacementHit | null): boolean {
     if (key === hoverKey) return Boolean(pendingPiece);
     cancelPreview();
     hoverKey = key;
-    const chosen = val('trapTemplate') !== '' ? templates[Number(val('trapTemplate'))] : undefined;
+    const chosen = chosenTrap();
     let record =
       kind === 'trap'
         ? placeTrap(
             chosen ??
               (() => {
-                throw new Error('Open a save containing this trap first.');
+                throw new Error('Choose a trap and rarity first.');
               })(),
             support,
             number('trapTurn'),
@@ -1484,6 +1476,7 @@ for (const chip of document.querySelectorAll<HTMLElement>('[data-material]'))
   };
 el('trapSearch').oninput = () => {
   filterTraps();
+  refreshTrapRarities();
   trapInfo();
   refreshPieceImage();
   placementChanged();

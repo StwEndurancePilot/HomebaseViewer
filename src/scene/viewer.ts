@@ -16,7 +16,7 @@ import { meshIdentity } from '../core/mesh-identity';
 import { pennyTrapPivotOffset } from '../core/trap-pivots';
 import { zoneForCapture, type Capture, type Placement } from '../core/save';
 import { attachment, type Vec3 } from '../core/editor';
-import { structureKind } from '../core/build-pieces';
+import { structureKind, patternOf } from '../core/build-pieces';
 import { worldSupportAt } from './world-support';
 import { isBuildingSupport, isMapBuilding, mapSurfaceReference } from '../core/support';
 import { TrapMover } from './trap-mover';
@@ -521,6 +521,8 @@ export class Viewer {
       }
     }
     const hits = ray.intersectObject(this.builds, true);
+    let buildHit: PlacementHit | null = null;
+    let buildDistance = Infinity;
     for (const hit of hits) {
       const record = (hit.object.userData.records as Placement[] | undefined)?.[
         hit.instanceId ?? 0
@@ -536,12 +538,14 @@ export class Viewer {
       const normal = hit.face?.normal
         .clone()
         .applyNormalMatrix(new THREE.Matrix3().getNormalMatrix(matrix));
-      return {
+      buildDistance = hit.distance;
+      buildHit = {
         record,
         point: unreal(hit.point),
         camera: unreal(this.camera.position),
         ...(normal ? { normal: [-normal.z, normal.x, normal.y] as Vec3 } : {}),
       };
+      break;
     }
     const origin = new THREE.Vector3(
       -ray.ray.origin.z * 512,
@@ -560,7 +564,9 @@ export class Viewer {
     } | null = null;
     for (const record of this.placementRecords) {
       const kind = structureKind(record);
-      if (!kind || this.hiddenActors.has(record.actorPath)) continue;
+      const windowWall = ['WindowC', 'WindowSide', 'Windows'].includes(patternOf(record)?.id ?? '');
+      if (!kind || !isBuildingSupport(record) || this.hiddenActors.has(record.actorPath)) continue;
+      if (buildHit && !windowWall) continue;
       const inverse = new THREE.Quaternion(...record.transform.rotation).invert();
       const local = origin
           .clone()
@@ -572,11 +578,13 @@ export class Viewer {
       const distance = -(kind === 'wall' ? local.y : local.z) / denominator;
       if (
         distance <= 0 ||
+        distance >= buildDistance * 512 ||
         distance > (groundDistance + 0.02) * 512 ||
         (nearest && distance >= nearest.distance)
       )
         continue;
       const at = local.clone().addScaledVector(d, distance);
+      if (windowWall && (Math.abs(at.x) > 256 || at.z < 0 || at.z > 384)) continue;
       if (
         Math.abs(at.x) > 352 ||
         (kind === 'wall' ? at.z < -80 || at.z > 464 : at.y < -96 || at.y > 608)
@@ -590,7 +598,7 @@ export class Viewer {
     }
     return nearest
       ? { record: nearest.record, point: nearest.point, camera: origin.toArray() as Vec3 }
-      : ground;
+      : (buildHit ?? ground);
   }
   private updateMarquee(e: PointerEvent) {
     const r = this.host.getBoundingClientRect();

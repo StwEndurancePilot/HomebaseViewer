@@ -84,10 +84,10 @@ it('places electric traps on both faces of low and half walls and preserves atta
 });
 
 it('still rejects incompatible traps and wall edits', () => {
-  for (const id of ['WindowC', 'DoorC', 'QuarterWallHalf', 'Pillar']) {
+  for (const id of ['DoorC', 'QuarterWallHalf', 'Pillar']) {
     const parent = editStructure(wall(), EDIT_PATTERNS.find((p) => p.id === id)!);
     expect(() => placeTrap(electric(), parent, 0, 0, ZERO_OFFSETS, 'standard')).toThrow(
-      /solid wall/,
+      /solid or windowed wall/,
     );
   }
   const parent = editStructure(wall(), EDIT_PATTERNS.find((p) => p.id === 'QuarterWallS')!);
@@ -96,7 +96,9 @@ it('still rejects incompatible traps and wall edits', () => {
     classPath: '/Trap_Wall_Launcher.Trap_Wall_Launcher_C',
     itemPath: '/TID_Wall_Launcher_SR_T05',
   };
-  expect(() => placeTrap(launcher, parent, 0, 0, ZERO_OFFSETS, 'standard')).toThrow(/solid wall/);
+  expect(() => placeTrap(launcher, parent, 0, 0, ZERO_OFFSETS, 'standard')).toThrow(
+    /solid or windowed wall/,
+  );
 });
 
 it('cuts attached groups across documents with independent undo and a durable clipboard snapshot', () => {
