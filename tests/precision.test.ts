@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { Quaternion, Vector3 } from 'three';
-import { decodeNumber, parseCapture, readSaveText, type Pose } from '../src/core/save';
+import { decodeNumber, isMenuSave, parseCapture, readSaveText, type Pose } from '../src/core/save';
 import { sceneMatrix, scenePoint } from '../src/core/transforms';
 import { meshIdentity } from '../src/core/mesh-identity';
 const pose: Pose = {
@@ -30,11 +30,15 @@ function capture() {
     ],
   };
 }
-function save(text: string, wide: boolean) {
+function save(
+  text: string,
+  wide: boolean,
+  saveClass = '/Script/ExtractionCoreRuntime.SpriteSaveGame',
+) {
   const header = Buffer.concat([
     Buffer.from('GVAS'),
     Buffer.alloc(80),
-    Buffer.from('/Script/ExtractionCoreRuntime.SpriteSaveGame\0'),
+    Buffer.from('++Fortnite+Release-43.00\0' + saveClass + '\0'),
   ]);
   const marker = Buffer.from('\x11\0\0\0ExternalDataJson\0\x0c\0\0\0StrProperty\0');
   const content = Buffer.from(text + '\0', wide ? 'utf16le' : 'utf8'),
@@ -59,6 +63,62 @@ describe('SpriteSaveGame import', () => {
       expect(loaded.placements[0].meshTransform.translation).toEqual(pose.translation);
       expect(loaded.placements[0].transform.translation).toEqual([0, 0, 0]);
     });
+  for (const saveClass of [
+    '/Script/ExtractionCoreRuntime.SpriteSaveGame',
+    '/Game/Athena/Hud/AthenaFPSTicker.STWDataSave_C',
+  ])
+    for (const wide of [false, true])
+      it(`recognises ${saveClass} in ${wide ? 'UTF16' : 'UTF8'} as a menu save, never a cloud backup`, () => {
+        const bytes = save('STW_HOMEBASE_1\n' + JSON.stringify(capture()) + '\n', wide, saveClass);
+        expect(isMenuSave(bytes)).toBe(true);
+        expect(parseCapture(bytes).placements[0].meshTransform.translation).toEqual(
+          pose.translation,
+        );
+        expect(isMenuSave(bytes.subarray(0, -1))).toBe(true);
+        expect(() => parseCapture(bytes.subarray(0, -1))).toThrow(/Truncated/);
+      });
+  it('does not recognise unrelated cloud containers as menu saves', () => {
+    const bytes = save('SavedActors', false, '/Script/FortniteGame.FortSaveGame');
+    expect(isMenuSave(bytes)).toBe(false);
+    expect(() => parseCapture(bytes)).toThrow(/not an STW menu/);
+  });
+  it('accepts scan baseline and route records without counting them as placements', () => {
+    const row = [
+      'placement',
+      'structure',
+      '',
+      'Class',
+      '',
+      'Mesh',
+      '',
+      '9',
+      'false',
+      '0',
+      '0',
+      '{}',
+      '{}',
+      'null',
+      'null',
+      '0000',
+      '{}',
+    ].join('|');
+    const text =
+      'STW_HOMEBASE_1\n' +
+      JSON.stringify(capture()) +
+      '\n' +
+      row +
+      '\nBASE|' +
+      row.replaceAll('%', '%25').replaceAll('|', '%7C') +
+      '\nCELL|-1:2|-512.000|1024.000|6000.000|1';
+    expect(parseCapture(save(text, true)).placements).toHaveLength(1);
+    for (const suffix of [
+      'BASE|placement%7Cstructure',
+      'CELL|-1:2|NaN|0|0|1',
+      'CELL|-1:2|0|0|0|2',
+      'UNKNOWN|data',
+    ])
+      expect(() => parseCapture(save(text + '\n' + suffix, false))).toThrow(/checkpoint|replay/);
+  });
   it('rejects truncated saves, wrong containers, settings and invalid numbers', () => {
     const bytes = save('STW_HOMEBASE_1\n' + JSON.stringify(capture()) + '\n', false);
     expect(() => parseCapture(bytes.subarray(0, -1))).toThrow();

@@ -27,13 +27,20 @@ const MAX_SIZE = 128 * 1024 * 1024;
 const marker = new TextEncoder().encode('\x11\0\0\0ExternalDataJson\0\x0c\0\0\0StrProperty\0');
 const trailer = new Uint8Array([5, 0, 0, 0, 78, 111, 110, 101, 0, 0, 0, 0, 0]);
 const ascii = new TextDecoder('utf-8', { fatal: true });
+export function isMenuSave(bytes: Uint8Array): boolean {
+  const header = new TextDecoder().decode(bytes.subarray(0, 65536)).toLowerCase();
+  return [
+    '/Script/ExtractionCoreRuntime.SpriteSaveGame',
+    '/Game/Athena/Hud/AthenaFPSTicker.STWDataSave_C',
+  ].some((name) => header.includes('\0' + name.toLowerCase() + '\0'));
+}
 function matchAt(bytes: Uint8Array, pattern: Uint8Array, at: number) {
   return pattern.every((value, index) => bytes[at + index] === value);
 }
 export function readSaveText(bytes: Uint8Array): string {
   if (bytes.length > MAX_SIZE || bytes.length < 80 || ascii.decode(bytes.subarray(0, 4)) !== 'GVAS')
     throw new Error(
-      'Choose a menu homebase .sav (SpriteSaveGame), or a capture JSON. Epic cloud saves are a different format.',
+      'Choose a menu homebase .sav, or a capture JSON. Epic cloud saves are a different format.',
     );
   let markerAt = -1;
   for (let i = 4; i <= Math.min(65536, bytes.length - marker.length); i++) {
@@ -42,12 +49,7 @@ export function readSaveText(bytes: Uint8Array): string {
       break;
     }
   }
-  if (
-    markerAt < 0 ||
-    !new TextDecoder()
-      .decode(bytes.subarray(0, markerAt))
-      .includes('/Script/ExtractionCoreRuntime.SpriteSaveGame\0')
-  )
+  if (markerAt < 0 || !isMenuSave(bytes.subarray(0, markerAt)))
     throw new Error('This is not an STW menu homebase save.');
   const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
   const sizeAt = markerAt + marker.length + 4,
@@ -130,6 +132,10 @@ export function parseCapture(bytes: Uint8Array): Capture {
     for (const line of lines.slice(2)) {
       if (!line) continue;
       const fields = line.split('|');
+      if (fields[0] === 'BASE' || fields[0] === 'CELL') {
+        if (!validCheckpoint(fields)) throw new Error('Invalid homebase capture checkpoint.');
+        continue;
+      }
       if (
         fields.length !== 17 ||
         !['placement', 'existing-world', 'unavailable'].includes(fields[0])
@@ -186,4 +192,32 @@ export function zoneForCapture(data: Capture): string | null {
         : path.includes('twine')
           ? 'pve_04'
           : null;
+}
+
+function validCheckpoint(fields: string[]): boolean {
+  if (fields.some((field) => /[\0\r\n]/.test(field))) return false;
+  if (fields[0] === 'BASE') {
+    if (fields.length !== 2) return false;
+    const row = fields[1]
+      .replaceAll('%7C', '|')
+      .replaceAll('%0A', '\n')
+      .replaceAll('%0D', '\r')
+      .replaceAll('%25', '%')
+      .split('|');
+    return (
+      row.length === 17 &&
+      ['placement', 'existing-world', 'unavailable'].includes(row[0]) &&
+      ['structure', 'trap'].includes(row[1])
+    );
+  }
+  return (
+    fields.length === 6 &&
+    fields[1].length > 0 &&
+    ['0', '1'].includes(fields[5]) &&
+    fields
+      .slice(2, 5)
+      .every(
+        (field) => /^[+-]?(?:\d+(?:\.\d*)?|\.\d+)$/.test(field) && Number.isFinite(Number(field)),
+      )
+  );
 }

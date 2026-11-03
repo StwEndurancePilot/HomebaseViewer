@@ -23,3 +23,11 @@ For a hidden integration check, set HOMEBASE_HANDOFF_FILE to a test save and run
 This mode uses a separate temporary profile, disables updates, keeps the window
 hidden and asserts that both startup and second-instance requests create tabs.
 It never changes the source save. Normal launches show and focus the Viewer.
+
+The reader accepts both the legacy `/Script/ExtractionCoreRuntime.SpriteSaveGame`
+and current `/Game/Athena/Hud/AthenaFPSTicker.STWDataSave_C` menu containers, with
+UTF-8 or UTF-16 payloads. Both are recognised before considering Epic cloud import;
+a damaged menu save keeps its own parsing error rather than becoming an empty
+cloud backup. Camera capture `BASE` and `CELL` checkpoint rows are recognised as
+scan metadata, not additional placements. Designer uses the capture's placement
+document and writes fresh replay rows when exporting edits.

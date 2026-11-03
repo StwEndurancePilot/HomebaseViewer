@@ -13,7 +13,7 @@ import { cycleColorTheme } from '../ui/theme';
 import { partThumbnail } from '../ui/part-thumbnail';
 import { directionAt, groundSupport, surfaceSupport, wallFaceAt } from '../core/placement-target';
 import { tileKeyDelta } from '../core/tile-movement';
-import { parseCapture, type Placement } from '../core/save';
+import { isMenuSave, parseCapture, type Placement } from '../core/save';
 import {
   exportDiagnostics,
   shapeOf,
@@ -418,7 +418,7 @@ async function open(files: File[]) {
         } catch (error) {
           const header = new TextDecoder('latin1').decode(bytes.subarray(0, 65536));
           if (
-            !header.includes('/Script/ExtractionCoreRuntime.SpriteSaveGame') &&
+            !isMenuSave(bytes) &&
             (header.startsWith('ECFD') ||
               (bytes[0] === 31 && bytes[1] === 139) ||
               header.includes('SavedActors') ||
