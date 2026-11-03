@@ -19,6 +19,13 @@ test('launcher handoff is bounded, accepts Unicode local saves, and reports unre
     const item = await q.take();
     assert.equal(item.name, '基地 test.sav');
     assert.equal(Buffer.from(item.bytes).toString(), 'GVASfixture');
+    q.enqueue(['app', file, file]);
+    assert.equal((await q.take()).name, '基地 test.sav');
+    assert.equal((await q.take()).name, '基地 test.sav');
+    assert.equal(await q.take(), null);
+    await writeFile(file, Buffer.from('ECFDcloud-fixture'));
+    q.enqueue(['app', file]);
+    assert.equal(Buffer.from((await q.take()).bytes).toString(), 'ECFDcloud-fixture');
     q.enqueue(['--open-homebase', path.join(root, 'missing.sav')]);
     assert.ok((await q.take()).error);
     for (let i = 0; i < 20; i++) q.enqueue(['--open-homebase', file]);

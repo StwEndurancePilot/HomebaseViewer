@@ -10,6 +10,10 @@ const homebaseRequests = new HomebaseRequests(() => {
     mainWindow.webContents.send('homebase-open-available');
 });
 homebaseRequests.enqueue(process.argv);
+app.on('open-file', (event, file) => {
+  event.preventDefault();
+  homebaseRequests.enqueue([file]);
+});
 const smokeTest = process.argv.includes('--smoke-test');
 app.setPath('userData', path.join(app.getPath('appData'), 'Homebase Viewer'));
 if (smokeTest)
@@ -152,7 +156,8 @@ if (ownsInstance)
         cancelId: 0,
         title: 'Unsaved blueprint edits',
         message: 'Some homebases have edits that have not been saved.',
-        detail: 'Use Save draft or Export .sav to keep your work.',
+        detail:
+          'Automatic drafts are available in History. Use Save draft or Export .sav for a separate file copy.',
       });
       if (choice === 1) event.preventDefault();
       else updates.cancelRestart();

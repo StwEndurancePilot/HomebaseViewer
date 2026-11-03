@@ -8,7 +8,7 @@ const env = { ...process.env };
 delete env.ELECTRON_RUN_AS_NODE;
 const application = await electron.launch({
   ...(process.env.VIEWER_EXE ? { executablePath: process.env.VIEWER_EXE } : {}),
-  args: [...(process.env.VIEWER_EXE ? [] : ['.']), '--smoke-test', '--open-homebase', file],
+  args: [...(process.env.VIEWER_EXE ? [] : ['.']), '--smoke-test', file],
   env,
 });
 try {
@@ -20,12 +20,12 @@ try {
     false,
   );
   await page.waitForFunction(
-    () => document.querySelectorAll('#documents button').length === 1,
+    () => document.querySelectorAll('#documents .document-name').length === 1,
     {},
     { timeout: 60000 },
   );
   assert.equal(
-    await page.locator('#documents button').first().getAttribute('title'),
+    await page.locator('#documents .document-name').first().getAttribute('title'),
     path.basename(file),
   );
   await application.evaluate(
@@ -34,7 +34,9 @@ try {
     file,
   );
   await page.waitForFunction(
-    () => document.querySelectorAll('#documents button').length === 2,
+    () =>
+      document.querySelectorAll('#documents .document-name').length === 2 &&
+      !document.querySelector('#open').disabled,
     {},
     { timeout: 60000 },
   );

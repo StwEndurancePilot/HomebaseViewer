@@ -7,19 +7,18 @@ class HomebaseRequests {
     this.notify = notify;
   }
   enqueue(argv) {
-    const index = argv.indexOf('--open-homebase');
-    if (index < 0) return;
-    const file = argv[index + 1];
-    if (
-      typeof file !== 'string' ||
-      !path.isAbsolute(file) ||
-      file.startsWith('\\\\') ||
-      !file.toLowerCase().endsWith('.sav')
-    )
-      return;
-    if (this.queue.length >= 8) return;
-    this.queue.push(file);
-    this.notify();
+    for (const file of argv) {
+      if (
+        typeof file !== 'string' ||
+        !path.isAbsolute(file) ||
+        file.startsWith('\\\\') ||
+        !file.toLowerCase().endsWith('.sav')
+      )
+        continue;
+      if (this.queue.length >= 8) return;
+      this.queue.push(file);
+      this.notify();
+    }
   }
   async take() {
     const file = this.queue.shift();
@@ -40,8 +39,8 @@ class HomebaseRequests {
         if (!read.bytesRead) throw new Error('The homebase changed while opening. Try again.');
         offset += read.bytesRead;
       }
-      if ((await handle.stat()).size !== stat.size || bytes.toString('ascii', 0, 4) !== 'GVAS')
-        throw new Error('Not a supported homebase save.');
+      if ((await handle.stat()).size !== stat.size)
+        throw new Error('The homebase changed while opening. Try again.');
       return { name, bytes: new Uint8Array(bytes) };
     } catch {
       return {

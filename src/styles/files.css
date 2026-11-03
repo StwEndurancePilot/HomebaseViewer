@@ -1,0 +1,102 @@
+.document-tab {
+  display: flex;
+  flex-shrink: 0;
+  align-items: stretch;
+}
+#documents .document-name {
+  border-radius: 12px 0 0 4px;
+}
+#documents .document-close {
+  min-width: 30px;
+  padding: 4px 8px;
+  border-radius: 0 12px 4px 0;
+  font-size: 18px;
+}
+.document-tab:has(.active) .document-close {
+  background: var(--md-sys-color-primary-container);
+  color: var(--md-sys-color-on-primary-container);
+}
+#draftState {
+  font-size: 11px;
+  color: var(--md-sys-color-on-surface-variant);
+  max-width: 85px;
+}
+#draftState.error {
+  color: var(--md-sys-color-error);
+}
+.file-dialog {
+  width: min(560px, calc(100vw - 64px));
+  max-height: 80vh;
+  overflow: auto;
+  padding: 24px;
+  border: 1px solid var(--md-sys-color-outline-variant);
+  border-radius: 24px;
+  background: var(--md-sys-color-surface-container);
+  color: var(--md-sys-color-on-surface);
+}
+.file-dialog::backdrop {
+  background: rgb(0 0 0 / 55%);
+}
+.file-dialog h2 {
+  margin: 0;
+}
+.file-dialog p {
+  color: var(--md-sys-color-on-surface-variant);
+  line-height: 1.5;
+}
+.file-dialog label {
+  display: block;
+  margin: 20px 0 8px;
+}
+.file-dialog input,
+.file-dialog select {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--md-sys-color-outline);
+  border-radius: 8px;
+  background: var(--md-sys-color-surface);
+  color: inherit;
+  font: inherit;
+}
+.file-dialog button {
+  padding: 12px 16px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--md-sys-color-surface-container-high);
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+.file-dialog button:hover {
+  background: var(--md-sys-color-secondary-container);
+}
+.file-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 24px;
+}
+.file-dialog #createBase {
+  background: var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-primary);
+}
+#historyList {
+  display: grid;
+  gap: 8px;
+}
+.history-entry {
+  display: grid;
+  gap: 8px;
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+.history-entry span {
+  font-size: 12px;
+  color: var(--md-sys-color-on-surface-variant);
+}
+@media (max-width: 1200px) {
+  .app-bar .brand strong {
+    display: none;
+  }
+}

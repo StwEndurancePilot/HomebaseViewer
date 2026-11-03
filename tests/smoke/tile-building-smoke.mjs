@@ -85,6 +85,7 @@ try {
   assert.deepEqual((await inspect()).actorTransform.translation, original);
 
   await click('newBlueprint');
+  await click('createBase');
   await settle();
   assert.equal(await page.locator('#structures').textContent(), '0');
   await page.keyboard.press('2');
@@ -124,6 +125,7 @@ try {
   assert.equal(await page.locator('#structures').textContent(), '4');
   await page.keyboard.press('Escape');
   await click('newBlueprint');
+  await click('createBase');
   await settle();
   await page.keyboard.press('5');
   await page.mouse.move(centre.x, centre.y);

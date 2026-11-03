@@ -13,11 +13,13 @@
     <header class="app-bar">
       <div class="brand"><span class="brand-mark">H</span><strong>Homebase Designer</strong></div>
       <div id="filename" class="filename"></div>
-      <md-text-button id="newBlueprint" disabled>New blueprint</md-text-button>
+      <md-text-button id="newBlueprint">New base</md-text-button>
+      <md-text-button id="historyOpen" aria-haspopup="dialog">History</md-text-button>
+      <span id="draftState" role="status"></span>
       <md-text-button id="saveDraft" disabled>Save draft</md-text-button>
       <md-filled-tonal-button id="open"
         ><i slot="icon" class="ph ph-folder-open" aria-hidden="true"></i>Open
-        homebases</md-filled-tonal-button
+        .sav</md-filled-tonal-button
       >
       <div class="export-split" role="group" aria-label="Export blueprint">
         <md-filled-button id="exportSave" disabled
@@ -70,6 +72,29 @@
       ></md-icon-button>
       <input id="file" type="file" accept=".sav,.asv,.json" multiple hidden />
     </header>
+    <dialog id="newBaseDialog" class="file-dialog" aria-labelledby="newBaseTitle">
+      <form id="newBaseForm">
+        <h2 id="newBaseTitle">Create a new base</h2>
+        <p>Start with an empty map. A draft is saved automatically on this device.</p>
+        <label for="baseName">Base name</label>
+        <input id="baseName" required maxlength="120" autocomplete="off" />
+        <label for="baseZone">Map</label>
+        <select id="baseZone"></select>
+        <div class="file-dialog-actions">
+          <button id="cancelNewBase" type="button">Cancel</button>
+          <button id="createBase" type="submit">Create base</button>
+        </div>
+      </form>
+    </dialog>
+    <dialog id="historyDialog" class="file-dialog" aria-labelledby="historyTitle">
+      <div class="panel-heading">
+        <h2 id="historyTitle">File history</h2>
+        <button id="closeHistory" aria-label="Close history">×</button>
+      </div>
+      <p>Reopen the latest draft, including edits. Closing a tab keeps its draft here.</p>
+      <p id="historyEmpty" role="status"></p>
+      <div id="historyList"></div>
+    </dialog>
     <section id="updatesPanel" class="surface" aria-label="App updates" hidden>
       <div class="panel-heading">
         <h2>Updates</h2>
@@ -95,6 +120,7 @@
               ><i slot="icon" class="ph ph-folder-open" aria-hidden="true"></i>Choose a
               save</md-filled-button
             ><md-text-button id="welcomeAccount">Import from Epic account</md-text-button
+            ><md-text-button id="welcomeNew">Create a new base</md-text-button
             ><span class="local-note">.sav · .asv · .json</span>
           </div>
           <div class="welcome-model">
@@ -159,6 +185,9 @@
             ><span class="dock-divider"></span>
             <md-icon-button id="copy" aria-label="Copy selection" title="Copy selection (Ctrl+C)"
               ><i class="ph ph-copy" aria-hidden="true"></i
+            ></md-icon-button>
+            <md-icon-button id="cut" aria-label="Cut selection" title="Cut selection (Ctrl+X)"
+              ><i class="ph ph-scissors" aria-hidden="true"></i
             ></md-icon-button>
             <md-icon-button id="paste" aria-label="Paste group" title="Paste group (Ctrl+V)"
               ><i class="ph ph-clipboard" aria-hidden="true"></i

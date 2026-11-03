@@ -77,6 +77,7 @@ try {
   await click('boxSelect');
   await click('copy');
   await click('newBlueprint');
+  await click('createBase');
   await settle();
   await click('paste');
   await click('commitPaste');

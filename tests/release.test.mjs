@@ -38,6 +38,12 @@ it('keeps install identity stable and preserves app data across upgrades', () =>
   expect(a.nsis.guid).toBe(b.nsis.guid);
   expect(a.nsis.deleteAppDataOnUninstall).toBe(false);
   expect(a.nsis.perMachine).toBe(false);
+  expect(a.fileAssociations).toContainEqual({
+    ext: 'sav',
+    name: 'HomebaseDesigner.Save',
+    description: 'Homebase save',
+    role: 'Editor',
+  });
   expect(a.publish[0]).toMatchObject({ provider: 'github', vPrefixedTagName: false });
   expect(installerConfig(null, '1.7.0').publish).toBeNull();
 });

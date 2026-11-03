@@ -12,6 +12,7 @@ import {
   type PastePlan,
   type Offsets,
   type Vec3,
+  copyGroup,
 } from './editor';
 export class EditorDocument {
   selected = new Set<string>();
@@ -29,6 +30,7 @@ export class EditorDocument {
     public name: string,
     public data: Capture,
     public template: Uint8Array | null,
+    public readonly id: string = crypto.randomUUID(),
   ) {}
   get canUndo() {
     return this.undoStack.length > 0;
@@ -144,6 +146,11 @@ export class EditorDocument {
       this.data.placements.filter((p) => !ids.has(p.actorPath)),
       new Set(),
     );
+  }
+  cutSelected() {
+    const clipboard = copyGroup(this.data, this.selected);
+    this.deleteSelected();
+    return clipboard;
   }
   offsetSelected(offsets: Offsets) {
     this.editTraps((p, parent) => withOffsets(p, offsets, parent));

@@ -196,7 +196,7 @@ export function trapCategory(p: Placement): 'floor' | 'wall' | 'ceiling' | 'unkn
         ? 'floor'
         : 'unknown';
 }
-function standardSupport(p: Placement, full = true) {
+function standardSupport(p: Placement, full = true, lowWall = false) {
   const cone = patternOf(p)?.id === 'RoofS';
   if (full && structureKind(p) === 'roof' && !cone)
     throw new Error(
@@ -204,13 +204,15 @@ function standardSupport(p: Placement, full = true) {
     );
   if (!isBuildingSupport(p) || (shapeOf(p) === 'other' && !cone && (full || !structureKind(p))))
     throw new Error('Point at a supported building piece.');
-  if (full && !cone && patternOf(p) && !['Solid', 'Floor'].includes(patternOf(p)!.id))
-    throw new Error('Traps require a full floor, a cone edited into a ramp, or a solid wall.');
+  if (full && !cone && !lowWall && patternOf(p) && !['Solid', 'Floor'].includes(patternOf(p)!.id))
+    throw new Error(
+      'This trap requires a full floor, a cone edited into a ramp, or a solid wall. Electric wall traps also fit full-width low and half walls.',
+    );
   const up = vec([0, 0, 1]).applyQuaternion(q(p.transform));
   const forward = vec([1, 0, 0]).applyQuaternion(q(p.transform));
   if (
     p.transform.scale.some(
-      (v, i) => Math.abs(((!full || cone) && i === 0 ? Math.abs(v) : v) - 1) > 1e-6,
+      (v, i) => Math.abs(((!full || cone || lowWall) && i === 0 ? Math.abs(v) : v) - 1) > 1e-6,
     ) ||
     up.distanceTo(vec([0, 0, 1])) > 1e-6 ||
     Math.min(Math.abs(forward.x), Math.abs(forward.y)) > 1e-6
@@ -353,7 +355,11 @@ export function placeTrap(
   inverted = false,
   autoFitCone = true,
 ): Placement {
-  standardSupport(support);
+  const lowWall =
+    /(?:trap_wall_electric|tid_wall_electric)(?:[._\s]|$)/i.test(
+      `${template.classPath} ${template.itemPath ?? ''}`,
+    ) && ['HalfWall', 'QuarterWallS'].includes(patternOf(support)?.id ?? '');
+  standardSupport(support, true, lowWall);
   const category = trapCategory(template),
     rampCone = patternOf(support)?.id === 'RoofS',
     fitCone = rampCone && autoFitCone,

@@ -972,8 +972,15 @@ export class Viewer {
       this.markers.add(mesh);
     }
     this.report = report;
-    if (!preserveView) this.frame();
     const terrainInfo = zone ? OUTPOST_ZONE_TERRAIN[zone] : undefined;
+    if (this.bounds.isEmpty()) {
+      const spawn = terrainInfo?.spawn;
+      this.bounds.setFromCenterAndSize(
+        spawn ? new THREE.Vector3(spawn[1], spawn[2], -spawn[0]) : new THREE.Vector3(),
+        new THREE.Vector3(8, 1, 8),
+      );
+    }
+    if (!preserveView) this.frame();
     this.spawn = terrainInfo?.spawn
       ? new THREE.Vector3(terrainInfo.spawn[1], terrainInfo.spawn[2] + 0.5, -terrainInfo.spawn[0])
       : this.controls.target.clone().add(new THREE.Vector3(0, 1, 0));

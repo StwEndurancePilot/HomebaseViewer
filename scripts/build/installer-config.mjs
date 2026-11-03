@@ -20,6 +20,14 @@ export function installerConfig(repository, version) {
       'package.json',
     ],
     asar: true,
+    fileAssociations: [
+      {
+        ext: 'sav',
+        name: 'HomebaseDesigner.Save',
+        description: 'Homebase save',
+        role: 'Editor',
+      },
+    ],
     extraResources: [{ from: 'electron/homebase-open.json', to: 'homebase-open.json' }],
     extraMetadata: {
       description: 'Fortnite STW homebase designer and blueprint editor',

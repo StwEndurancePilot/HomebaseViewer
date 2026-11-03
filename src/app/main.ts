@@ -1,4 +1,7 @@
 import { connectLauncherFiles } from './launcher-files';
+import { DraftHistory } from './draft-history';
+import { BASE_ZONES, newBase } from '../core/new-base';
+import '../styles/files.css';
 import '../styles/updates.css';
 import { setupUpdatePanel } from '../ui/panels/update-panel';
 import { el } from '../ui/dom';
@@ -70,6 +73,7 @@ const status = (text: string) => {
 };
 const fileInput = el<HTMLInputElement>('file');
 const docs: EditorDocument[] = [];
+const history = new DraftHistory();
 let active: EditorDocument | null = null,
   viewer: Viewer | null = null,
   loading = false;
@@ -156,6 +160,7 @@ window.homebaseDownloads?.onFinished(({ url, completed }) => {
   const save = saves.get(url);
   if (save && completed) {
     save.doc.savedRevision = save.revision;
+    void saveAutomaticDraft(save.doc);
     tabs();
     status(`Saved ${save.doc.name}.`);
   } else if (save) status('Not saved. Your edits are still open.');
@@ -197,11 +202,15 @@ function tabs() {
   const host = el('documents');
   host.replaceChildren();
   for (const doc of docs) {
+    const tab = document.createElement('div');
+    tab.className = 'document-tab';
     const button = document.createElement('button');
+    button.className = 'document-name';
     button.textContent =
       (doc.dirty ? '● ' : '') + doc.name.replace(/^STW_Homebase_/, '').replace('Zone_Outpost_', '');
     button.title = doc.name;
     button.classList.toggle('active', doc === active);
+    button.setAttribute('aria-current', String(doc === active));
     button.disabled = loading;
     button.onclick = guard(async () => {
       stopBuilding();
@@ -209,7 +218,71 @@ function tabs() {
       active = doc;
       await render(false);
     });
-    host.append(button);
+    const close = document.createElement('button');
+    close.className = 'document-close';
+    close.textContent = '×';
+    close.title = `Close ${doc.name} (Ctrl+W). Draft stays in History.`;
+    close.setAttribute('aria-label', `Close ${doc.name}`);
+    close.disabled = loading;
+    close.onclick = guard(() => closeDocument(doc));
+    tab.append(button, close);
+    host.append(tab);
+  }
+}
+async function saveAutomaticDraft(doc: EditorDocument, touch = false) {
+  try {
+    await history.save(doc, touch);
+    el('draftState').textContent = 'Draft saved';
+    el('draftState').classList.remove('error');
+    el('draftState').title = 'Your latest work is stored on this device. Reopen it from History.';
+    return true;
+  } catch (error) {
+    el('draftState').textContent = 'Draft not saved';
+    el('draftState').classList.add('error');
+    el('draftState').title = errorText(error);
+    status(`Automatic draft failed: ${errorText(error)}. Use Save draft to keep a file copy.`);
+    return false;
+  }
+}
+async function closeDocument(doc: EditorDocument) {
+  loading = true;
+  tabs();
+  try {
+    if (!(await saveAutomaticDraft(doc)))
+      throw new Error(
+        'Tab kept open because its draft could not be saved. Use Save draft and retry.',
+      );
+    const index = docs.indexOf(doc);
+    if (index < 0) return;
+    docs.splice(index, 1);
+    if (active === doc) {
+      pieceEditor.cancel();
+      stopBuilding();
+      stopMoving();
+      closePanels();
+      cancelPreview();
+      setMode('orbit');
+      viewer?.setBoxSelection(false);
+      active = docs[Math.min(index, docs.length - 1)] ?? null;
+      if (active) await render(false);
+      else {
+        if (viewer) viewer.renderer.domElement.hidden = true;
+        el('welcome').hidden = false;
+        el('tools').hidden = true;
+        el('editor').hidden = true;
+        el('crosshair').hidden = true;
+        el('selectionChip').hidden = true;
+        el('filename').textContent = '';
+        el('hint').textContent = '';
+        for (const id of ['saveDraft', 'exportSave', 'exportOptions', 'report'])
+          el<HTMLButtonElement>(id).disabled = true;
+      }
+    }
+    refreshTemplates();
+    status('Tab closed. Its draft is available in History.');
+  } finally {
+    loading = false;
+    tabs();
   }
 }
 function selected() {
@@ -355,12 +428,14 @@ async function render(preserveView: boolean) {
   el<HTMLButtonElement>('open').disabled = true;
   tabs();
   try {
+    await saveAutomaticDraft(doc);
     if (!viewer) {
       viewer = new Viewer(el('viewport'), select, (text) => (el('hint').textContent = text));
       viewer.onPlacementHover = hoverPlacement;
       viewer.onPlacementClick = (hit) => void clickPlacement(hit);
       configureMover();
     }
+    viewer.renderer.domElement.hidden = false;
     el('welcome').hidden = true;
     el('tools').hidden = false;
     el('editor').hidden = false;
@@ -440,6 +515,7 @@ async function open(files: File[]) {
         active = new EditorDocument(file.name, data, template);
         if (defaultedLevels || repairedMeshes) active.savedRevision = -1;
         docs.push(active);
+        await saveAutomaticDraft(active, true);
         added = true;
       } catch (e) {
         failures.push(`${file.name}: ${errorText(e)}`);
@@ -504,9 +580,9 @@ function previewPlace() {
   el<HTMLButtonElement>('place').disabled = false;
   status('Preview ready.');
 }
-function copy() {
+function copy(cut = false) {
   const doc = current();
-  clipboard = copyGroup(doc.data, doc.selected);
+  clipboard = cut ? doc.cutSelected() : copyGroup(doc.data, doc.selected);
   clipboardName = doc.name;
   const [x, y, z] = clipboard.anchor;
   el<HTMLInputElement>('pasteX').value = String(x);
@@ -515,7 +591,9 @@ function copy() {
   el<HTMLSelectElement>('pasteYaw').value = '0';
   el('clipboardInfo').textContent =
     `${clipboard.records.length} pieces from ${clipboardName}. Anchor: ${clipboard.anchor.join(', ')}.`;
-  status(`Copied ${clipboard.records.length} pieces.`);
+  status(
+    `${cut ? 'Cut' : 'Copied'} ${clipboard.records.length} pieces. Switch tabs and paste (Ctrl+V).`,
+  );
 }
 function previewPaste() {
   cancelPreview();
@@ -616,7 +694,12 @@ el('selectAll').onclick = guard(() =>
   ),
 );
 el('clearSelection').onclick = guard(() => select([], false));
-el('copy').onclick = guard(copy);
+el('copy').onclick = guard(() => copy());
+el('cut').onclick = guard(async () => {
+  copy(true);
+  await render(true);
+  status('Selection cut. Switch tabs and paste (Ctrl+V). Ctrl+Z restores the source.');
+});
 el('paste').onclick = guard(() => {
   stopBuilding();
   openPanel('pastePanel');
@@ -634,24 +717,86 @@ el('redo').onclick = guard(async () => {
   current().redo();
   await render(true);
 });
-el('newBlueprint').onclick = guard(async () => {
-  stopBuilding();
-  closePanels();
-  const doc = current();
-  active = new EditorDocument(
-    `Custom-blueprint-${docs.filter((d) => d.name.startsWith('Custom-blueprint')).length + 1}.sav`,
-    {
-      ...structuredClone(doc.data),
-      placements: [],
-      capturedCount: 0,
-      completeHomebase: false,
-      cloudIssues: [],
-    },
-    doc.template,
-  );
-  docs.push(active);
-  await render(false);
-  status('Blueprint created.');
+const newBaseDialog = el<HTMLDialogElement>('newBaseDialog');
+function showNewBase() {
+  el<HTMLInputElement>('baseName').value =
+    `Custom-blueprint-${docs.filter((d) => d.name.startsWith('Custom-blueprint')).length + 1}`;
+  const zones = el<HTMLSelectElement>('baseZone');
+  zones.replaceChildren();
+  if (active) zones.add(new Option('Same map as current tab', 'current'));
+  for (const [id, zone] of Object.entries(BASE_ZONES)) zones.add(new Option(zone.name, id));
+  newBaseDialog.showModal();
+}
+el('newBlueprint').onclick = guard(showNewBase);
+el('welcomeNew').onclick = guard(showNewBase);
+el('cancelNewBase').onclick = () => newBaseDialog.close();
+el<HTMLFormElement>('newBaseForm').onsubmit = (event) => {
+  event.preventDefault();
+  guard(async () => {
+    stopBuilding();
+    closePanels();
+    const name = val('baseName')
+      .trim()
+      .replace(/\.(sav|json)$/i, '');
+    if (!name || /[<>:"/\\|?*\u0000-\u001f]/.test(name))
+      throw new Error('Enter a base name without file path characters.');
+    active = new EditorDocument(
+      `${name}.sav`,
+      newBase(val('baseZone'), active?.data),
+      menuContainer(),
+    );
+    active.savedRevision = -1;
+    docs.push(active);
+    newBaseDialog.close();
+    await render(false);
+    startBuilding();
+    status('Base created. Choose a building piece and click the ground to start.');
+  })();
+};
+const historyDialog = el<HTMLDialogElement>('historyDialog');
+el('closeHistory').onclick = () => historyDialog.close();
+el('historyOpen').onclick = guard(async () => {
+  const list = el('historyList');
+  list.replaceChildren();
+  el('historyEmpty').textContent = 'Loading history…';
+  historyDialog.showModal();
+  try {
+    const entries = await history.list();
+    el('historyEmpty').textContent = entries.length
+      ? ''
+      : 'Open a save or create a base to start your history.';
+    for (const entry of entries) {
+      const button = document.createElement('button');
+      button.className = 'history-entry';
+      const name = document.createElement('strong');
+      name.textContent = entry.name;
+      const detail = document.createElement('span');
+      detail.textContent = `${entry.pieces.toLocaleString()} pieces · ${new Date(entry.updatedAt).toLocaleString()}${entry.dirty ? ' · Unexported edits' : ''}`;
+      button.append(name, detail);
+      button.onclick = guard(async () => {
+        loading = true;
+        try {
+          const existing = docs.find((doc) => doc.id === entry.id);
+          const doc = existing ?? (await history.restore(entry.id));
+          if (!doc) throw new Error('This draft is no longer available.');
+          if (!existing) docs.push(doc);
+          stopBuilding();
+          closePanels();
+          active = doc;
+          await saveAutomaticDraft(doc, true);
+          historyDialog.close();
+          await render(false);
+          status('Restored the latest draft.');
+        } finally {
+          loading = false;
+          tabs();
+        }
+      });
+      list.append(button);
+    }
+  } catch (error) {
+    el('historyEmpty').textContent = `Could not load history: ${errorText(error)}`;
+  }
 });
 el('saveDraft').onclick = guard(() => {
   const doc = current();
@@ -782,6 +927,7 @@ el('report').onclick = () => {
     );
 };
 document.addEventListener('keydown', (e) => {
+  if (newBaseDialog.open || historyDialog.open) return;
   if (exportMenu.open) {
     if (e.key === 'Escape') {
       e.preventDefault();
@@ -890,6 +1036,12 @@ document.addEventListener('keydown', (e) => {
   const ctrl = e.ctrlKey || e.metaKey;
   let action: string | undefined;
   if (ctrl && e.key.toLowerCase() === 'c') action = 'copy';
+  if (ctrl && e.key.toLowerCase() === 'x') action = 'cut';
+  if (ctrl && e.key.toLowerCase() === 'w') {
+    e.preventDefault();
+    guard(() => closeDocument(current()))();
+    return;
+  }
   if (ctrl && e.key.toLowerCase() === 'v') action = 'paste';
   if (ctrl && e.key.toLowerCase() === 'z') action = e.shiftKey ? 'redo' : 'undo';
   if (ctrl && e.key.toLowerCase() === 'y') action = 'redo';

@@ -133,6 +133,7 @@ try {
   await page.keyboard.press('Control+a');
   await click('copy');
   await click('newBlueprint');
+  await click('createBase');
   await settle();
   await click('paste');
   await click('commitPaste');
