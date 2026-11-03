@@ -43,6 +43,7 @@ import {
 import { isBuildingSupport } from '../core/support';
 import { EditorDocument } from '../core/editor-document';
 import { exportSave, exportJson } from '../core/export';
+import { exportFilename } from '../core/export-filename';
 import { meshStem } from '../core/mesh-identity';
 import { Viewer, type PlacementHit } from '../scene/viewer';
 import { setupAccountPanel } from '../ui/panels/account-panel';
@@ -113,6 +114,7 @@ const saves = new Map<
   {
     doc: EditorDocument;
     revision: number;
+    name: string;
   }
 >();
 const requirementsPanel = new RequirementsPanel({
@@ -164,7 +166,7 @@ window.homebaseDownloads?.onFinished(({ url, completed }) => {
     save.doc.savedRevision = save.revision;
     void saveAutomaticDraft(save.doc);
     tabs();
-    status(`Saved ${save.doc.name}.`);
+    status(`Saved ${save.name}.`);
   } else if (save) status('Not saved. Your edits are still open.');
   saves.delete(url);
   URL.revokeObjectURL(url);
@@ -628,12 +630,38 @@ function download(bytes: Uint8Array | string, name: string, type: string, doc?: 
       : new Blob([new Uint8Array(bytes).buffer], { type });
   const url = URL.createObjectURL(blob),
     a = document.createElement('a');
-  if (doc) saves.set(url, { doc, revision: doc.revision });
+  if (doc) saves.set(url, { doc, revision: doc.revision, name });
   a.href = url;
   a.download = name;
   a.click();
   if (!window.homebaseDownloads) setTimeout(() => URL.revokeObjectURL(url), 60000);
 }
+const exportNameDialog = el<HTMLDialogElement>('exportNameDialog');
+const exportNameInput = el<HTMLInputElement>('exportName');
+let pendingExport: { doc: EditorDocument; revision: number; bytes: Uint8Array } | null = null;
+const exportNames = new WeakMap<EditorDocument, string>();
+el('cancelExportName').onclick = () => exportNameDialog.close();
+exportNameDialog.addEventListener('close', () => {
+  pendingExport = null;
+});
+exportNameInput.oninput = () => exportNameInput.setCustomValidity('');
+el<HTMLFormElement>('exportNameForm').onsubmit = (event) => {
+  event.preventDefault();
+  if (!pendingExport || loading) return;
+  try {
+    const name = exportFilename(exportNameInput.value);
+    const { doc, revision, bytes } = pendingExport;
+    if (active !== doc || doc.revision !== revision)
+      throw new Error('The base changed. Cancel and export again.');
+    download(bytes, name, 'application/octet-stream', doc);
+    exportNames.set(doc, name);
+    exportNameDialog.close();
+    status(`Choose where to save ${name}.`);
+  } catch (error) {
+    exportNameInput.setCustomValidity(errorText(error));
+    exportNameInput.reportValidity();
+  }
+};
 function exportBlueprint() {
   const doc = current();
   stopBuilding();
@@ -646,8 +674,12 @@ function exportBlueprint() {
       throw new Error('Open a menu-generated .sav once to supply its native save container.');
     const bytes = exportSave(template, doc.data),
       stem = doc.name.replace(/\.(sav|json)$/i, '').replace(/^STW_Homebase_/, '');
-    download(bytes, `STW_Homebase_${stem}_Blueprint.sav`, 'application/octet-stream', doc);
-    status('Choose where to save.');
+    pendingExport = { doc, revision: doc.revision, bytes };
+    exportNameInput.value = exportNames.get(doc) ?? `STW_Homebase_${stem}_Blueprint.sav`;
+    exportNameInput.setCustomValidity('');
+    exportNameDialog.showModal();
+    exportNameInput.focus();
+    exportNameInput.setSelectionRange(0, exportNameInput.value.length - 4);
   } catch (error) {
     exportReviews.set(doc, { revision: doc.revision, runtime: [errorText(error)] });
     refreshExportIssues(true);
@@ -931,7 +963,7 @@ el('report').onclick = () => {
     );
 };
 document.addEventListener('keydown', (e) => {
-  if (newBaseDialog.open || historyDialog.open) return;
+  if (newBaseDialog.open || historyDialog.open || exportNameDialog.open) return;
   if (exportMenu.open) {
     if (e.key === 'Escape') {
       e.preventDefault();

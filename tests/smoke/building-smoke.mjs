@@ -32,6 +32,7 @@ async function download(id, name) {
     });
   }, destination);
   await click(id);
+  if (id === 'exportSave') await click('confirmExportName');
   for (let i = 0; i < 100 && !(await app.evaluate(() => globalThis.buildDownload)); i++)
     await page.waitForTimeout(100);
   assert.equal(await app.evaluate(() => globalThis.buildDownload), 'completed');

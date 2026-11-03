@@ -77,7 +77,8 @@
   gap: 8px;
   margin-top: 24px;
 }
-.file-dialog #createBase {
+.file-dialog #createBase,
+.file-dialog #confirmExportName {
   background: var(--md-sys-color-primary);
   color: var(--md-sys-color-on-primary);
 }

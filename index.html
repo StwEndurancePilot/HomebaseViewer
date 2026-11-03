@@ -86,6 +86,25 @@
         </div>
       </form>
     </dialog>
+    <dialog id="exportNameDialog" class="file-dialog" aria-labelledby="exportNameTitle">
+      <form id="exportNameForm">
+        <h2 id="exportNameTitle">Export .sav</h2>
+        <p>Choose a file name. You can pick where to save it next.</p>
+        <label for="exportName">File name</label>
+        <input
+          id="exportName"
+          required
+          maxlength="255"
+          autocomplete="off"
+          aria-describedby="exportNameHint"
+        />
+        <p id="exportNameHint">The .sav extension is added automatically.</p>
+        <div class="file-dialog-actions">
+          <button id="cancelExportName" type="button">Cancel</button>
+          <button id="confirmExportName" type="submit">Export .sav</button>
+        </div>
+      </form>
+    </dialog>
     <dialog id="historyDialog" class="file-dialog" aria-labelledby="historyTitle">
       <div class="panel-heading">
         <h2 id="historyTitle">File history</h2>

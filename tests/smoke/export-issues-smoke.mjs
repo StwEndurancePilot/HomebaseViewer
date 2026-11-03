@@ -198,6 +198,7 @@ try {
     });
   }, dest);
   await click('retryExport');
+  await click('confirmExportName');
   for (let i = 0; i < 100 && !(await app.evaluate(() => globalThis.issueDownload)); i++)
     await page.waitForTimeout(100);
   assert.equal(await app.evaluate(() => globalThis.issueDownload), 'completed');

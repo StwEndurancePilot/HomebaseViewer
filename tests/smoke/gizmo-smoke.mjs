@@ -202,6 +202,7 @@ try {
     });
   }, dest);
   await click('exportSave');
+  await click('confirmExportName');
   for (let i = 0; i < 100 && !(await app.evaluate(() => globalThis.gizmoDownload)); i++)
     await page.waitForTimeout(100);
   assert.equal(await app.evaluate(() => globalThis.gizmoDownload), 'completed');

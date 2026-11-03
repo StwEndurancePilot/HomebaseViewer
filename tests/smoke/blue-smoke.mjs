@@ -59,6 +59,7 @@ async function save(id, name) {
     });
   }, dest);
   await click(id);
+  if (id === 'exportSave') await click('confirmExportName');
   for (let i = 0; i < 100; i++) {
     const state = await app.evaluate(() => globalThis.redesignDownload);
     if (state) {

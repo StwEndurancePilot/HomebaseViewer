@@ -25,6 +25,7 @@ try {
     });
   }, destination);
   await page.locator('#exportSave').click();
+  await page.locator('#confirmExportName').click();
   for (let i = 0; i < 100 && !(await app.evaluate(() => globalThis.replayDownload)); i++)
     await page.waitForTimeout(100);
   assert.equal(await app.evaluate(() => globalThis.replayDownload), 'completed');

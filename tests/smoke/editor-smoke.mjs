@@ -53,6 +53,7 @@ async function download(id, name) {
     });
   }, destination);
   await click(id);
+  if (id === 'exportSave') await click('confirmExportName');
   for (let i = 0; i < 100; i++) {
     const state = await app.evaluate(() => globalThis.editorDownload);
     if (state) {

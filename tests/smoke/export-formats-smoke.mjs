@@ -20,11 +20,16 @@ async function download(id, name) {
   await app.evaluate(({ session }, dest) => {
     globalThis.exportDone = null;
     session.defaultSession.once('will-download', (_e, item) => {
+      globalThis.exportFilename = item.getFilename();
       item.setSavePath(dest);
       item.once('done', (_e, s) => (globalThis.exportDone = s));
     });
   }, dest);
   await page.locator('#' + id).click();
+  if (id === 'exportMenuSav') {
+    await page.locator('#exportName').fill('Twine — 城 🏠');
+    await page.locator('#confirmExportName').click();
+  }
   for (let i = 0; i < 100 && !(await app.evaluate(() => globalThis.exportDone)); i++)
     await page.waitForTimeout(100);
   assert.equal(await app.evaluate(() => globalThis.exportDone), 'completed');
@@ -56,8 +61,28 @@ try {
     .locator('#file')
     .setInputFiles(path.resolve('artifacts/validation/utf8-unicode-export.sav'));
   await page.waitForFunction(() => !document.querySelector('#open').disabled);
+  await app.evaluate(({ session }) => {
+    globalThis.cancelledExportDownloads = 0;
+    session.defaultSession.on('will-download', () => globalThis.cancelledExportDownloads++);
+  });
+  const beforeCancel = await page.locator('.document-name.active').textContent();
+  await page.locator('#exportSave').click();
+  await page.locator('#exportName').fill('invalid/name');
+  await page.locator('#confirmExportName').click();
+  assert.equal(await page.locator('#exportNameDialog').evaluate((dialog) => dialog.open), true);
+  assert.equal(await page.locator('#exportName').evaluate((input) => input.validity.valid), false);
+  await page.locator('#cancelExportName').click();
+  await page.locator('#exportSave').click();
+  await page.keyboard.press('Escape');
+  assert.equal(await page.locator('#exportNameDialog').evaluate((dialog) => dialog.open), false);
+  assert.equal(await app.evaluate(() => globalThis.cancelledExportDownloads), 0);
+  assert.equal(await page.locator('.document-name.active').textContent(), beforeCancel);
   await page.locator('#exportOptions').click();
   const bytes = await download('exportMenuSav', 'utf8-packaged-export.sav');
+  assert.equal(await app.evaluate(() => globalThis.exportFilename), 'Twine — 城 🏠.sav');
+  await page.locator('#exportSave').click();
+  assert.equal(await page.locator('#exportName').inputValue(), 'Twine — 城 🏠.sav');
+  await page.locator('#cancelExportName').click();
   const start = bytes.indexOf(Buffer.from('STW_HOMEBASE_1\n'));
   assert.ok(start > 0);
   const count = bytes.readInt32LE(start - 4);

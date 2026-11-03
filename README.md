@@ -20,7 +20,7 @@ Choose **Open .sav** or drop a `.sav`, `.asv` or capture `.json` onto the window
 - **Move:** select pieces and use the arrow keys to move one horizontal tile relative to the camera. Page Up / Page Down moves the selection up / down one building level (384 Unreal units). Attached traps follow their structures. Ctrl+Z undoes a move. Select traps to use the XYZ handles or numeric offsets; support links are retained.
 - **Requirements:** inspect material totals, trap quantities and saved perks, or filter trap visibility.
 - **Trap perks:** select a trap and choose **Edit perks**. Pick perks and rarities, add or remove slots, and reorder them before applying. Changes support undo/redo and are included in drafts and exports.
-- **Export .sav:** create a menu blueprint. The arrow also offers formatted JSON. **Save draft** retains the full editable document.
+- **Export .sav:** choose a filename, then save a menu blueprint. The `.sav` extension is added automatically, and the last export name is remembered for that tab. The arrow also offers formatted JSON. **Save draft** retains the full editable document.
 
 Export issues appear in a list and highlight affected pieces. Click an issue to select and frame it.
 
