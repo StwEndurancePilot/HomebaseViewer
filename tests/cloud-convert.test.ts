@@ -11,6 +11,7 @@ import {
 import { exportJson, exportSave } from '../src/core/export';
 import { exportDiagnostics } from '../src/core/editor';
 import { parseCapture, readSaveText } from '../src/core/save';
+import buildEdits from '../src/data/build-edits.json';
 const { decodeCloudBytes } = createRequire(import.meta.url)(
   '../electron/accounts/epic-account.cjs',
 );
@@ -484,4 +485,125 @@ it('continues blocking unknown classes instead of guessing a mesh', () => {
     'missing-path',
     'invalid-material',
   ]);
+});
+
+it('exports Dev spiral stairs with their verified mesh, exact pose and attached traps', () => {
+  const path =
+      '/Game/Building/ActorBlueprints/Player/Wood/L1/PBWA_W1_StairSpiral.PBWA_W1_StairSpiral_C',
+    mesh = '/Game/Packages/DS_Fortnight/SM/Mesh/S_SpiralStaircaseTest.S_SpiralStaircaseTest';
+  for (const mirrored of [false, true]) {
+    const data = convertCloudSave(
+      cat(
+        Buffer.from('SavedActors'),
+        actor({
+          path,
+          rotation: [0, 0, Math.SQRT1_2, Math.SQRT1_2],
+          scale: [mirrored ? -1 : 1, 2, 0.5],
+          body: cat(
+            currentProperty(
+              'bMirrored',
+              typeName('BoolProperty'),
+              Buffer.alloc(0),
+              mirrored ? 16 : 0,
+            ),
+            string('None'),
+          ),
+        }),
+        actor({
+          id: 2,
+          path: ceiling,
+          body: cat(
+            property('TrapData', 'ObjectProperty', string(item)),
+            property(
+              'AttachedTo',
+              'StructProperty',
+              guid(1),
+              cat(string('Guid'), Buffer.alloc(16)),
+            ),
+            string('None'),
+          ),
+        }),
+      ),
+      'pve_04',
+      'dev-stairs.sav',
+    );
+    const stair = data.placements[0];
+    expect(stair).toMatchObject({
+      classPath: path,
+      meshPath: mesh,
+      resourceType: 0,
+      level: 0,
+      buildingType: 5,
+      mirrored,
+    });
+    expect(stair.meshTransform).toEqual(stair.transform);
+    expect(exportDiagnostics(data)).toEqual([]);
+    const original = structuredClone(data);
+    const roundtrip = parseCapture(exportSave(menuContainer(), data));
+    expect(
+      roundtrip.placements.map((p) => [
+        p.classPath,
+        p.meshPath,
+        p.transform,
+        p.meshTransform,
+        p.attachment,
+      ]),
+    ).toEqual(
+      JSON.parse(
+        JSON.stringify(
+          data.placements.map((p) => [
+            p.classPath,
+            p.meshPath,
+            p.transform,
+            p.meshTransform,
+            p.attachment,
+          ]),
+        ),
+      ),
+    );
+    stair.meshPath = '';
+    stair.resourceType = 6;
+    stair.buildingType = 10;
+    stair.cloudIssues = [
+      'No verified primary-mesh mapping for this cloud class. Import its equivalent from a menu capture.',
+    ];
+    expect(exportDiagnostics(data)).toHaveLength(3);
+    if (!mirrored)
+      writeFileSync('artifacts/validation/cloud-special-draft.json', JSON.stringify(data));
+    expect(repairCloudMeshMappings(data)).toBe(1);
+    expect(data).toEqual(original);
+    expect(repairCloudMeshMappings(data)).toBe(0);
+    expect(exportDiagnostics(data)).toEqual([]);
+  }
+});
+
+it('repairs and exports pillars in every material and tier, including the Stone L2 Pillar2 class', () => {
+  const definitions = buildEdits.definitions.filter((d) => d.shape === 'Pillar');
+  expect(definitions).toHaveLength(9);
+  for (const def of definitions) {
+    const data = convertCloudSave(
+      cat(Buffer.from('SavedActors'), actor({ path: def.classPath })),
+      'pve_04',
+      'pillars.sav',
+    );
+    const p = data.placements[0];
+    expect(p).toMatchObject({
+      meshPath: def.meshPath,
+      resourceType: def.material,
+      level: def.tier - 1,
+    });
+    p.meshPath = '';
+    p.resourceType = 6;
+    p.cloudIssues = [
+      'No verified primary-mesh mapping for this cloud class. Import its equivalent from a menu capture.',
+    ];
+    expect(repairCloudMeshMappings(data)).toBe(1);
+    expect(exportDiagnostics(data)).toEqual([]);
+    expect(parseCapture(exportSave(menuContainer(), data)).placements[0]).toMatchObject({
+      classPath: def.classPath,
+      meshPath: def.meshPath,
+      transform: p.transform,
+      resourceType: def.material,
+    });
+  }
 });

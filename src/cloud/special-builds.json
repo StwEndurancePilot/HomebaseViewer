@@ -1,0 +1,15 @@
+{
+  "source": "Fortnite 42.40 installed assets, read-only CUE4Parse export: PBWA_W1_StairSpiral.json. Default actor and root StaticMeshComponent0 agree on the mesh; the root has no relative transform override. Mesh is present in assets/outpost-game/builds/builds.glb.",
+  "classes": [
+    {
+      "classPath": "/Game/Building/ActorBlueprints/Player/Wood/L1/PBWA_W1_StairSpiral.PBWA_W1_StairSpiral_C",
+      "meshPath": "/Game/Packages/DS_Fortnight/SM/Mesh/S_SpiralStaircaseTest.S_SpiralStaircaseTest",
+      "meshRelative": { "translation": [0, 0, 0], "rotation": [0, 0, 0, 1], "scale": [1, 1, 1] },
+      "attachmentType": 9,
+      "buildingType": 5,
+      "resourceType": 0,
+      "level": 0,
+      "variants": 1
+    }
+  ]
+}

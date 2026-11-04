@@ -5,6 +5,7 @@ import { relativePose } from '../core/editor';
 import { referencedWorldSupports } from '../core/support';
 import { buildDefinitionForClass, EDIT_PATTERNS } from '../core/build-pieces';
 import catalogData from './catalog.json';
+import specialBuilds from './special-builds.json';
 import container from './menu-container.json';
 type ClassInfo = {
   classPath: string;
@@ -158,10 +159,17 @@ const canonicalClasses = new Map(
 );
 const missingMeshIssue =
   'No verified primary-mesh mapping for this cloud class. Import its equivalent from a menu capture.';
+const specialClasses = new Map(
+  specialBuilds.classes.map((info) => [info.classPath.toLowerCase(), info as ClassInfo]),
+);
 function classInfo(classPath: string, mirrored: boolean): ClassInfo | undefined {
   const key = canonicalPath(classPath).toLowerCase() + '|' + mirrored;
   const observed = catalog.classes[key] ?? canonicalClasses.get(key);
   if (observed) return observed;
+  const special = specialClasses.get(
+    classPath.toLowerCase().replace(/^\/savetheworld\//, '/game/'),
+  );
+  if (special) return special;
   const def = buildDefinitionForClass(classPath);
   const kind = EDIT_PATTERNS.find((p) => p.id === def?.shape)?.kind;
   if (!def || !kind) return undefined;

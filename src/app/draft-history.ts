@@ -1,5 +1,6 @@
 import { EditorDocument } from '../core/editor-document';
 import type { Capture } from '../core/save';
+import { applyCloudTrapLevelFallback, repairCloudMeshMappings } from '../cloud/convert';
 
 export type HistoryEntry = {
   id: string;
@@ -108,6 +109,9 @@ export class DraftHistory {
     const doc = new EditorDocument(draft.name, draft.data, draft.template, draft.id);
     doc.revision = draft.revision;
     doc.savedRevision = draft.savedRevision;
+    const defaultedLevels = applyCloudTrapLevelFallback(doc.data);
+    const repairedMeshes = repairCloudMeshMappings(doc.data);
+    if (defaultedLevels || repairedMeshes) doc.revision++;
     return doc;
   }
 }
