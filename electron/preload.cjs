@@ -9,6 +9,10 @@ const invoke = async (channel, ...args) => {
   if (!result.ok) throw new Error(result.error);
   return result.value;
 };
+contextBridge.exposeInMainWorld('homebaseDiscord', {
+  state: () => invoke('discord-state'),
+  open: () => invoke('discord-open'),
+});
 contextBridge.exposeInMainWorld('homebaseLauncher', {
   next: () => invoke('homebase-open-next'),
   onAvailable(callback) {

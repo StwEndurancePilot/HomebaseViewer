@@ -2,6 +2,10 @@ import type { UpdateState } from './update';
 import type { Zone, State, PennyAccount } from './account';
 declare global {
   interface Window {
+    homebaseDiscord?: {
+      state(): Promise<{ inviteOpened: boolean }>;
+      open(): Promise<{ inviteOpened: boolean }>;
+    };
     homebaseUpdates?: {
       state(): Promise<UpdateState>;
       check(): Promise<UpdateState>;

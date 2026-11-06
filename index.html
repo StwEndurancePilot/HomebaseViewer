@@ -71,7 +71,33 @@
         ><i class="ph ph-arrow-circle-up" aria-hidden="true"></i
       ></md-icon-button>
       <input id="file" type="file" accept=".sav,.asv,.json" multiple hidden />
+      <md-icon-button
+        id="discordOpen"
+        aria-label="Join our Discord server"
+        title="Join our Discord server"
+        aria-haspopup="dialog"
+      >
+        <i class="ph ph-discord-logo" aria-hidden="true"></i>
+      </md-icon-button>
     </header>
+    <dialog
+      id="discordDialog"
+      class="file-dialog"
+      aria-labelledby="discordTitle"
+      aria-describedby="discordDescription"
+    >
+      <h2 id="discordTitle">Join our Discord community</h2>
+      <p id="discordDescription">
+        Join our Discord server for giveaways, updates, blueprint tips and support from other
+        players.
+      </p>
+      <p>Open the invitation once to continue. We’ll remember this on this device.</p>
+      <p id="discordError" role="alert" hidden></p>
+      <div class="file-dialog-actions">
+        <button id="discordClose" type="button" hidden>Close</button>
+        <button id="discordJoin" type="button">Join now</button>
+      </div>
+    </dialog>
     <dialog id="newBaseDialog" class="file-dialog" aria-labelledby="newBaseTitle">
       <form id="newBaseForm">
         <h2 id="newBaseTitle">Create a new base</h2>

@@ -4,6 +4,7 @@ import { HomeHistory } from '../ui/home-history';
 import { BASE_ZONES, newBase } from '../core/new-base';
 import '../styles/updates.css';
 import { setupUpdatePanel } from '../ui/panels/update-panel';
+import { setupDiscordPanel } from '../ui/panels/discord-panel';
 import { el } from '../ui/dom';
 import '../ui/theme';
 import '../styles/app.css';
@@ -57,6 +58,7 @@ import { trapName } from '../core/requirements';
 import { trapCatalog, trapTemplate } from '../core/trap-catalog';
 import { RequirementsPanel, renderSelectedPerks } from '../ui/panels/requirements-panel';
 setupUpdatePanel();
+setupDiscordPanel();
 document.title = `Homebase Designer ${version}`;
 const val = (id: string) => el<HTMLInputElement>(id).value;
 const number = (id: string) => {
@@ -966,7 +968,7 @@ el('report').onclick = () => {
     );
 };
 document.addEventListener('keydown', (e) => {
-  if (newBaseDialog.open || historyDialog.open || exportNameDialog.open) return;
+  if (document.querySelector('dialog[open]')) return;
   if (exportMenu.open) {
     if (e.key === 'Escape') {
       e.preventDefault();

@@ -2,6 +2,7 @@ const { app, BrowserWindow, session, dialog, ipcMain, shell } = require('electro
 const path = require('node:path');
 const { existsSync } = require('node:fs');
 const { AppUpdater } = require('./updates/app-updater.cjs');
+const { DiscordCommunity } = require('./discord-community.cjs');
 let mainWindow;
 let updates;
 const { HomebaseRequests } = require('./homebase-requests.cjs');
@@ -57,6 +58,7 @@ if (ownsInstance)
       },
     });
     mainWindow = window;
+    const discord = new DiscordCommunity(app.getPath('userData'), (url) => shell.openExternal(url));
     let nativeUpdater = null;
     if (
       app.isPackaged &&
@@ -107,6 +109,8 @@ if (ownsInstance)
         }
       });
     handle('update-state', () => updates.getState());
+    handle('discord-state', () => discord.state);
+    handle('discord-open', () => discord.open());
     handle('homebase-open-next', () => homebaseRequests.take());
     handle('update-check', () => updates.check());
     handle('update-restart', () => updates.requestRestart());
