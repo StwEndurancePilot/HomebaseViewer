@@ -131,6 +131,21 @@
         </div>
       </form>
     </dialog>
+    <dialog
+      id="removeHomeDialog"
+      class="file-dialog"
+      aria-labelledby="removeHomeTitle"
+      aria-describedby="removeHomeDescription removeHomeWarning"
+    >
+      <h2 id="removeHomeTitle">Remove homebase?</h2>
+      <p id="removeHomeDescription"></p>
+      <p id="removeHomeWarning"></p>
+      <p id="removeHomeError" role="alert" hidden></p>
+      <div class="file-dialog-actions">
+        <button id="cancelRemoveHome" type="button" autofocus>Keep homebase</button>
+        <button id="confirmRemoveHome" type="button">Remove homebase</button>
+      </div>
+    </dialog>
     <dialog id="historyDialog" class="file-dialog" aria-labelledby="historyTitle">
       <div class="panel-heading">
         <h2 id="historyTitle">File history</h2>

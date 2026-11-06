@@ -1,4 +1,4 @@
-import type { DraftHistory } from '../app/draft-history';
+import type { DraftHistory, HistoryEntry } from '../app/draft-history';
 import { el } from './dom';
 import { baseThumbnail } from './base-thumbnail';
 
@@ -6,13 +6,95 @@ export class HomeHistory {
   private generation = 0;
   private observer?: IntersectionObserver;
   private queue: Promise<void> = Promise.resolve();
+  private contextMenu?: HTMLDivElement;
+
+  private showContextMenu(entry: HistoryEntry, anchor: HTMLButtonElement, x: number, y: number) {
+    this.contextMenu?.remove();
+    const menu = document.createElement('div');
+    menu.className = 'home-history-menu';
+    menu.popover = 'auto';
+    menu.setAttribute('role', 'menu');
+    menu.setAttribute('aria-label', `Actions for ${entry.name}`);
+    const item = document.createElement('button');
+    item.type = 'button';
+    item.setAttribute('role', 'menuitem');
+    item.textContent = 'Remove homebase…';
+    item.onclick = () => {
+      menu.hidePopover();
+      anchor.focus();
+      this.confirmRemoval(entry);
+    };
+    menu.onkeydown = (event) => {
+      if (event.key === 'Escape' || event.key === 'Tab') {
+        event.preventDefault();
+        menu.hidePopover();
+        anchor.focus();
+      }
+      if (['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) {
+        event.preventDefault();
+        item.focus();
+      }
+    };
+    menu.append(item);
+    document.body.append(menu);
+    this.contextMenu = menu;
+    menu.showPopover();
+    const bounds = menu.getBoundingClientRect();
+    menu.style.left = `${Math.max(8, Math.min(x, window.innerWidth - bounds.width - 8))}px`;
+    menu.style.top = `${Math.max(8, Math.min(y, window.innerHeight - bounds.height - 8))}px`;
+    item.focus();
+  }
 
   constructor(
     private history: DraftHistory,
     private open: (id: string) => void,
   ) {}
 
+  private confirmRemoval(entry: HistoryEntry) {
+    const dialog = el<HTMLDialogElement>('removeHomeDialog');
+    const cancel = el<HTMLButtonElement>('cancelRemoveHome');
+    const confirm = el<HTMLButtonElement>('confirmRemoveHome');
+    const error = el('removeHomeError');
+    el('removeHomeDescription').textContent =
+      `Remove “${entry.name}” from Your homebases and History on this device? Your exported files and in-game homebase will not be changed.`;
+    el('removeHomeWarning').textContent = entry.dirty
+      ? 'This draft has unexported edits. Removing it permanently deletes those edits. Keep the homebase and export it first if you want a copy.'
+      : 'This permanently deletes the local draft. You can open an exported save again to add it back.';
+    error.hidden = true;
+    let removing = false;
+    dialog.oncancel = (event) => {
+      if (removing) event.preventDefault();
+    };
+    cancel.onclick = () => dialog.close();
+    confirm.onclick = async () => {
+      if (removing) return;
+      removing = true;
+      cancel.disabled = confirm.disabled = true;
+      confirm.textContent = 'Removing…';
+      try {
+        await this.history.remove(entry.id);
+        dialog.close();
+        await this.refresh();
+        el('homeHistoryStatus').textContent =
+          `“${entry.name}” removed. ` + el('homeHistoryStatus').textContent;
+        const next = el('homeHistoryList').querySelector<HTMLButtonElement>('.home-history-remove');
+        (next ?? el('welcomeNew')).focus();
+      } catch {
+        error.textContent =
+          'Could not remove this homebase. Your draft is still saved. Please try again.';
+        error.hidden = false;
+      } finally {
+        removing = false;
+        cancel.disabled = confirm.disabled = false;
+        confirm.textContent = 'Remove homebase';
+      }
+    };
+    dialog.showModal();
+    cancel.focus();
+  }
+
   async refresh() {
+    this.contextMenu?.remove();
     const generation = ++this.generation;
     this.observer?.disconnect();
     const host = el('homeHistoryList');
@@ -82,7 +164,38 @@ export class HomeHistory {
         time.textContent = new Date(entry.updatedAt).toLocaleString();
         button.append(preview, name, details, time);
         button.onclick = () => this.open(entry.id);
-        host.append(button);
+        const card = document.createElement('div');
+        card.className = 'home-history-card';
+        const remove = document.createElement('button');
+        remove.className = 'home-history-remove';
+        remove.type = 'button';
+        const icon = document.createElement('i');
+        icon.className = 'ph ph-trash';
+        icon.setAttribute('aria-hidden', 'true');
+        remove.append(icon);
+        remove.title = 'Remove homebase';
+        remove.setAttribute('aria-label', `Remove ${entry.name}`);
+        remove.setAttribute('aria-haspopup', 'dialog');
+        remove.onclick = () => this.confirmRemoval(entry);
+        card.oncontextmenu = (event) => {
+          event.preventDefault();
+          const bounds = button.getBoundingClientRect();
+          this.showContextMenu(
+            entry,
+            button,
+            event.clientX || bounds.right - 32,
+            event.clientY || bounds.top + 32,
+          );
+        };
+        card.onkeydown = (event) => {
+          if (event.key === 'ContextMenu' || (event.shiftKey && event.key === 'F10')) {
+            event.preventDefault();
+            const bounds = button.getBoundingClientRect();
+            this.showContextMenu(entry, button, bounds.right - 32, bounds.top + 32);
+          }
+        };
+        card.append(button, remove);
+        host.append(card);
         if (!entry.preview) this.observer.observe(button);
       }
     } catch {

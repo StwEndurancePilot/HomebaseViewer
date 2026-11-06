@@ -209,6 +209,81 @@ try {
   assert.ok(await page.locator('#historyOpen').isVisible());
   await click('historyOpen');
   await page.screenshot({ path: 'artifacts/validation/file-history.png' });
+  await click('closeHistory');
+  while (await page.locator('.document-close').count()) {
+    await page.locator('.document-close').first().click();
+    await settle();
+  }
+  await page.waitForFunction(() => document.querySelectorAll('.home-history-remove').length === 4);
+  const removeFresh = page.getByRole('button', { name: 'Remove Fresh base.sav', exact: true });
+  const freshCard = page.locator('.home-history-card').filter({ hasText: 'Fresh base' });
+  await page.locator('#homeHistoryTitle').hover();
+  assert.equal(await removeFresh.evaluate((el) => getComputedStyle(el).opacity), '0');
+  await freshCard.hover();
+  assert.equal(await removeFresh.evaluate((el) => getComputedStyle(el).opacity), '1');
+  await freshCard.click({ button: 'right' });
+  await page.getByRole('menuitem', { name: 'Remove homebase…' }).click();
+  await click('cancelRemoveHome');
+  assert.equal((await entries()).length, 4);
+  await gallery.focus();
+  await page.keyboard.press('Shift+F10');
+  await page.getByRole('menuitem').waitFor({ state: 'visible' });
+  await page.keyboard.press('Escape');
+  assert.equal(await gallery.evaluate((el) => el === document.activeElement), true);
+  await freshCard.click({ button: 'right' });
+  await page.locator('#homeHistoryTitle').click();
+  assert.equal(await page.getByRole('menuitem').isVisible(), false);
+  await freshCard.hover();
+  await page.screenshot({ path: 'artifacts/validation/home-history-trash-hover.png' });
+  await removeFresh.click();
+  assert.match(await page.locator('#removeHomeWarning').textContent(), /unexported edits/);
+  assert.equal(
+    await page.locator('#cancelRemoveHome').evaluate((el) => el === document.activeElement),
+    true,
+  );
+  await page.keyboard.press('Escape');
+  assert.equal((await entries()).length, 4);
+  await removeFresh.click();
+  await click('cancelRemoveHome');
+  assert.equal((await entries()).length, 4);
+  await removeFresh.click();
+  await page.evaluate(() => {
+    globalThis.originalTransaction = IDBDatabase.prototype.transaction;
+    IDBDatabase.prototype.transaction = function (...args) {
+      if (args[1] === 'readwrite') throw new DOMException('Disk failure', 'UnknownError');
+      return globalThis.originalTransaction.apply(this, args);
+    };
+  });
+  await click('confirmRemoveHome');
+  await page.locator('#removeHomeError').waitFor({ state: 'visible' });
+  assert.equal((await entries()).length, 4);
+  await page.evaluate(() => {
+    IDBDatabase.prototype.transaction = globalThis.originalTransaction;
+  });
+  await page.screenshot({ path: 'artifacts/validation/home-history-removal.png' });
+  await click('confirmRemoveHome');
+  await removeFresh.waitFor({ state: 'detached' });
+  assert.equal((await entries()).length, 3);
+  await page.reload();
+  await page.waitForFunction(() => document.querySelectorAll('.home-history-remove').length === 3);
+  assert.equal(await removeFresh.count(), 0);
+  await click('historyOpen');
+  assert.equal(await page.locator('.history-entry').filter({ hasText: 'Fresh base' }).count(), 0);
+  await click('closeHistory');
+  for (let remaining = 3; remaining > 0; remaining--) {
+    await page.locator('.home-history-card').first().hover();
+    await page.locator('.home-history-remove').first().click();
+    await click('confirmRemoveHome');
+    await page.waitForFunction(
+      (n) => document.querySelectorAll('.home-history-remove').length === n,
+      remaining - 1,
+    );
+  }
+  assert.equal((await entries()).length, 0);
+  assert.match(
+    await page.locator('#homeHistoryStatus').textContent(),
+    /Your bases will appear here/,
+  );
   assert.deepEqual(errors, []);
   console.log(
     'PASS: new base, automatic drafts, history after reload, cut/paste, independent undo, close tabs, duplicate opens, shell handoff and failed-save recovery.',

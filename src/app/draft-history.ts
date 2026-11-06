@@ -81,6 +81,18 @@ export class DraftHistory {
     });
   }
 
+  async remove(id: string) {
+    const db = await this.db();
+    await new Promise<void>((resolve, reject) => {
+      const transaction = db.transaction(['drafts', 'history'], 'readwrite');
+      transaction.objectStore('drafts').delete(id);
+      transaction.objectStore('history').delete(id);
+      transaction.oncomplete = () => resolve();
+      transaction.onabort = () => reject(transaction.error ?? new Error('Removal aborted.'));
+      transaction.onerror = () => reject(transaction.error);
+    });
+  }
+
   async savePreview(id: string, revision: number, preview: string) {
     const db = await this.db();
     await new Promise<void>((resolve, reject) => {
