@@ -1,3 +1,4 @@
+import { completeDiscordOnboarding } from './discord-onboarding.mjs';
 import { _electron as electron } from 'playwright';
 import { createServer } from 'node:http';
 import { createHash } from 'node:crypto';
@@ -38,6 +39,7 @@ const app = await electron.launch(
 );
 const page = await app.firstWindow();
 const errors = [];
+await completeDiscordOnboarding(app, page);
 page.on('pageerror', (error) => errors.push(String(error)));
 try {
   await app.evaluate(({ BrowserWindow }) => {

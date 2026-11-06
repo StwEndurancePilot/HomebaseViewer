@@ -1,3 +1,4 @@
+import { completeDiscordOnboarding } from './discord-onboarding.mjs';
 import { _electron as electron } from 'playwright';
 import assert from 'node:assert/strict';
 import path from 'node:path';
@@ -8,6 +9,7 @@ const app = await electron.launch(
     : { args: ['.', '--smoke-test'] },
 );
 const page = await app.firstWindow();
+await completeDiscordOnboarding(app, page);
 const errors = [];
 page.on('pageerror', (error) => errors.push(String(error)));
 const click = (id) => page.locator(`#${id}`).click();

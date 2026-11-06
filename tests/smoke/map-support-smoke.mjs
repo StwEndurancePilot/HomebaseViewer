@@ -1,3 +1,4 @@
+import { completeDiscordOnboarding } from './discord-onboarding.mjs';
 import { _electron as electron } from 'playwright';
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import path from 'node:path';
@@ -64,6 +65,7 @@ const app = await electron.launch(
 );
 const page = await app.firstWindow();
 const errors = [];
+await completeDiscordOnboarding(app, page);
 page.on('pageerror', (error) => errors.push(String(error)));
 const settle = () => page.waitForFunction(() => !document.querySelector('#open').disabled);
 try {

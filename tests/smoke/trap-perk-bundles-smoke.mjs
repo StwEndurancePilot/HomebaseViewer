@@ -1,3 +1,4 @@
+import { completeDiscordOnboarding } from './discord-onboarding.mjs';
 import { _electron as electron } from 'playwright';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
@@ -32,6 +33,7 @@ const app = await electron.launch(
 );
 const page = await app.firstWindow(),
   errors = [];
+await completeDiscordOnboarding(app, page);
 page.on('pageerror', (e) => errors.push(String(e)));
 await app.evaluate(({ BrowserWindow }) => {
   BrowserWindow.getAllWindows()[0].webContents.setBackgroundThrottling(false);

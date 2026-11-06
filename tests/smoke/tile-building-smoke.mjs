@@ -1,3 +1,4 @@
+import { completeDiscordOnboarding } from './discord-onboarding.mjs';
 import { _electron as electron } from 'playwright';
 import path from 'node:path';
 import assert from 'node:assert/strict';
@@ -9,6 +10,7 @@ const app = await electron.launch(
 );
 const page = await app.firstWindow();
 const errors = [];
+await completeDiscordOnboarding(app, page);
 page.on('pageerror', (e) => errors.push(String(e)));
 await app.evaluate(({ BrowserWindow }) => {
   const window = BrowserWindow.getAllWindows()[0];
