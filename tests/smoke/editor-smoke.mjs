@@ -92,7 +92,8 @@ try {
   await settle();
   await click('paste');
   await page.locator('#pasteX').fill('1536');
-  await page.locator('#pasteYaw').selectOption('90');
+  await click('pasteRotate90');
+  assert.equal(await page.locator('#pasteYaw').inputValue(), '90');
   await click('previewPaste');
   assert.equal(
     await page.locator('#commitPaste').isEnabled(),

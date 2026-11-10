@@ -197,3 +197,189 @@ The separate vertical ceiling seating, unrecorded component transforms, missing 
 Exact visual 1:1 fidelity is not achieved. The supplied .sav provides saved transforms but no mesh geometry. Penny's quantized blueprint assemblies have baked component transforms and artificial trap seating offsets. The originals needed to undo these correctly are not present in the repository or available from the user. See README.md and the exported fidelity report. Primary mesh names are resolved directly from the shipped GLBs; no full trap assembly or grid/yaw inference is substituted. The viewer remains usable as a clearly labeled reference viewer, with exact imported transforms available for inspection.
 
 No live Unreal comparison, authoritative full-homebase coverage, original mesh pivot recovery, secondary component reconstruction, or Unreal-equivalent collision behavior is claimed. Nothing was installed into Fortnite or published. RDW-source's existing edits were left untouched.
+
+## Trap rotation gizmo (Pitch / Yaw / Roll)
+
+The offset panel's Move handle drags a world-space translate gizmo; the Rotate handle
+(`rotateTraps`, `offsetRotate`, Shift+G) attaches the same `TransformControls` proxy in
+`rotate` mode and converts the drag into the same Pitch/Yaw/Roll triple the numeric fields
+write, so a gizmo edit and a typed edit are interchangeable.
+
+- Scene axes map to Unreal as `X -> Y`, `Y -> Z`, `Z -> -X` (`scenePoint`). A world ring
+  drag therefore maps to `pitch` (ring X), `yaw` (ring Y) and `roll` (ring Z).
+- `sceneRotationToAngles` reflects the delta quaternion back into Unreal space and
+  decomposes it with the `ZYX` order that `unrealRotator` composes, then snaps to the
+  Angle snap value and clamps to the active per-edit limit.
+- Rotation is applied about each trap's own translation (`rotatedTrap`), which is the same
+  pivot `withOffsets` uses for `angles`, so the preview and the commit cannot diverge.
+- Ring colours follow the translate palette: green = ring X (pitch), blue = ring Y (yaw),
+  red = ring Z (roll). Angle snap defaults to 5 degrees.
+- Covered by `tests/trap-move.test.ts` ("rotation gizmo mapping"): axis mapping, snap and
+  clamp, and preview/commit equivalence with `withOffsets` for pitch, yaw, roll, mixes and
+  a 180 degree flip.
+
+## Trap offset readout (X / Y / Z / Pitch / Yaw / Roll)
+
+The Trap offsets number grid is a live readout of the selection, not just an input form.
+
+- Selecting a trap fills the six fields from `offsetOf`: position is measured against the
+  stored base transform, and angles come from the stored `editorOffsets` total so a pure
+  180 degree pitch stays `180` instead of decomposing to yaw/roll +/-180.
+- While a Move or Rotate drag is in progress, `previewOffsets` adds the live drag delta to
+  the previous totals, so the fields track the ghost preview. Cancelling restores them.
+- Every committed drag and every selection change re-runs `syncOffsetInputs`.
+- "Apply to selection" is absolute (`EditorDocument.setOffsets`): the typed values replace
+  the totals and are applied from the stored base transform. The gizmo stays incremental
+  (`offsetSelected`), so drags accumulate and typed values overwrite.
+- The three editor-only keys (`editorBaseTransform`, `editorBaseMeshTransform`,
+  `editorOffsets`) are stripped in `exportCapture`, so a saved blueprint is byte-identical
+  to one produced without the editor bookkeeping.
+- Paste, ceiling flip and fresh trap placement establish a new offset baseline at the
+  resulting pose. Their offset readout starts at zero; subsequent movement and absolute
+  Apply preserve the pasted or flipped orientation. A trap template cannot carry its old
+  editor baseline into a newly placed trap.
+- Covered by `tests/trap-move.test.ts` ("offset readout", "offset readout accumulation"):
+  accumulation across moves and rotations, absolute Apply, the 180 degree readability case
+  and gizmo preview == incremental commit.
+- `tests/editor-offset-lifecycle.test.ts` covers all four paste turns followed by movement,
+  rotation preview/commit and absolute reset, ceiling flip with undo/redo, template reuse,
+  and offset/oblique trap anchors snapped through all four turns at positive and negative
+  destinations. The original three regressions failed on PR head `ba375a7` and passed on
+  the base `b8eb2d3`; these cases now pass with the fixes.
+- Run `node tests/smoke/offset-lifecycle-smoke.mjs` after `npm run build` for the built
+  Electron workflow. It checks offset input, a rotated snapped paste, movement after paste,
+  ceiling flip followed by movement, undo/redo, and the support lattice in a saved draft.
+  It uses a synthetic fixture and isolated smoke-test app state, with external invite
+  opening stubbed. Validation on 10 November 2026: this desktop check passed, as did
+  `npm run check` (208 passed, 4 skipped) and the production build.
+
+## Ground tile lattice in empty and new blueprints
+
+Floor pieces placed on open ground in a fresh capture used to land half a tile off the
+game's grid (`y` rounded to a multiple of 512 instead of a multiple of 512 plus 256).
+
+- Ground truth: 8,200 yaw-only floor placements across 20 local `STW_Homebase_*.sav`
+  menus. Every one has `z % 384 = 0`. Yaw 0/180 pieces have `x % 512 = 0` (4,172 / 4,026
+  split across the two parities) and `y % 512 = 256` (4,164), while yaw 90/270 pieces have
+  `x % 512 = 256` and `y % 512 = 0`. Walls, pillars, archways and balconies follow the same
+  rule.
+- Repro: `AAAA.sav` (standard placement) put the floor at `y = -4096` (mod 512 = 0, wrong);
+  `BBBB.sav` (pasted from a real save) at `y = -4352` (mod 512 = 256, correct). The delta
+  is exactly 256.
+- Fix: `GROUND_TILE_ORIGIN = [0, 256, 0]` in `placement-target.ts`. `groundSupport` uses it
+  when no captured reference piece exists; reference-relative snapping is unchanged, and
+  `directionAt` already used `y - 256` as the tile centre.
+- Covered by `tests/ground-placement.test.ts`: the empty-blueprint snap test now asserts
+  `x % 512 = 0`, `y % 512 = 256`, `z % 384 = 0` at positive and negative coordinates, plus
+  a yaw-90 reference case and a wall-contained terrain case (11 tests).
+
+## Rotate copied groups before pasting
+
+The Paste panel exposes 90, 180, 270 and 360 degree filter chips next to the existing
+`pasteYaw` select.
+
+- A chip sets `pasteYaw` to that angle (`360` normalises to `0`), highlights itself and
+  re-runs `previewPaste`, so the ghost is rotated before the user commits.
+- Copying a new group resets the rotation to 0 and highlights the 360 chip; changing the
+  select keeps the chips in sync.
+- Rotation is the same `planPaste` path the select already used (90 degree steps around the
+  clipboard anchor), covered by `tests/editor.test.ts` ("planPaste applies a yaw").
+- Verified live: copied two pieces, pressed 90/180/270/360, the select and chip state
+  followed each press, `pasteInfo` reported "2 pieces to add" and Paste added 2 structures
+  and 2 traps. The exported JSON proves the data rotation: the source floor's rotation is
+  identity, the pasted floor is `(0, 0, 0.7071, 0.7071)` (= yaw 90) at `[12048, 20000, 768]`,
+  and the pasted trap composes the same yaw.
+
+## Pasted groups re-seat on the same lattice
+
+Rotation about the clipboard anchor used to keep the source origin's parity, so a pasted
+group inherited the source's lattice offset instead of the lattice for its new yaw.
+
+- Universal rule from the same 20-save survey: every player build has
+  `z % 384 = 0`; yaw 0/180 origins have `x % 512 = 0`, `y % 512 = 256`; yaw 90/270 origins
+  have `x % 512 = 256`, `y % 512 = 0`. This holds for floors, ramps, stairs, cones, walls,
+  pillars, archways, balconies, half/quarter walls and traps (the `Solid`/`Floor`/`RoofS`/
+  `Stair*` families were counted directly).
+- `planPaste` snaps the copied building reference to that parity after the paste turn
+  (`originParity`, `rotationYaw`). `Clipboard.gridReference` holds the selected structure's
+  pose, or the captured support's pose when the anchor is a trap. The rotated displacement
+  from anchor to support is included in the snap calculation, so offset or obliquely rotated
+  traps cannot pull a cardinal support off-grid. The whole clipboard still moves rigidly,
+  preserving spacing and attachments. Oblique supports retain anchor-relative snapping.
+- Regression tests in `tests/editor.test.ts`: every source yaw 0/90/180/270 crossed with every
+  paste turn, checking floor + wall + trap parity; a turned trap used as the copied anchor
+  (its support must stay on the lattice); and an off-lattice `AAAA`-style floor
+  (`y = -4096`) that is re-seated to `y ≡ 256` (yaw 0) or `x ≡ 256, y ≡ 0` (yaw 90).
+- Verified live against the real `AAAA.sav`: copy its only floor (`y = -4096`) and paste with
+  snap on, yaw 0 → exported pasted floor `y = -3840` (`mod 512 = 256`); repeat with yaw 90 →
+  `[3328, -4096]` (`x mod 512 = 256`, `y mod 512 = 0`). Both match the `BBBB.sav` parity.
+
+## Pasted groups keep their storey height
+
+Walls pasted from a group whose copied anchor was a trap sat up to 192 cm too high ("a bit
+higher than it should be").
+
+- Cause: the paste snap rounded the destination Z to an absolute multiple of 384. A build
+  anchor always has `z % 384 = 0`, so this was invisible, but mounted traps do not: the real
+  `STW_Homebase_99_Imported_491e452a.sav` has wall traps at `z = 1448`. Anchoring a copy on
+  that trap and pasting it at its own position snapped `1448 → 1536`, lifting the whole group
+  (floors, walls, traps) by **+88 cm**. Reproduced with the real save through `planPaste`
+  (every piece `dz = 88`).
+- Fix: Z now snaps in whole storeys relative to the clipboard anchor
+  (`anchorZ + round((z - anchorZ) / 384) * 384`) minus the copied building reference's
+  `storeyResidue` (`z % 384`, `editor.ts`). Concrete builds keep the same `z % 384` they had
+  (0 for every surveyed save), so an unchanged paste never moves them; off-lattice legacy
+  builds still re-seat, and a storey move is still a 384 cm step.
+- X/Y use the support-relative `originParity` snap from the section above.
+- Regression tests in `tests/editor.test.ts`: a copied group anchored on an off-lattice trap
+  (`z = 1448`) pastes at its own anchor with floors/walls still at 384 and the trap at 1448;
+  pasting it one storey down keeps the structures on `z % 384 = 0` and moves the trap to 1064.
+- Real-save check after the fix: the same `99.sav` trap-anchored paste reports no `dz` for any
+  piece.
+
+## A trap already at the destination no longer blocks a bulk paste
+
+Pasting a whole build failed with `sm_tar_pit_trap: A trap of this support category already
+occupies that exact position and orientation.` on one save, while the same clipboard pasted
+fine into another. The destination already held that build, so its traps occupied the target
+poses.
+
+- Cause: the paste treated a trap as reusable only when item path, perks, level, support
+  actor, actor transform **and** mesh transform all matched byte-for-byte
+  (`planPaste`, `editor.ts`). A destination trap at the same pose with a different perk roll,
+  level or mesh snapshot fell through to `placementConflict`, which returns an error, and any
+  error aborts the whole paste.
+- Fix: pasted traps are reused when the destination has a trap of the same item on the same
+  support at the same pose, and any same-category trap already occupying the pasted pose is
+  skipped whether or not its item differs (`trapOccupiesPose`, `editor.ts`). The rest of the
+  group still pastes; the paste panel now counts these as "already present".
+- Structures keep the strict rule: a non-equivalent building on the same tile is still an
+  error, and a trap whose copied support is missing still errors.
+- Regression tests in `tests/editor.test.ts`: same build with retuned perks/level → 0 errors,
+  every piece reused; a different trap item at the same pose → reused, not an error; a
+  two-floor group where only one destination tile is occupied → the other floor and trap are
+  still added.
+- Real-save check: `STW_Homebase_99_Imported_491e452a.sav` copied in full and pasted onto a
+  copy of itself with altered trap perks/levels reports 0 errors and reuses every piece;
+  pasting the same clipboard 90° elsewhere still adds all pieces.
+
+## An occupied tile merges instead of aborting the paste
+
+Pasting a whole build then failed with `bbw_m3_floor: A building already occupies that floor
+tile or wall edge.` — the same save already held a floor on that tile that was not
+byte-identical (different mesh snapshot, mirror flag, material/tier or edited shape).
+
+- Cause: only a piece whose class, mesh, mirror flag, actor pose **and** mesh pose all matched
+  was treated as reusable. Everything else hit `placementConflict`, whose building message is
+  an error, and one error aborts the whole group.
+- Fix: `occupyingStructure` (`editor.ts`) now extracts the occupancy test (same family, building
+  centre within 1 cm, walls must be parallel). `placementConflict` uses it for manual placement,
+  and `planPaste` uses it to reuse the occupant: the pasted piece is skipped, counted as
+  "already present", and the clipboard identity is remapped to the occupant so the group's traps
+  re-attach to the piece that is really there. A wall on the opposite face of the same edge is
+  still the same wall edge.
+- Manual placement (`placeStructure`) is unchanged: it still rejects an occupied tile.
+- Regression tests in `tests/editor.test.ts`: a mirrored/edited variant of the destination floor
+  → 0 errors, the floor is reused and its copied trap lands on the existing support; a brick
+  wall replacing a wood wall's class → reused, nothing added. Real-save check: `99.sav` pasted
+  onto itself after altering a structure's mesh snapshot → 0 errors, every piece reused.

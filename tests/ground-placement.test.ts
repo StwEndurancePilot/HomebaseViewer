@@ -36,9 +36,20 @@ it('targets the window opening ahead of builds behind it and respects closer obs
   expect(s.hit()?.record).toBe(backWall);
 });
 
-it('snaps an empty blueprint to tiles, including negative coordinates', () => {
-  expect(groundSupport([1100, 700, 390], []).transform.translation).toEqual([1024, 512, 384]);
-  expect(groundSupport([-600, -50, 0], []).transform.translation).toEqual([-512, -512, 0]);
+it('snaps an empty blueprint to the game tile lattice, including negative coordinates', () => {
+  expect(groundSupport([1100, 700, 390], []).transform.translation).toEqual([1024, 256, 384]);
+  expect(groundSupport([-600, -50, 0], []).transform.translation).toEqual([-512, -256, 0]);
+  for (const point of [
+    [3072, -4096, -384],
+    [0, 0, 0],
+    [1, 257, 1],
+    [-1, -1, -1],
+  ] as [number, number, number][]) {
+    const t = groundSupport(point, []).transform.translation;
+    expect(((t[0] % 512) + 512) % 512).toBe(0);
+    expect(((t[1] % 512) + 512) % 512).toBe(256);
+    expect(((t[2] % 384) + 384) % 384).toBe(0);
+  }
 });
 
 it('aligns terrain placements with the captured grid and rotation', () => {
@@ -169,11 +180,35 @@ it('returns captured world supports when picking their rendered mesh', () => {
 
 it('snaps both horizontal and vertical map surfaces to building tiles', () => {
   expect(surfaceSupport([1100, 700, 770], [0, 0, -1], []).transform.translation).toEqual([
-    1024, 512, 768,
+    1024, 256, 768,
   ]);
   const wall = surfaceSupport([1280, 700, 500], [1, 0, 0], []);
   expect(wall.buildingType).toBe(0);
-  expect(wall.transform.translation).toEqual([1280, 768, 384]);
+  expect(wall.transform.translation).toEqual([1280, 512, 384]);
   const negative = surfaceSupport([-256, -100, -10], [-1, 0, 0], []);
-  expect(negative.transform.translation).toEqual([-256, -256, -384]);
+  expect(negative.transform.translation).toEqual([-256, 0, -384]);
+});
+
+it('keeps the rotated game lattice when a yaw-90 piece anchors the grid', () => {
+  const reference = buildingRecord('floor', 2, 3, {
+    translation: [256, 0, 0],
+    rotation: unrealRotator(0, 90, 0),
+    scale: [1, 1, 1],
+  });
+  const point = new THREE.Vector3(200, 100, 0)
+    .applyQuaternion(new THREE.Quaternion(...reference.transform.rotation))
+    .add(new THREE.Vector3(...reference.transform.translation));
+  const t = groundSupport(point.toArray(), [reference]).transform.translation;
+  expect(((t[0] % 512) + 512) % 512).toBe(256);
+  expect(((t[1] % 512) + 512) % 512).toBe(0);
+});
+
+it('anchors terrain floors to the wall lattice already used by the game', () => {
+  const wall = buildingRecord('wall', 2, 3, {
+    translation: [0, 256, 0],
+    rotation: [0, 0, 0, 1],
+    scale: [1, 1, 1],
+  });
+  const t = groundSupport([200, 260, 0], [wall]).transform.translation;
+  expect(t).toEqual([0, 256, 0]);
 });

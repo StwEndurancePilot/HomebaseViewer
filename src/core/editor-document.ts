@@ -7,7 +7,7 @@ import { trapPerks, trapTypeKey, trapVariantKey } from './requirements';
 import {
   attachment,
   placementConflict,
-  withOffsets,
+  withBaseOffsets,
   flipCeilingTrap,
   type PastePlan,
   type Offsets,
@@ -153,7 +153,10 @@ export class EditorDocument {
     return clipboard;
   }
   offsetSelected(offsets: Offsets) {
-    this.editTraps((p, parent) => withOffsets(p, offsets, parent));
+    this.editTraps((p, parent) => withBaseOffsets(p, offsets, parent, false));
+  }
+  setOffsets(offsets: Offsets) {
+    this.editTraps((p, parent) => withBaseOffsets(p, offsets, parent, true));
   }
   moveSelected(delta: Vec3) {
     this.commit(moveTiles(this.data.placements, this.selected, delta), new Set(this.selected));

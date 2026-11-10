@@ -816,7 +816,8 @@ h1 {
   pointer-events: none;
   white-space: nowrap;
 }
-.tool-dock #moveTraps.active {
+.tool-dock #moveTraps.active,
+.tool-dock #rotateTraps.active {
   --md-text-button-label-text-color: var(--md-sys-color-primary);
 }
 

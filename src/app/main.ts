@@ -29,6 +29,7 @@ import {
   ZERO_OFFSETS,
   type OffsetLimit,
   copyGroup,
+  offsetOf,
   planPaste,
   placeStructure,
   placeTrap,
@@ -330,7 +331,10 @@ function selectionUI() {
     rows.length !== 1 || !patternOf(rows[0]) || rows[0].captureRole !== 'placement';
   el<HTMLButtonElement>('moveTraps').disabled =
     !rows.length || rows.some((p) => p.kind !== 'trap' || p.captureRole !== 'placement');
+  el<HTMLButtonElement>('rotateTraps').disabled = el<HTMLButtonElement>('moveTraps').disabled;
   el<HTMLButtonElement>('offsetMove').disabled = el<HTMLButtonElement>('moveTraps').disabled;
+  el<HTMLButtonElement>('offsetRotate').disabled = el<HTMLButtonElement>('moveTraps').disabled;
+  syncOffsetInputs();
   el<HTMLButtonElement>('flipSelected').disabled =
     !rows.length ||
     rows.some(
@@ -544,6 +548,33 @@ function offsets(): Offsets {
 function placementOffsets(): Offsets {
   return val('placementMode') === 'menu-offset' ? offsets() : ZERO_OFFSETS;
 }
+function showOffsets(found: Offsets) {
+  const round = (value: number) => String(Number(value.toFixed(3)));
+  ['X', 'Y', 'Z'].forEach(
+    (axis, index) => (el<HTMLInputElement>(`offset${axis}`).value = round(found.position[index])),
+  );
+  ['Pitch', 'Yaw', 'Roll'].forEach(
+    (angle, index) => (el<HTMLInputElement>(`offset${angle}`).value = round(found.angles[index])),
+  );
+}
+function syncOffsetInputs() {
+  const rows = active
+    ? selected().filter((p) => p.kind === 'trap' && p.captureRole === 'placement')
+    : [];
+  if (!rows.length) return;
+  showOffsets(offsetOf(rows[0]));
+}
+function previewOffsets(delta: Offsets) {
+  const trap = active
+    ? selected().find((p) => p.kind === 'trap' && p.captureRole === 'placement')
+    : undefined;
+  if (!trap) return;
+  const previous = offsetOf(trap);
+  showOffsets({
+    position: previous.position.map((v, i) => v + delta.position[i]) as Vec3,
+    angles: previous.angles.map((v, i) => v + delta.angles[i]) as Vec3,
+  });
+}
 function support() {
   const rows = selected();
   if (rows.length !== 1 || rows[0].kind !== 'structure')
@@ -593,6 +624,7 @@ function copy(cut = false) {
   el<HTMLInputElement>('pasteY').value = String(y);
   el<HTMLInputElement>('pasteZ').value = String(z);
   el<HTMLSelectElement>('pasteYaw').value = '0';
+  syncPasteRotation();
   el('clipboardInfo').textContent =
     `${clipboard.records.length} pieces from ${clipboardName}. Anchor: ${clipboard.anchor.join(', ')}.`;
   status(
@@ -617,10 +649,27 @@ function previewPaste() {
       ? ' Source and target maps differ; review its world location against this terrain.'
       : '';
   el('pasteInfo').textContent =
-    `${plan.records.length} pieces to add · ${plan.skipped} identical pieces reused.${crossZone}`;
+    `${plan.records.length} pieces to add · ${plan.skipped} already present.${crossZone}`;
   if (plan.errors.length) throw new Error(plan.errors.slice(0, 3).join('\n'));
   el<HTMLButtonElement>('commitPaste').disabled = !plan.records.length;
   status(plan.records.length ? 'Ready to paste.' : 'Already here. Choose another position.');
+}
+function syncPasteRotation() {
+  const yaw = ((number('pasteYaw') % 360) + 360) % 360;
+  for (const button of document.querySelectorAll<HTMLElement>('[data-paste-yaw]'))
+    (
+      button as HTMLElement & {
+        selected: boolean;
+      }
+    ).selected = Number(button.dataset.pasteYaw) % 360 === yaw;
+}
+function rotatePaste(degrees: number) {
+  const yaw = ((degrees % 360) + 360) % 360;
+  el<HTMLSelectElement>('pasteYaw').value = String(yaw);
+  syncPasteRotation();
+  if (!clipboard) return;
+  previewPaste();
+  status(`Copied group rotated ${degrees}°.`);
 }
 function download(bytes: Uint8Array | string, name: string, type: string, doc?: EditorDocument) {
   const blob =
@@ -884,8 +933,9 @@ el('place').onclick = guard(async () => {
   await render(true);
 });
 el('applyOffsets').onclick = guard(async () => {
-  current().offsetSelected(offsets());
+  current().setOffsets(offsets());
   await render(true);
+  syncOffsetInputs();
   status('Offsets applied.');
 });
 el('zeroOffsets').onclick = () => {
@@ -894,6 +944,9 @@ el('zeroOffsets').onclick = () => {
   cancelPreview();
 };
 el('previewPaste').onclick = guard(previewPaste);
+for (const button of document.querySelectorAll<HTMLElement>('[data-paste-yaw]'))
+  button.onclick = guard(() => rotatePaste(Number(button.dataset.pasteYaw)));
+el<HTMLSelectElement>('pasteYaw').addEventListener('change', syncPasteRotation);
 el('commitPaste').onclick = guard(async () => {
   if (!pendingPaste) throw new Error('Preview the group first.');
   const count = pendingPaste.records.length;
@@ -1036,7 +1089,7 @@ document.addEventListener('keydown', (e) => {
   }
   if (!buildActive && !e.ctrlKey && !e.metaKey && e.key.toLowerCase() === 'g') {
     e.preventDefault();
-    el<HTMLButtonElement>('moveTraps').click();
+    el<HTMLButtonElement>(e.shiftKey ? 'rotateTraps' : 'moveTraps').click();
     return;
   }
   if (viewer?.mover.dragging) return;
@@ -1527,12 +1580,18 @@ function stopMoving() {
   viewer?.mover.detach();
   el('moveReadout').hidden = true;
   el('moveTraps').classList.remove('active');
+  el('rotateTraps').classList.remove('active');
+}
+function previewReadout(angles: Vec3) {
+  const r = (v: number) => `${v.toFixed(1)}°`;
+  return `Pitch ${r(angles[0])} · Yaw ${r(angles[1])} · Roll ${r(angles[2])} · Esc cancels`;
 }
 function configureMover() {
   const v = viewer!;
   v.mover.onPreview = (delta) => {
     if (!active) return;
     v.previewTrapMove(active.selected, delta);
+    previewOffsets({ position: delta, angles: [0, 0, 0] });
     el('moveReadout').hidden = false;
     el('moveReadout').textContent =
       `X ${delta[0].toFixed(2)} · Y ${delta[1].toFixed(2)} · Z ${delta[2].toFixed(2)} cm · Esc cancels`;
@@ -1547,6 +1606,7 @@ function configureMover() {
           constrainZ: el<HTMLInputElement>('constrainZ').checked,
         });
         await render(true);
+        syncOffsetInputs();
         startMoving(false);
       } catch (e) {
         v.previewTrapMove(current().selected, [0, 0, 0]);
@@ -1555,8 +1615,34 @@ function configureMover() {
       }
     })();
   };
+  v.mover.onRotatePreview = (angles) => {
+    if (!active) return;
+    v.previewTrapRotate(active.selected, angles);
+    previewOffsets({ position: [0, 0, 0], angles });
+    el('moveReadout').hidden = false;
+    el('moveReadout').textContent = previewReadout(angles);
+  };
+  v.mover.onRotateCommit = (angles) => {
+    void (async () => {
+      try {
+        current().offsetSelected({
+          position: [0, 0, 0],
+          angles,
+          limit: val('offsetLimit') as OffsetLimit,
+          constrainZ: false,
+        });
+        await render(true);
+        syncOffsetInputs();
+        startRotating(false);
+      } catch (e) {
+        v.previewTrapRotate(current().selected, [0, 0, 0]);
+        stopMoving();
+        status(errorText(e));
+      }
+    })();
+  };
 }
-function startMoving(showPanel = true) {
+function requireMovableTraps() {
   const rows = selected(),
     doc = current();
   if (!rows.length || rows.some((p) => p.kind !== 'trap' || p.captureRole !== 'placement'))
@@ -1570,24 +1656,50 @@ function startMoving(showPanel = true) {
     )
   )
     throw new Error('Selected traps need captured building supports.');
+  return rows;
+}
+function prepareTrapTool() {
   stopBuilding();
   setMode('orbit');
   viewer!.setBoxSelection(false);
   el('boxSelect').classList.remove('active');
   configureMoveLimits();
+}
+function startMoving(showPanel = true) {
+  requireMovableTraps();
+  prepareTrapTool();
   viewer!.startTrapMove();
   el('moveTraps').classList.add('active');
+  el('rotateTraps').classList.remove('active');
   if (showPanel) openPanel('offsetPanel');
   el('moveReadout').textContent = 'Drag an axis or plane · Esc finishes · Ctrl+Z undoes';
   el('moveReadout').hidden = false;
   el('hint').textContent =
     'Move traps in world XYZ · Red X · Green Y · Blue Z · Supports stay in place';
 }
+function startRotating(showPanel = true) {
+  requireMovableTraps();
+  prepareTrapTool();
+  viewer!.startTrapRotate();
+  el('rotateTraps').classList.add('active');
+  el('moveTraps').classList.remove('active');
+  if (showPanel) openPanel('offsetPanel');
+  el('moveReadout').textContent =
+    'Drag a ring · Green = pitch · Blue = yaw · Red = roll · Esc finishes';
+  el('moveReadout').hidden = false;
+  el('hint').textContent =
+    'Rotate traps in world axes · Ring X = pitch · Ring Y = yaw · Ring Z = roll · Supports stay in place';
+}
 el('moveTraps').onclick = guard(() => {
-  if (viewer?.mover.active) stopMoving();
+  if (viewer?.mover.active && viewer.mover.mode === 'translate') stopMoving();
   else startMoving();
 });
+el('rotateTraps').onclick = guard(() => {
+  if (viewer?.mover.active && viewer.mover.mode === 'rotate') stopMoving();
+  else startRotating();
+});
 el('offsetMove').onclick = guard(() => startMoving());
+el('offsetRotate').onclick = guard(() => startRotating());
 el('flipSelected').onclick = guard(async () => {
   stopMoving();
   current().flipSelectedCeilings();
@@ -1615,10 +1727,14 @@ function syncOffsetLimits() {
 }
 el('offsetLimit').onchange = guard(syncOffsetLimits);
 el('moveSnap').onchange = guard(syncOffsetLimits);
+el('rotateSnap').onchange = guard(syncOffsetLimits);
 function configureMoveLimits() {
   if (!viewer) return;
-  viewer.mover.max = OFFSET_LIMITS[val('offsetLimit') as OffsetLimit].position;
+  const limit = OFFSET_LIMITS[val('offsetLimit') as OffsetLimit];
+  viewer.mover.max = limit.position;
+  viewer.mover.angleMax = limit.angle;
   viewer.mover.step = number('moveSnap');
+  viewer.mover.angleStep = number('rotateSnap');
   const rows = active ? selected() : [];
   viewer.mover.zRange =
     el<HTMLInputElement>('constrainZ').checked &&

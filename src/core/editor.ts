@@ -54,6 +54,8 @@ export function selectionZDeltaRange(records: Placement[], all: Placement[]): [n
 export type Clipboard = {
   records: Placement[];
   anchor: Vec3;
+  anchorRotation: Pose['rotation'];
+  gridReference: Pose;
   worldPath: string;
 };
 export type PastePlan = {
@@ -78,6 +80,13 @@ export function unrealRotator(pitch: number, yaw: number, roll: number): Pose['r
     .multiply(new Quaternion().setFromAxisAngle(new Vector3(1, 0, 0), -roll * rad))
     .toArray() as Pose['rotation'];
 }
+export function rotationYaw(rotation: Pose['rotation']): number {
+  const yaw = new Euler().setFromQuaternion(new Quaternion(...rotation), 'ZYX').z / rad;
+  return ((yaw % 360) + 360) % 360;
+}
+export const originParity = (yaw: number): readonly [number, number] =>
+  Math.round(((yaw % 360) + 360) % 360) % 180 === 0 ? [0, 256] : [256, 0];
+export const storeyResidue = (z: number): number => ((z % 384) + 384) % 384;
 export function relativePose(child: Pose, parent: Pose): Pose {
   if (parent.scale.some((s) => Math.abs(s) < 1e-12))
     throw new Error('Cannot attach to a zero-scale support.');
@@ -118,7 +127,92 @@ function rigidPose(p: Pose, anchor: Vec3, destination: Vec3, rotation: Quaternio
     scale: [...p.scale],
   };
 }
-export function withOffsets(record: Placement, offsets: Offsets, support: Placement): Placement {
+function rotationDelta(pose: Pose, angles: Vec3): Quaternion {
+  const euler = new Euler().setFromQuaternion(q(pose), 'ZYX');
+  return new Quaternion(
+    ...unrealRotator(
+      -euler.y / rad + angles[0],
+      euler.z / rad + angles[1],
+      -euler.x / rad + angles[2],
+    ),
+  ).multiply(q(pose).invert());
+}
+export function rotatedTrap(record: Placement, angles: Vec3): Placement {
+  const base = basePose(record),
+    previous = offsetOf(record),
+    total: Vec3 = [
+      previous.angles[0] + angles[0],
+      previous.angles[1] + angles[1],
+      previous.angles[2] + angles[2],
+    ],
+    start = { ...clone(record), transform: base.transform, meshTransform: base.meshTransform },
+    pivot = [...start.transform.translation] as Vec3,
+    delta = rotationDelta(start.transform, total),
+    destination = arr(vec(pivot).add(vec(previous.position)));
+  return {
+    ...start,
+    transform: rigidPose(start.transform, pivot, destination, delta),
+    meshTransform: rigidPose(start.meshTransform, pivot, destination, delta),
+  };
+}
+export function basePose(record: Placement): { transform: Pose; meshTransform: Pose } {
+  const base = record.editorBaseTransform as Pose | undefined,
+    baseMesh = record.editorBaseMeshTransform as Pose | undefined;
+  return {
+    transform: structuredClone(base ?? record.transform),
+    meshTransform: structuredClone(baseMesh ?? record.meshTransform),
+  };
+}
+function resetOffsetBase(record: Placement) {
+  delete record.editorBaseTransform;
+  delete record.editorBaseMeshTransform;
+  delete record.editorOffsets;
+}
+export function offsetOf(record: Placement): Offsets {
+  const base = basePose(record),
+    deg = 180 / Math.PI,
+    stored = record.editorOffsets as Offsets | undefined;
+  const position = record.transform.translation.map(
+    (value, axis) => value - base.transform.translation[axis],
+  ) as Vec3;
+  if (stored?.angles) return { position, angles: [...stored.angles] as Vec3 };
+  const euler = new Euler().setFromQuaternion(
+    q(record.transform).multiply(q(base.transform).invert()),
+    'ZYX',
+  );
+  const angles: Vec3 = [-euler.y * deg, euler.z * deg, -euler.x * deg];
+  const halfTurn = (value: number) => Math.abs(Math.abs(value) - 180) < 1e-6;
+  if (Math.abs(angles[0]) < 1e-6 && halfTurn(angles[1]) && halfTurn(angles[2])) {
+    angles[0] = 180;
+    angles[1] = 0;
+    angles[2] = 0;
+  }
+  return { position, angles };
+}
+export function withBaseOffsets(
+  record: Placement,
+  offsets: Offsets,
+  support: Placement,
+  absolute: boolean,
+): Placement {
+  validateOffsets(offsets);
+  const base = basePose(record),
+    previous = offsetOf(record),
+    add = (a: Vec3, b: Vec3): Vec3 => [a[0] + b[0], a[1] + b[1], a[2] + b[2]];
+  const total: Offsets = {
+    position: absolute ? offsets.position : add(previous.position, offsets.position),
+    angles: absolute ? offsets.angles : add(previous.angles, offsets.angles),
+    limit: 'unrestricted',
+    constrainZ: offsets.constrainZ,
+  };
+  const start = { ...record, transform: base.transform, meshTransform: base.meshTransform };
+  const result = withOffsets(start, total, support);
+  result.editorBaseTransform = base.transform;
+  result.editorBaseMeshTransform = base.meshTransform;
+  result.editorOffsets = { position: [...total.position], angles: [...total.angles] };
+  return result;
+}
+function validateOffsets(offsets: Offsets) {
   const limit = OFFSET_LIMITS[offsets.limit ?? 'free'];
   if (![...offsets.position, ...offsets.angles].every(Number.isFinite))
     throw new Error('Offsets must be finite numbers.');
@@ -129,6 +223,9 @@ export function withOffsets(record: Placement, offsets: Offsets, support: Placem
     throw new Error(
       `This edit is limited to ±${limit.position} cm per axis and ±${limit.angle}° per angle.`,
     );
+}
+export function withOffsets(record: Placement, offsets: Offsets, support: Placement): Placement {
+  validateOffsets(offsets);
   if (offsets.constrainZ) {
     const [min, max] = trapZDeltaRange(record, support),
       z = offsets.position[2];
@@ -137,21 +234,9 @@ export function withOffsets(record: Placement, offsets: Offsets, support: Placem
         `Estimated ${trapCategory(record)} trap Z limit: this trap can move ${min.toFixed(2)} to ${max.toFixed(2)} cm vertically from its current position. Disable Constrain Z for unrestricted editing.`,
       );
   }
-  const result = clone(record),
-    euler = new Euler().setFromQuaternion(q(record.transform), 'ZYX');
+  const result = clone(record);
   const hasAngles = offsets.angles.some((v) => v !== 0);
-  const rotation = hasAngles
-    ? new Quaternion(
-        ...unrealRotator(
-          -euler.y / rad + offsets.angles[0],
-          euler.z / rad + offsets.angles[1],
-          -euler.x / rad + offsets.angles[2],
-        ),
-      )
-    : q(record.transform);
-  const delta = hasAngles
-    ? rotation.clone().multiply(q(record.transform).invert())
-    : new Quaternion();
+  const delta = hasAngles ? rotationDelta(record.transform, offsets.angles) : new Quaternion();
   const destination = arr(vec(record.transform.translation).add(vec(offsets.position)));
   result.transform = rigidPose(record.transform, record.transform.translation, destination, delta);
   result.meshTransform = rigidPose(
@@ -386,6 +471,7 @@ export function placeTrap(
   if (!Number.isFinite(turn) || turn % 90 !== 0)
     throw new Error('Standard trap orientation must use 90° steps.');
   const result = clone(template);
+  resetOffsetBase(result);
   result.actorPath = id();
   result.savedActorGuid = zeroGuid;
   result.mirrored = false;
@@ -442,6 +528,7 @@ export function flipCeilingTrap(record: Placement, support: Placement): Placemen
     throw new Error('Select ceiling traps to flip upside down.');
   const result = clone(record),
     rotation = q(record.transform).multiply(new Quaternion(0, -1, 0, 0));
+  resetOffsetBase(result);
   const delta = rotation.clone().multiply(q(record.transform).invert());
   result.transform = {
     ...clone(record.transform),
@@ -471,12 +558,52 @@ function samePose(a: Pose, b: Pose, epsilon = 1e-5) {
     1 - Math.abs(q(a).dot(q(b))) < epsilon
   );
 }
+export function trapOccupiesPose(p: Placement, rows: Placement[]) {
+  return rows.some(
+    (other) =>
+      other.actorPath !== p.actorPath &&
+      other.kind === 'trap' &&
+      other.captureRole === 'placement' &&
+      trapCategory(other) === trapCategory(p) &&
+      samePose(other.transform, p.transform),
+  );
+}
 function buildingCentre(p: Placement) {
   return (structureKind(p) && structureKind(p) !== 'wall') || shapeOf(p) === 'floor'
     ? vec([0, 256, 0]).applyQuaternion(q(p.transform)).add(vec(p.transform.translation))
     : vec(p.transform.translation);
 }
+export function occupyingStructure(p: Placement, rows: Placement[]): Placement | null {
+  const kind = structureKind(p),
+    shape = shapeOf(p);
+  if (p.kind !== 'structure' || (!kind && shape === 'other')) return null;
+  const family = kind ?? shape;
+  for (const other of rows) {
+    if (
+      other.actorPath === p.actorPath ||
+      other.captureRole !== 'placement' ||
+      other.kind !== 'structure' ||
+      (structureKind(other) ?? shapeOf(other)) !== family ||
+      buildingCentre(p).distanceTo(buildingCentre(other)) >= 0.01
+    )
+      continue;
+    if (
+      family === 'wall' &&
+      Math.abs(
+        vec([1, 0, 0])
+          .applyQuaternion(q(p.transform))
+          .dot(vec([1, 0, 0]).applyQuaternion(q(other.transform))),
+      ) <=
+        1 - 1e-6
+    )
+      continue;
+    return other;
+  }
+  return null;
+}
 export function placementConflict(p: Placement, rows: Placement[]): string | null {
+  if (occupyingStructure(p, rows))
+    return 'A building already occupies that floor tile or wall edge.';
   const mapSupport = rows.some(
     (support) =>
       support.actorPath === attachment(p)?.supportActorPath &&
@@ -498,23 +625,6 @@ export function placementConflict(p: Placement, rows: Placement[]): string | nul
     )
       continue;
     if (
-      p.kind === 'structure' &&
-      (structureKind(p) || shapeOf(p) !== 'other') &&
-      (structureKind(p) ?? shapeOf(p)) === (structureKind(other) ?? shapeOf(other))
-    ) {
-      if (buildingCentre(p).distanceTo(buildingCentre(other)) < 0.01) {
-        if (
-          (structureKind(p) !== 'wall' && shapeOf(p) !== 'wall') ||
-          Math.abs(
-            vec([1, 0, 0])
-              .applyQuaternion(q(p.transform))
-              .dot(vec([1, 0, 0]).applyQuaternion(q(other.transform))),
-          ) >
-            1 - 1e-6
-        )
-          return 'A building already occupies that floor tile or wall edge.';
-      }
-    } else if (
       p.kind === 'trap' &&
       trapCategory(p) === trapCategory(other) &&
       samePose(p.transform, other.transform)
@@ -554,8 +664,18 @@ export function copyGroup(data: Capture, selected: ReadonlySet<string>): Clipboa
     }
   }
   const records = data.placements.filter((p) => ids.has(p.actorPath));
-  const anchor = byId.get(selected.values().next().value!)!.transform.translation;
-  return { records: clone(records), anchor: [...anchor], worldPath: data.worldPath };
+  const anchorRecord = byId.get(selected.values().next().value!)!;
+  const gridReference =
+    anchorRecord.kind === 'trap'
+      ? byId.get(attachment(anchorRecord)!.supportActorPath)!
+      : anchorRecord;
+  return {
+    records: clone(records),
+    anchor: [...anchorRecord.transform.translation],
+    anchorRotation: [...anchorRecord.transform.rotation] as Pose['rotation'],
+    gridReference: clone(gridReference.transform),
+    worldPath: data.worldPath,
+  };
 }
 export function planPaste(
   data: Capture,
@@ -566,20 +686,38 @@ export function planPaste(
 ): PastePlan {
   if (![...destination, yaw].every(Number.isFinite) || yaw % 90 !== 0)
     throw new Error('Paste rotation must use 90° steps and finite anchor coordinates.');
-  const at = destination.map((v, i) =>
-    snap
-      ? clipboard.anchor[i] +
-        Math.round((v - clipboard.anchor[i]) / (i === 2 ? 384 : 512)) * (i === 2 ? 384 : 512)
-      : v,
-  ) as Vec3;
-  const rotation = new Quaternion(...unrealRotator(0, yaw, 0)),
-    remap = new Map<string, string>();
+  const turn = ((yaw % 360) + 360) % 360,
+    rotation = new Quaternion(...unrealRotator(0, turn, 0)),
+    reference = clipboard.gridReference,
+    referenceOffset = vec(reference.translation)
+      .sub(vec(clipboard.anchor))
+      .applyQuaternion(rotation),
+    sourceYaw = rotationYaw(reference.rotation),
+    quarter = Math.round(sourceYaw / 90),
+    aligned = Math.abs(sourceYaw - quarter * 90) < 1e-6,
+    [parityX, parityY] = originParity(quarter * 90 + turn),
+    zAnchor = clipboard.anchor[2],
+    zResidue = storeyResidue(reference.translation[2]),
+    at = destination.map((v, i) => {
+      if (!snap) return v;
+      if (i === 2) return zAnchor + Math.round((v - zAnchor) / 384) * 384 - zResidue;
+      if (!aligned) {
+        const step = 512,
+          anchor = clipboard.anchor[i];
+        return anchor + Math.round((v - anchor) / step) * step;
+      }
+      const parity = i === 0 ? parityX : parityY;
+      const offset = referenceOffset.getComponent(i);
+      return Math.round((v + offset - parity) / 512) * 512 + parity - offset;
+    }) as Vec3;
+  const remap = new Map<string, string>();
   const all = clipboard.records.map((original) => {
     const p = clone(original);
     remap.set(original.actorPath, (p.actorPath = id()));
     p.savedActorGuid = zeroGuid;
     p.transform = rigidPose(p.transform, clipboard.anchor, at, rotation);
     p.meshTransform = rigidPose(p.meshTransform, clipboard.anchor, at, rotation);
+    resetOffsetBase(p);
     delete p.perkReadProbe;
     if (p.trapPerksStatus !== 'observed-effects') delete p.trapEffectSources;
     p.editorPlacementMode = 'copied';
@@ -602,7 +740,14 @@ export function planPaste(
       result.skipped++;
       continue;
     }
-    const conflict = placementConflict(p, [...data.placements, ...result.records]);
+    const rows = [...data.placements, ...result.records];
+    const occupant = occupyingStructure(p, rows);
+    if (occupant) {
+      remap.set(original.actorPath, occupant.actorPath);
+      result.skipped++;
+      continue;
+    }
+    const conflict = placementConflict(p, rows);
     if (conflict) result.errors.push(`${meshStem(p.meshPath)}: ${conflict}`);
     result.records.push(p);
     result.added.push(p.actorPath);
@@ -627,17 +772,19 @@ export function planPaste(
       (t) =>
         t.kind === 'trap' &&
         t.itemPath === p.itemPath &&
-        t.trapPerks === p.trapPerks &&
-        t.trapLevel === p.trapLevel &&
         attachment(t)?.supportActorPath === parent.actorPath &&
-        samePose(t.transform, p.transform) &&
-        samePose(t.meshTransform, p.meshTransform),
+        samePose(t.transform, p.transform),
     );
     if (equivalent) {
       result.skipped++;
       continue;
     }
-    const conflict = placementConflict(p, [...data.placements, ...result.records]);
+    const rows = [...data.placements, ...result.records];
+    if (trapOccupiesPose(p, rows)) {
+      result.skipped++;
+      continue;
+    }
+    const conflict = placementConflict(p, rows);
     if (conflict) result.errors.push(`${meshStem(p.meshPath)}: ${conflict}`);
     result.records.push(p);
     result.added.push(p.actorPath);
