@@ -187,7 +187,7 @@ describe('bulk groups and history', () => {
       .applyQuaternion(new Quaternion(...b.transform.rotation).invert());
     near(newLocal.toArray(), originalLocal.toArray());
   });
-  it('reuses exact supports and traps, but blocks conflicting variants atomically', () => {
+  it('reuses exact supports, and never blocks a paste for an occupied trap pose', () => {
     const f = floor(),
       p = trap(f),
       data = capture([f, p]),
@@ -201,11 +201,66 @@ describe('bulk groups and history', () => {
     expect(attachment(newTrap.records[0])?.supportActorPath).toBe(f.actorPath);
     const alternate = structuredClone(data);
     alternate.placements[1].trapPerks = 'different';
-    const conflict = planPaste(alternate, group, group.anchor, 0, false);
-    expect(conflict.errors.length).toBeGreaterThan(0);
-    const doc = new EditorDocument('test', alternate, null);
-    expect(() => doc.paste(conflict)).toThrow();
-    expect(doc.data).toBe(alternate);
+    alternate.placements[1].trapLevel = 9;
+    const perks = planPaste(alternate, group, group.anchor, 0, false);
+    expect(perks.errors).toEqual([]);
+    expect(perks.skipped).toBe(2);
+    expect(perks.records).toEqual([]);
+    const otherTrap = structuredClone(data);
+    otherTrap.placements[1].itemPath = 'TID_Floor_Freeze_R_T04.TID_Floor_Freeze_R_T04';
+    otherTrap.placements[1].meshPath = '/Game/Weapons/FORT_TRAPS/Floor/Freeze/SM_Freeze_Trap_R_T04';
+    const occupied = planPaste(otherTrap, group, group.anchor, 0, false);
+    expect(occupied.errors).toEqual([]);
+    expect(occupied.skipped).toBe(2);
+    expect(occupied.records).toEqual([]);
+  });
+  it('pastes the rest of a bulk group when one destination trap is already there', () => {
+    const base = floor([0, 256, 384]),
+      second = floor([1024, 256, 384]),
+      first = trap(base),
+      other = trap(second);
+    const source = capture([base, first, second, other]),
+      group = copyGroup(source, new Set([base.actorPath, second.actorPath]));
+    const destination = structuredClone(source);
+    destination.placements[1].trapPerks = 'upgraded|perk';
+    destination.placements[1].trapLevel = 50;
+    const plan = planPaste(destination, group, group.anchor, 0, false);
+    expect(plan.errors).toEqual([]);
+    expect(plan.skipped).toBe(4);
+    const moved = planPaste(destination, group, [4096, 256, 384], 0, false);
+    expect(moved.errors).toEqual([]);
+    expect(moved.records).toHaveLength(4);
+    destination.placements[1].itemPath = 'TID_Floor_Freeze_R_T04.TID_Floor_Freeze_R_T04';
+    const swapped = planPaste(destination, group, group.anchor, 0, false);
+    expect(swapped.errors).toEqual([]);
+    expect(swapped.skipped).toBe(4);
+  });
+  it('reuses an occupied tile instead of aborting the paste when the variant differs', () => {
+    const f = floor([0, 256, 384]),
+      mounted = trap(f),
+      group = copyGroup(capture([f, mounted]), new Set([f.actorPath]));
+    const edited = structuredClone(capture([f])),
+      plan = planPaste(edited, group, group.anchor, 0, false);
+    expect(plan.errors).toEqual([]);
+    expect(plan.skipped).toBe(1);
+    expect(plan.records).toHaveLength(1);
+    expect(attachment(plan.records[0])?.supportActorPath).toBe(f.actorPath);
+    const variant = structuredClone(capture([f]));
+    variant.placements[0].mirrored = true;
+    variant.placements[0].meshTransform.translation = [0, 256, 384];
+    const merged = planPaste(variant, group, group.anchor, 0, false);
+    expect(merged.errors).toEqual([]);
+    expect(merged.skipped).toBe(1);
+    expect(merged.records).toHaveLength(1);
+    expect(attachment(merged.records[0])?.supportActorPath).toBe(f.actorPath);
+    const wall = buildingRecord('wall', 2, 3, pose()),
+      wallGroup = copyGroup(capture([wall]), new Set([wall.actorPath])),
+      bricked = structuredClone(capture([wall]));
+    bricked.placements[0].classPath = '/Game/Building/Brick/Brick_Wall.Brick_Wall_C';
+    const occupied = planPaste(bricked, wallGroup, wallGroup.anchor, 0, false);
+    expect(occupied.errors).toEqual([]);
+    expect(occupied.skipped).toBe(1);
+    expect(occupied.records).toEqual([]);
   });
   it('does not quantize existing precision on an unchanged paste', () => {
     const f = floor([10000, 20000, 30000]),
@@ -646,3 +701,32 @@ describe('cone trap supports', () => {
     expect(doc.data.placements).toEqual([cone, t]);
   });
 });
+
+const trapSave = path.join(directory, 'STW_Homebase_99_Imported_491e452a.sav');
+it.skipIf(!existsSync(trapSave))(
+  'reuses a real build whose destination traps were retuned instead of blocking the paste',
+  () => {
+    const src = parseCapture(new Uint8Array(readFileSync(trapSave)));
+    const group = copyGroup(src, new Set(src.placements.map((p) => p.actorPath)));
+    const destination = structuredClone(src);
+    for (const p of destination.placements)
+      if (p.kind === 'trap') {
+        p.trapPerks = 'retuned|perk';
+        p.trapLevel = 1;
+      }
+    const plan = planPaste(destination, group, group.anchor, 0, true);
+    expect(plan.errors).toEqual([]);
+    expect(plan.records).toEqual([]);
+    expect(plan.skipped).toBe(group.records.length);
+    const moved = planPaste(destination, group, [8192, 4096, group.anchor[2]], 90, true);
+    expect(moved.errors).toEqual([]);
+    expect(moved.records).toHaveLength(group.records.length);
+    const retiled = structuredClone(src),
+      changed = retiled.placements.find((p) => p.kind === 'structure')!;
+    changed.meshTransform.translation = [changed.meshTransform.translation[0], 1, 2];
+    const merged = planPaste(retiled, group, group.anchor, 0, true);
+    expect(merged.errors).toEqual([]);
+    expect(merged.records).toEqual([]);
+    expect(merged.skipped).toBe(group.records.length);
+  },
+);

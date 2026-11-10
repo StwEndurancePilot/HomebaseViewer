@@ -649,7 +649,7 @@ function previewPaste() {
       ? ' Source and target maps differ; review its world location against this terrain.'
       : '';
   el('pasteInfo').textContent =
-    `${plan.records.length} pieces to add · ${plan.skipped} identical pieces reused.${crossZone}`;
+    `${plan.records.length} pieces to add · ${plan.skipped} already present.${crossZone}`;
   if (plan.errors.length) throw new Error(plan.errors.slice(0, 3).join('\n'));
   el<HTMLButtonElement>('commitPaste').disabled = !plan.records.length;
   status(plan.records.length ? 'Ready to paste.' : 'Already here. Choose another position.');

@@ -550,12 +550,52 @@ function samePose(a: Pose, b: Pose, epsilon = 1e-5) {
     1 - Math.abs(q(a).dot(q(b))) < epsilon
   );
 }
+export function trapOccupiesPose(p: Placement, rows: Placement[]) {
+  return rows.some(
+    (other) =>
+      other.actorPath !== p.actorPath &&
+      other.kind === 'trap' &&
+      other.captureRole === 'placement' &&
+      trapCategory(other) === trapCategory(p) &&
+      samePose(other.transform, p.transform),
+  );
+}
 function buildingCentre(p: Placement) {
   return (structureKind(p) && structureKind(p) !== 'wall') || shapeOf(p) === 'floor'
     ? vec([0, 256, 0]).applyQuaternion(q(p.transform)).add(vec(p.transform.translation))
     : vec(p.transform.translation);
 }
+export function occupyingStructure(p: Placement, rows: Placement[]): Placement | null {
+  const kind = structureKind(p),
+    shape = shapeOf(p);
+  if (p.kind !== 'structure' || (!kind && shape === 'other')) return null;
+  const family = kind ?? shape;
+  for (const other of rows) {
+    if (
+      other.actorPath === p.actorPath ||
+      other.captureRole !== 'placement' ||
+      other.kind !== 'structure' ||
+      (structureKind(other) ?? shapeOf(other)) !== family ||
+      buildingCentre(p).distanceTo(buildingCentre(other)) >= 0.01
+    )
+      continue;
+    if (
+      family === 'wall' &&
+      Math.abs(
+        vec([1, 0, 0])
+          .applyQuaternion(q(p.transform))
+          .dot(vec([1, 0, 0]).applyQuaternion(q(other.transform))),
+      ) <=
+        1 - 1e-6
+    )
+      continue;
+    return other;
+  }
+  return null;
+}
 export function placementConflict(p: Placement, rows: Placement[]): string | null {
+  if (occupyingStructure(p, rows))
+    return 'A building already occupies that floor tile or wall edge.';
   const mapSupport = rows.some(
     (support) =>
       support.actorPath === attachment(p)?.supportActorPath &&
@@ -577,23 +617,6 @@ export function placementConflict(p: Placement, rows: Placement[]): string | nul
     )
       continue;
     if (
-      p.kind === 'structure' &&
-      (structureKind(p) || shapeOf(p) !== 'other') &&
-      (structureKind(p) ?? shapeOf(p)) === (structureKind(other) ?? shapeOf(other))
-    ) {
-      if (buildingCentre(p).distanceTo(buildingCentre(other)) < 0.01) {
-        if (
-          (structureKind(p) !== 'wall' && shapeOf(p) !== 'wall') ||
-          Math.abs(
-            vec([1, 0, 0])
-              .applyQuaternion(q(p.transform))
-              .dot(vec([1, 0, 0]).applyQuaternion(q(other.transform))),
-          ) >
-            1 - 1e-6
-        )
-          return 'A building already occupies that floor tile or wall edge.';
-      }
-    } else if (
       p.kind === 'trap' &&
       trapCategory(p) === trapCategory(other) &&
       samePose(p.transform, other.transform)
@@ -705,7 +728,14 @@ export function planPaste(
       result.skipped++;
       continue;
     }
-    const conflict = placementConflict(p, [...data.placements, ...result.records]);
+    const rows = [...data.placements, ...result.records];
+    const occupant = occupyingStructure(p, rows);
+    if (occupant) {
+      remap.set(original.actorPath, occupant.actorPath);
+      result.skipped++;
+      continue;
+    }
+    const conflict = placementConflict(p, rows);
     if (conflict) result.errors.push(`${meshStem(p.meshPath)}: ${conflict}`);
     result.records.push(p);
     result.added.push(p.actorPath);
@@ -730,17 +760,19 @@ export function planPaste(
       (t) =>
         t.kind === 'trap' &&
         t.itemPath === p.itemPath &&
-        t.trapPerks === p.trapPerks &&
-        t.trapLevel === p.trapLevel &&
         attachment(t)?.supportActorPath === parent.actorPath &&
-        samePose(t.transform, p.transform) &&
-        samePose(t.meshTransform, p.meshTransform),
+        samePose(t.transform, p.transform),
     );
     if (equivalent) {
       result.skipped++;
       continue;
     }
-    const conflict = placementConflict(p, [...data.placements, ...result.records]);
+    const rows = [...data.placements, ...result.records];
+    if (trapOccupiesPose(p, rows)) {
+      result.skipped++;
+      continue;
+    }
+    const conflict = placementConflict(p, rows);
     if (conflict) result.errors.push(`${meshStem(p.meshPath)}: ${conflict}`);
     result.records.push(p);
     result.added.push(p.actorPath);
