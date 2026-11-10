@@ -118,7 +118,87 @@ function rigidPose(p: Pose, anchor: Vec3, destination: Vec3, rotation: Quaternio
     scale: [...p.scale],
   };
 }
-export function withOffsets(record: Placement, offsets: Offsets, support: Placement): Placement {
+function rotationDelta(pose: Pose, angles: Vec3): Quaternion {
+  const euler = new Euler().setFromQuaternion(q(pose), 'ZYX');
+  return new Quaternion(
+    ...unrealRotator(
+      -euler.y / rad + angles[0],
+      euler.z / rad + angles[1],
+      -euler.x / rad + angles[2],
+    ),
+  ).multiply(q(pose).invert());
+}
+export function rotatedTrap(record: Placement, angles: Vec3): Placement {
+  const base = basePose(record),
+    previous = offsetOf(record),
+    total: Vec3 = [
+      previous.angles[0] + angles[0],
+      previous.angles[1] + angles[1],
+      previous.angles[2] + angles[2],
+    ],
+    start = { ...clone(record), transform: base.transform, meshTransform: base.meshTransform },
+    pivot = [...start.transform.translation] as Vec3,
+    delta = rotationDelta(start.transform, total),
+    destination = arr(vec(pivot).add(vec(previous.position)));
+  return {
+    ...start,
+    transform: rigidPose(start.transform, pivot, destination, delta),
+    meshTransform: rigidPose(start.meshTransform, pivot, destination, delta),
+  };
+}
+export function basePose(record: Placement): { transform: Pose; meshTransform: Pose } {
+  const base = record.editorBaseTransform as Pose | undefined,
+    baseMesh = record.editorBaseMeshTransform as Pose | undefined;
+  return {
+    transform: structuredClone(base ?? record.transform),
+    meshTransform: structuredClone(baseMesh ?? record.meshTransform),
+  };
+}
+export function offsetOf(record: Placement): Offsets {
+  const base = basePose(record),
+    deg = 180 / Math.PI,
+    stored = record.editorOffsets as Offsets | undefined;
+  const position = record.transform.translation.map(
+    (value, axis) => value - base.transform.translation[axis],
+  ) as Vec3;
+  if (stored?.angles) return { position, angles: [...stored.angles] as Vec3 };
+  const euler = new Euler().setFromQuaternion(
+    q(record.transform).multiply(q(base.transform).invert()),
+    'ZYX',
+  );
+  const angles: Vec3 = [-euler.y * deg, euler.z * deg, -euler.x * deg];
+  const halfTurn = (value: number) => Math.abs(Math.abs(value) - 180) < 1e-6;
+  if (Math.abs(angles[0]) < 1e-6 && halfTurn(angles[1]) && halfTurn(angles[2])) {
+    angles[0] = 180;
+    angles[1] = 0;
+    angles[2] = 0;
+  }
+  return { position, angles };
+}
+export function withBaseOffsets(
+  record: Placement,
+  offsets: Offsets,
+  support: Placement,
+  absolute: boolean,
+): Placement {
+  validateOffsets(offsets);
+  const base = basePose(record),
+    previous = offsetOf(record),
+    add = (a: Vec3, b: Vec3): Vec3 => [a[0] + b[0], a[1] + b[1], a[2] + b[2]];
+  const total: Offsets = {
+    position: absolute ? offsets.position : add(previous.position, offsets.position),
+    angles: absolute ? offsets.angles : add(previous.angles, offsets.angles),
+    limit: 'unrestricted',
+    constrainZ: offsets.constrainZ,
+  };
+  const start = { ...record, transform: base.transform, meshTransform: base.meshTransform };
+  const result = withOffsets(start, total, support);
+  result.editorBaseTransform = base.transform;
+  result.editorBaseMeshTransform = base.meshTransform;
+  result.editorOffsets = { position: [...total.position], angles: [...total.angles] };
+  return result;
+}
+function validateOffsets(offsets: Offsets) {
   const limit = OFFSET_LIMITS[offsets.limit ?? 'free'];
   if (![...offsets.position, ...offsets.angles].every(Number.isFinite))
     throw new Error('Offsets must be finite numbers.');
@@ -129,6 +209,9 @@ export function withOffsets(record: Placement, offsets: Offsets, support: Placem
     throw new Error(
       `This edit is limited to ±${limit.position} cm per axis and ±${limit.angle}° per angle.`,
     );
+}
+export function withOffsets(record: Placement, offsets: Offsets, support: Placement): Placement {
+  validateOffsets(offsets);
   if (offsets.constrainZ) {
     const [min, max] = trapZDeltaRange(record, support),
       z = offsets.position[2];
@@ -137,21 +220,9 @@ export function withOffsets(record: Placement, offsets: Offsets, support: Placem
         `Estimated ${trapCategory(record)} trap Z limit: this trap can move ${min.toFixed(2)} to ${max.toFixed(2)} cm vertically from its current position. Disable Constrain Z for unrestricted editing.`,
       );
   }
-  const result = clone(record),
-    euler = new Euler().setFromQuaternion(q(record.transform), 'ZYX');
+  const result = clone(record);
   const hasAngles = offsets.angles.some((v) => v !== 0);
-  const rotation = hasAngles
-    ? new Quaternion(
-        ...unrealRotator(
-          -euler.y / rad + offsets.angles[0],
-          euler.z / rad + offsets.angles[1],
-          -euler.x / rad + offsets.angles[2],
-        ),
-      )
-    : q(record.transform);
-  const delta = hasAngles
-    ? rotation.clone().multiply(q(record.transform).invert())
-    : new Quaternion();
+  const delta = hasAngles ? rotationDelta(record.transform, offsets.angles) : new Quaternion();
   const destination = arr(vec(record.transform.translation).add(vec(offsets.position)));
   result.transform = rigidPose(record.transform, record.transform.translation, destination, delta);
   result.meshTransform = rigidPose(

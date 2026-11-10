@@ -251,6 +251,10 @@
             <md-text-button id="moveTraps" disabled title="Move selected traps (G)"
               ><i slot="icon" class="ph ph-arrows-out-cardinal" aria-hidden="true"></i
               >Move</md-text-button
+            >
+            <md-text-button id="rotateTraps" disabled title="Rotate selected traps (Shift+G)"
+              ><i slot="icon" class="ph ph-arrow-clockwise" aria-hidden="true"></i
+              >Rotate</md-text-button
             ><span class="dock-divider"></span>
             <md-icon-button id="copy" aria-label="Copy selection" title="Copy selection (Ctrl+C)"
               ><i class="ph ph-copy" aria-hidden="true"></i
@@ -506,6 +510,7 @@
             </div>
             <div class="button-row">
               <md-filled-tonal-button id="offsetMove">Drag XYZ</md-filled-tonal-button
+              ><md-text-button id="offsetRotate">Drag P/Y/R</md-text-button
               ><md-text-button id="flipSelected">Flip ceiling traps</md-text-button>
             </div>
             <label class="check-row"
@@ -523,6 +528,14 @@
                 <option value="256">½ tile · 256 cm</option>
                 <option value="512">1 tile · 512 cm</option>
               </select></label
+            ><label class="inline-field"
+              >Angle snap<select id="rotateSnap">
+                <option value="1">1°</option>
+                <option value="5" selected>5°</option>
+                <option value="15">15°</option>
+                <option value="45">45°</option>
+                <option value="90">90°</option>
+              </select></label
             ><label class="field"
               >Limit per edit<select id="offsetLimit">
                 <option value="placement">Placement menu · ±1,000 cm / ±180°</option>
@@ -536,7 +549,9 @@
                 Per-edit limits are separate from Constrain Z. Game limits are unverified.
               </p>
             </details>
-            <p class="muted">World cm · angles in degrees · 512 cm = 1 tile</p>
+            <p class="muted">
+              Current offset of the selection · world cm · angles in degrees · 512 cm = 1 tile
+            </p>
             <div class="number-grid">
               <label
                 >X<input

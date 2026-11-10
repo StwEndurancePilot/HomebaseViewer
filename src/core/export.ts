@@ -31,6 +31,9 @@ export function exportCapture(source: Capture): Capture {
     .sort((a, b) => Number(a.kind === 'trap') - Number(b.kind === 'trap'));
   const byId = new Map(data.placements.map((p) => [p.actorPath, p]));
   for (const p of data.placements) {
+    delete p.editorBaseTransform;
+    delete p.editorBaseMeshTransform;
+    delete p.editorOffsets;
     p.mirrored = Boolean(p.mirrored);
     if (p.captureRole === 'placement') p.savedActorGuid = '00000000000000000000000000000000';
     if (p.kind === 'trap') {

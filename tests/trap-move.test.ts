@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { Vector3, Quaternion } from 'three';
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import path from 'node:path';
-import { dragOffset } from '../src/scene/trap-mover';
+import { dragOffset, sceneRotationToAngles } from '../src/scene/trap-mover';
 import { scenePoint } from '../src/core/transforms';
 import { parseCapture, type Placement, type Capture } from '../src/core/save';
 import {
@@ -10,10 +10,12 @@ import {
   trapZDeltaRange,
   selectionZDeltaRange,
   buildingRecord,
+  offsetOf,
   placeTrap,
   flipCeilingTrap,
   unrealRotator,
   relativePose,
+  rotatedTrap,
   withOffsets,
   ZERO_OFFSETS,
 } from '../src/core/editor';
@@ -274,5 +276,109 @@ describe('estimated support-relative Z limits', () => {
     expect(doc.revision).toBe(1);
     doc.undo();
     expect(doc.data.placements).toEqual(rows);
+  });
+});
+describe('rotation gizmo mapping', () => {
+  const about = (x: number, y: number, z: number, degrees: number) =>
+    new Quaternion().setFromAxisAngle(new Vector3(x, y, z), (degrees * Math.PI) / 180);
+  const triple = (angles: number[]) => angles.map((v) => Number(v.toFixed(6)));
+  it('maps a world ring drag to the matching pitch, yaw and roll triple', () => {
+    expect(triple(sceneRotationToAngles(about(1, 0, 0, 30), 15, 3600))).toEqual([30, 0, 0]);
+    expect(triple(sceneRotationToAngles(about(0, 1, 0, 30), 15, 3600))).toEqual([0, -30, 0]);
+    expect(triple(sceneRotationToAngles(about(0, 0, 1, 30), 15, 3600))).toEqual([0, 0, -30]);
+  });
+  it('snaps each angle and clamps it to the active edit limit', () => {
+    expect(triple(sceneRotationToAngles(about(1, 0, 0, 30), 15, 3600))).toEqual([30, 0, 0]);
+    expect(triple(sceneRotationToAngles(about(0, 1, 0, 30), 15, 10))).toEqual([0, -10, 0]);
+    const free = sceneRotationToAngles(about(0, 0, 1, 17), 0, 3600);
+    expect(free[2]).toBeCloseTo(-17, 6);
+  });
+  it('previews exactly what the offset panel would apply', () => {
+    const f = support(),
+      p = placeTrap(template(f), f, 0, 0, ZERO_OFFSETS, 'standard');
+    for (const angles of [
+      [15, 0, 0],
+      [0, 90, 0],
+      [0, 0, -30],
+      [30, 45, 15],
+      [180, 0, 0],
+    ] as [number, number, number][]) {
+      const viaGizmo = rotatedTrap(p, angles),
+        viaPanel = withOffsets(p, { position: [0, 0, 0], angles }, f);
+      near(viaGizmo.transform.translation, viaPanel.transform.translation);
+      near(viaGizmo.transform.rotation, viaPanel.transform.rotation);
+      near(viaGizmo.meshTransform.translation, viaPanel.meshTransform.translation);
+      near(viaGizmo.meshTransform.rotation, viaPanel.meshTransform.rotation);
+    }
+  });
+});
+describe('offset readout', () => {
+  const docFor = (rows: Placement[]) =>
+    new EditorDocument(
+      'readout',
+      {
+        schemaVersion: 6,
+        format: 'stw-homebase-capture',
+        worldPath: 'test',
+        placements: rows,
+        completeHomebase: false,
+      } as Capture,
+      null,
+    );
+  it('shows the accumulated values and lets Apply set them absolutely', () => {
+    const f = support(),
+      p = placeTrap(template(f), f, 0, 0, ZERO_OFFSETS, 'standard'),
+      doc = docFor([f, p]);
+    doc.selected = new Set([p.actorPath]);
+    const current = () => offsetOf(doc.data.placements.find((r) => r.actorPath === p.actorPath)!);
+    doc.offsetSelected({ position: [128, 0, 0], angles: [0, 0, 0] });
+    near(current().position, [128, 0, 0]);
+    near(current().angles, [0, 0, 0]);
+    doc.offsetSelected({ position: [0, 0, 0], angles: [0, 5, 0] });
+    near(current().position, [128, 0, 0]);
+    near(current().angles, [0, 5, 0]);
+    doc.setOffsets({ position: [20, 0, 0], angles: [0, 0, 0] });
+    near(current().position, [20, 0, 0]);
+    near(current().angles, [0, 0, 0]);
+    doc.setOffsets({ position: [0, 0, 0], angles: [0, 0, 0] });
+    near(current().position, [0, 0, 0]);
+    near(current().angles, [0, 0, 0]);
+  });
+  it('keeps the base pose across rotations so 180 degrees stays readable', () => {
+    const f = support(),
+      p = placeTrap(template(f), f, 0, 0, ZERO_OFFSETS, 'standard'),
+      doc = docFor([f, p]);
+    doc.selected = new Set([p.actorPath]);
+    doc.offsetSelected({ position: [0, 0, 0], angles: [180, 0, 0] });
+    const found = offsetOf(doc.data.placements.find((r) => r.actorPath === p.actorPath)!);
+    expect(Math.abs(found.angles[0])).toBeCloseTo(180, 4);
+    near(found.position, [0, 0, 0]);
+  });
+});
+describe('offset readout accumulation', () => {
+  it('previews the accumulated total so the gizmo matches the commit', () => {
+    const f = support(),
+      p = placeTrap(template(f), f, 0, 0, ZERO_OFFSETS, 'standard'),
+      doc = new EditorDocument(
+        'accumulate',
+        {
+          schemaVersion: 6,
+          format: 'stw-homebase-capture',
+          worldPath: 'test',
+          placements: [f, p],
+          completeHomebase: false,
+        } as Capture,
+        null,
+      );
+    doc.selected = new Set([p.actorPath]);
+    doc.offsetSelected({ position: [64, 0, 0], angles: [0, 30, 0] });
+    const row = () => doc.data.placements.find((r) => r.actorPath === p.actorPath)!;
+    const preview = rotatedTrap(row(), [0, 15, 0]);
+    doc.offsetSelected({ position: [0, 0, 0], angles: [0, 15, 0] });
+    near(preview.transform.translation, row().transform.translation);
+    near(preview.transform.rotation, row().transform.rotation);
+    near(preview.meshTransform.rotation, row().meshTransform.rotation);
+    near(offsetOf(row()).angles, [0, 45, 0]);
+    near(offsetOf(row()).position, [64, 0, 0]);
   });
 });

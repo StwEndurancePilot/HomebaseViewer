@@ -15,7 +15,7 @@ import { sceneMatrix, scenePoint } from '../core/transforms';
 import { meshIdentity } from '../core/mesh-identity';
 import { pennyTrapPivotOffset } from '../core/trap-pivots';
 import { zoneForCapture, type Capture, type Placement } from '../core/save';
-import { attachment, type Vec3 } from '../core/editor';
+import { attachment, rotatedTrap, type Vec3 } from '../core/editor';
 import { structureKind, patternOf } from '../core/build-pieces';
 import { worldSupportAt } from './world-support';
 import { isBuildingSupport, isMapBuilding, mapSurfaceReference } from '../core/support';
@@ -395,7 +395,39 @@ export class Viewer {
   startTrapMove() {
     if (!this.selectedBox) throw new Error('Select a visible trap first.');
     this.setBoxSelection(false);
+    this.mover.setMode('translate');
     this.mover.attach(this.selectedBox.box.getCenter(new THREE.Vector3()));
+  }
+  startTrapRotate() {
+    if (!this.selectedBox) throw new Error('Select a visible trap first.');
+    this.setBoxSelection(false);
+    this.mover.setMode('rotate');
+    this.mover.attach(this.selectedBox.box.getCenter(new THREE.Vector3()));
+  }
+  previewTrapRotate(ids: ReadonlySet<string>, angles: Vec3) {
+    for (const group of [this.traps, this.markers])
+      group.traverse((o) => {
+        if (!(o instanceof THREE.InstancedMesh)) return;
+        (o.userData.records as Placement[]).forEach((p, i) => {
+          if (!ids.has(p.actorPath)) return;
+          const turned = rotatedTrap(p, angles);
+          o.setMatrixAt(
+            i,
+            group === this.markers
+              ? new THREE.Matrix4().makeTranslation(
+                  ...scenePoint(turned.meshTransform.translation).toArray(),
+                )
+              : sceneMatrix({
+                  ...turned.meshTransform,
+                  scale: turned.meshTransform.scale.map(Math.abs) as Vec3,
+                }),
+          );
+        });
+        o.instanceMatrix.needsUpdate = true;
+        o.computeBoundingBox();
+        o.computeBoundingSphere();
+      });
+    this.setSelection(ids);
   }
   previewTrapMove(ids: ReadonlySet<string>, delta: Vec3) {
     for (const group of [this.traps, this.markers])

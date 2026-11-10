@@ -1,7 +1,29 @@
-import { Object3D, Vector3, Mesh, MeshBasicMaterial, PerspectiveCamera, Scene } from 'three';
+import {
+  Euler,
+  Object3D,
+  Quaternion,
+  Vector3,
+  Mesh,
+  MeshBasicMaterial,
+  PerspectiveCamera,
+  Scene,
+} from 'three';
 import { TransformControls } from 'three/examples/jsm/controls/TransformControls.js';
 import { scenePoint } from '../core/transforms';
 import type { Vec3 } from '../core/editor';
+export type TrapMoverMode = 'translate' | 'rotate';
+export function sceneRotationToAngles(delta: Quaternion, step: number, max: number): Vec3 {
+  const euler = new Euler().setFromQuaternion(
+    new Quaternion(delta.z, -delta.x, -delta.y, delta.w),
+    'ZYX',
+  );
+  const deg = 180 / Math.PI;
+  const angle = (value: number) => {
+    const snapped = step ? Math.round(value / step) * step : value;
+    return Math.max(-max, Math.min(max, snapped));
+  };
+  return [angle(-euler.y * deg), angle(euler.z * deg), angle(-euler.x * deg)];
+}
 export function dragOffset(
   start: Vector3,
   end: Vector3,
@@ -22,12 +44,19 @@ export class TrapMover {
   readonly pivot = new Object3D();
   onPreview: (delta: Vec3) => void = () => {};
   onCommit: (delta: Vec3) => void = () => {};
+  onRotatePreview: (angles: Vec3) => void = () => {};
+  onRotateCommit: (angles: Vec3) => void = () => {};
   onDragging: (dragging: boolean) => void = () => {};
   step = 0;
   max = 2000;
+  angleStep = 5;
+  angleMax = 3600;
   zRange: readonly [number, number] = [-Infinity, Infinity];
+  mode: TrapMoverMode = 'translate';
   private start = new Vector3();
+  private startQuaternion = new Quaternion();
   private delta: Vec3 = [0, 0, 0];
+  private angles: Vec3 = [0, 0, 0];
   private transaction = false;
   private suppressClick = false;
   private labels = ['X', 'Y', 'Z'].map((axis) => {
@@ -47,33 +76,26 @@ export class TrapMover {
     this.control.setMode('translate');
     this.control.setSpace('world');
     this.control.setSize(1.1);
-    const colors: Record<string, number> = {
-      X: 0x64ce89,
-      Y: 0x78adff,
-      Z: 0xff7878,
-      XY: 0x78dadd,
-      YZ: 0xd7a0ef,
-      XZ: 0xe3cf7a,
-    };
-    this.control.traverse((o) => {
-      if (
-        o instanceof Mesh &&
-        o.material instanceof MeshBasicMaterial &&
-        colors[o.name] !== undefined
-      )
-        o.material.color.setHex(colors[o.name]);
-    });
+    this.tint();
     scene.add(this.pivot, this.control);
     canvas.parentElement!.append(...this.labels);
     this.control.addEventListener('mouseDown', () => {
       this.start.copy(this.pivot.position);
+      this.startQuaternion.copy(this.pivot.quaternion);
       this.delta = [0, 0, 0];
+      this.angles = [0, 0, 0];
       this.transaction = true;
       this.suppressClick = true;
       this.onDragging(true);
     });
     this.control.addEventListener('objectChange', () => {
       if (!this.transaction) return;
+      if (this.mode === 'rotate') {
+        const delta = this.startQuaternion.clone().invert().multiply(this.pivot.quaternion);
+        this.angles = sceneRotationToAngles(delta, this.angleStep, this.angleMax);
+        this.onRotatePreview(this.angles);
+        return;
+      }
       this.delta = dragOffset(this.start, this.pivot.position, this.step, this.max, this.zRange);
       this.pivot.position.copy(this.start).add(scenePoint(this.delta));
       this.onPreview(this.delta);
@@ -82,7 +104,9 @@ export class TrapMover {
       if (!this.transaction) return;
       this.transaction = false;
       this.onDragging(false);
-      if (this.delta.some((v) => v !== 0)) this.onCommit(this.delta);
+      if (this.mode === 'rotate') {
+        if (this.angles.some((v) => v !== 0)) this.onRotateCommit(this.angles);
+      } else if (this.delta.some((v) => v !== 0)) this.onCommit(this.delta);
     });
     canvas.addEventListener('pointerdown', this.pointerDown, true);
     canvas.addEventListener('click', this.click, true);
@@ -103,13 +127,27 @@ export class TrapMover {
     this.transaction = false;
     this.control.dragging = false;
     this.pivot.position.copy(this.start);
+    this.pivot.quaternion.copy(this.startQuaternion);
     this.delta = [0, 0, 0];
-    this.onPreview(this.delta);
+    this.angles = [0, 0, 0];
+    if (this.mode === 'rotate') this.onRotatePreview(this.angles);
+    else this.onPreview(this.delta);
     this.onDragging(false);
   };
+  setMode(mode: TrapMoverMode) {
+    if (this.mode === mode) return;
+    this.cancel();
+    this.mode = mode;
+    this.control.setMode(mode);
+    this.control.setSpace('world');
+    this.control.setSize(mode === 'rotate' ? 0.9 : 1.1);
+    this.tint();
+    if (mode !== 'translate') for (const label of this.labels) label.hidden = true;
+  }
   attach(position: Vector3) {
     this.detach();
     this.pivot.position.copy(position);
+    this.pivot.quaternion.identity();
     this.pivot.updateMatrixWorld();
     this.control.attach(this.pivot);
     this.control.enabled = true;
@@ -127,7 +165,7 @@ export class TrapMover {
     return this.transaction;
   }
   updateLabels() {
-    if (!this.active) return;
+    if (!this.active || this.mode !== 'translate') return;
     const factor =
       (this.pivot.position.distanceTo(this.camera.position) *
         Math.min((1.9 * Math.tan((Math.PI * this.camera.fov) / 360)) / this.camera.zoom, 7) *
@@ -142,6 +180,24 @@ export class TrapMover {
       label.hidden = point.z < -1 || point.z > 1;
       label.style.left = `${((point.x + 1) * this.canvas.clientWidth) / 2}px`;
       label.style.top = `${((1 - point.y) * this.canvas.clientHeight) / 2}px`;
+    });
+  }
+  private tint() {
+    const colors: Record<string, number> = {
+      X: 0x64ce89,
+      Y: 0x78adff,
+      Z: 0xff7878,
+      XY: 0x78dadd,
+      YZ: 0xd7a0ef,
+      XZ: 0xe3cf7a,
+    };
+    this.control.traverse((o) => {
+      if (
+        o instanceof Mesh &&
+        o.material instanceof MeshBasicMaterial &&
+        colors[o.name] !== undefined
+      )
+        o.material.color.setHex(colors[o.name]);
     });
   }
   dispose() {
