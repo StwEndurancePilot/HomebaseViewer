@@ -638,7 +638,30 @@
                 <option value="180">180°</option>
                 <option value="270">270°</option>
               </select></label
-            ><label class="check-row"
+            >
+            <div
+              class="button-row paste-rotate-row"
+              role="group"
+              aria-label="Rotate copied pieces before pasting"
+            >
+              <md-filter-chip id="pasteRotate90" data-paste-yaw="90" label="90°"></md-filter-chip
+              ><md-filter-chip
+                id="pasteRotate180"
+                data-paste-yaw="180"
+                label="180°"
+              ></md-filter-chip
+              ><md-filter-chip
+                id="pasteRotate270"
+                data-paste-yaw="270"
+                label="270°"
+              ></md-filter-chip
+              ><md-filter-chip
+                id="pasteRotate360"
+                data-paste-yaw="360"
+                label="360°"
+              ></md-filter-chip>
+            </div>
+            <label class="check-row"
               ><input id="pasteSnap" type="checkbox" checked />Move in whole tiles</label
             ><md-text-button id="pasteAtSelected">Use selected piece as anchor</md-text-button>
             <div class="button-row">

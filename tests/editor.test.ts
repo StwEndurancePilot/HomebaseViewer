@@ -22,6 +22,7 @@ import {
   planPaste,
   placementConflict,
   relativePose,
+  rotationYaw,
   exportIssues,
 } from '../src/core/editor';
 import { EDIT_PATTERNS, editStructure } from '../src/core/build-pieces';
@@ -215,14 +216,118 @@ describe('bulk groups and history', () => {
     const plan = planPaste(capture([]), group, group.anchor, 0, false);
     expect(plan.records[1].transform).toEqual(p.transform);
   });
-  it('snaps only group displacement and maintains offset spacing', () => {
+  it('snaps the pasted anchor onto the real lattice while preserving offset spacing', () => {
     const f = floor([0.25, 0.125, 1]),
       p = trap(f);
     p.transform.translation[0] += 13.7;
     const group = copyGroup(capture([f, p]), new Set([f.actorPath])),
       plan = planPaste(capture([]), group, [600, 0, 402], 0, true);
-    near(plan.records[0].transform.translation, [512.25, 0.125, 385]);
-    near(plan.records[1].transform.translation, [525.95, 0.125, 385]);
+    near(plan.records[0].transform.translation, [512, 256, 384]);
+    near(plan.records[1].transform.translation, [525.7, 256, 384]);
+  });
+  it('keeps pasted structures and their traps on the real lattice for every quarter turn', () => {
+    const lattice = (yaw: number): [number, number] => (yaw % 180 === 0 ? [0, 256] : [256, 0]);
+    const mod = (n: number, m: number) => ((n % m) + m) % m;
+    const yawOf = (rotation: number[]) =>
+      ((Math.round(
+        (Math.atan2(
+          2 * (rotation[3] * rotation[2] + rotation[0] * rotation[1]),
+          1 - 2 * (rotation[1] * rotation[1] + rotation[2] * rotation[2]),
+        ) *
+          180) /
+          Math.PI,
+      ) %
+        360) +
+        360) %
+      360;
+    const onLattice = (piece: Placement) => {
+      const [ex, ey] = lattice(yawOf(piece.transform.rotation));
+      expect(mod(piece.transform.translation[0], 512)).toBe(ex);
+      expect(mod(piece.transform.translation[1], 512)).toBe(ey);
+      expect(mod(piece.transform.translation[2], 384)).toBe(0);
+    };
+    const wall = (at: Pose['translation'], yaw = 0) => buildingRecord('wall', 2, 3, pose(at, yaw));
+    for (const sourceYaw of [0, 90, 180, 270]) {
+      const [px, py] = lattice(sourceYaw),
+        support = floor([px + 1536, py + 2560, 768], sourceYaw),
+        edge = wall([px + 1536, py + 2560, 0], sourceYaw),
+        attached = trap(support),
+        group = copyGroup(
+          capture([support, edge, attached]),
+          new Set([support.actorPath, edge.actorPath]),
+        );
+      for (const turn of [0, 90, 180, 270]) {
+        const plan = planPaste(capture([]), group, [12048.5, 20000.5, 700], turn, true);
+        expect(plan.errors).toEqual([]);
+        expect(plan.records).toHaveLength(3);
+        for (const piece of plan.records) onLattice(piece);
+      }
+    }
+  });
+  it('keeps group heights when the copied anchor is an off-lattice trap', () => {
+    const f = floor([0, 256, 384]),
+      wall = placeStructure(f, 'wall', 'south', 2, 3),
+      mounted = trap(wall, 'Wall');
+    mounted.transform.translation = [0, 256, 1448];
+    mounted.meshTransform.translation = [0, 256, 1448];
+    mounted.attachment = {
+      ...attachment(mounted)!,
+      status: 'resolved',
+      supportActorPath: wall.actorPath,
+      supportTransform: structuredClone(wall.transform),
+      relativeTransform: relativePose(mounted.transform, wall.transform),
+      side: 0,
+    };
+    const group = copyGroup(
+      capture([f, wall, mounted]),
+      new Set([mounted.actorPath, f.actorPath, wall.actorPath]),
+    );
+    expect(rotationYaw(group.anchorRotation)).toBe(0);
+    const plan = planPaste(capture([]), group, group.anchor, 0, true);
+    const floorPasted = plan.records.find(
+        (p) => p.kind === 'structure' && p.meshPath.includes('Floor'),
+      )!,
+      wallPasted = plan.records.find(
+        (p) => p.kind === 'structure' && p.meshPath.includes('Solid'),
+      )!,
+      trapPasted = plan.records.find((p) => p.kind === 'trap')!;
+    expect(floorPasted.transform.translation[2]).toBe(384);
+    expect(wallPasted.transform.translation[2]).toBe(384);
+    expect(trapPasted.transform.translation[2]).toBe(1448);
+    const lowered = planPaste(capture([]), group, [0, 256, 1152], 0, true);
+    for (const piece of lowered.records.filter((p) => p.kind === 'structure'))
+      expect(((piece.transform.translation[2] % 384) + 384) % 384).toBe(0);
+    expect(lowered.records.find((p) => p.kind === 'trap')!.transform.translation[2]).toBe(1064);
+  });
+  it('keeps the support on the lattice when a turned trap is the copied anchor', () => {
+    const mod = (n: number, m: number) => ((n % m) + m) % m;
+    const lattice = (yaw: number): [number, number] => (yaw % 180 === 0 ? [0, 256] : [256, 0]);
+    const support = floor([0, 256, 0], 0),
+      attached = placeTrap(template(), support, 90, 0, ZERO_OFFSETS, 'standard'),
+      group = copyGroup(capture([support, attached]), new Set([attached.actorPath]));
+    for (const turn of [0, 90, 180, 270]) {
+      const plan = planPaste(capture([]), group, [5000, 7000, 768], turn, true);
+      expect(plan.errors).toEqual([]);
+      expect(plan.records).toHaveLength(2);
+      const pastedTrap = plan.records.find((p) => p.kind === 'trap')!,
+        pastedSupport = plan.records.find((p) => p.kind === 'structure')!,
+        [tx, ty] = lattice((90 + turn) % 360),
+        [sx, sy] = lattice(turn);
+      expect(mod(pastedTrap.transform.translation[0], 512)).toBe(tx);
+      expect(mod(pastedTrap.transform.translation[1], 512)).toBe(ty);
+      expect(mod(pastedSupport.transform.translation[0], 512)).toBe(sx);
+      expect(mod(pastedSupport.transform.translation[1], 512)).toBe(sy);
+    }
+  });
+  it('re-seats an off-lattice legacy piece onto the real lattice when snapped', () => {
+    const mod = (n: number, m: number) => ((n % m) + m) % m;
+    const legacy = floor([3072, -4096, -384], 0),
+      group = copyGroup(capture([legacy]), new Set([legacy.actorPath]));
+    const flat = planPaste(capture([]), group, [3072, -4096, -384], 0, true);
+    expect(mod(flat.records[0].transform.translation[1], 512)).toBe(256);
+    const turned = planPaste(capture([]), group, [3072, -4096, -384], 90, true);
+    expect(mod(turned.records[0].transform.translation[0], 512)).toBe(256);
+    expect(mod(turned.records[0].transform.translation[1], 512)).toBe(0);
   });
   it('deletes supports with traps and restores complete groups through undo/redo', () => {
     const f = floor(),

@@ -624,6 +624,7 @@ function copy(cut = false) {
   el<HTMLInputElement>('pasteY').value = String(y);
   el<HTMLInputElement>('pasteZ').value = String(z);
   el<HTMLSelectElement>('pasteYaw').value = '0';
+  syncPasteRotation();
   el('clipboardInfo').textContent =
     `${clipboard.records.length} pieces from ${clipboardName}. Anchor: ${clipboard.anchor.join(', ')}.`;
   status(
@@ -652,6 +653,23 @@ function previewPaste() {
   if (plan.errors.length) throw new Error(plan.errors.slice(0, 3).join('\n'));
   el<HTMLButtonElement>('commitPaste').disabled = !plan.records.length;
   status(plan.records.length ? 'Ready to paste.' : 'Already here. Choose another position.');
+}
+function syncPasteRotation() {
+  const yaw = ((number('pasteYaw') % 360) + 360) % 360;
+  for (const button of document.querySelectorAll<HTMLElement>('[data-paste-yaw]'))
+    (
+      button as HTMLElement & {
+        selected: boolean;
+      }
+    ).selected = Number(button.dataset.pasteYaw) % 360 === yaw;
+}
+function rotatePaste(degrees: number) {
+  const yaw = ((degrees % 360) + 360) % 360;
+  el<HTMLSelectElement>('pasteYaw').value = String(yaw);
+  syncPasteRotation();
+  if (!clipboard) return;
+  previewPaste();
+  status(`Copied group rotated ${degrees}°.`);
 }
 function download(bytes: Uint8Array | string, name: string, type: string, doc?: EditorDocument) {
   const blob =
@@ -926,6 +944,9 @@ el('zeroOffsets').onclick = () => {
   cancelPreview();
 };
 el('previewPaste').onclick = guard(previewPaste);
+for (const button of document.querySelectorAll<HTMLElement>('[data-paste-yaw]'))
+  button.onclick = guard(() => rotatePaste(Number(button.dataset.pasteYaw)));
+el<HTMLSelectElement>('pasteYaw').addEventListener('change', syncPasteRotation);
 el('commitPaste').onclick = guard(async () => {
   if (!pendingPaste) throw new Error('Preview the group first.');
   const count = pendingPaste.records.length;

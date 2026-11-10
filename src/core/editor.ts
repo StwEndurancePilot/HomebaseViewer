@@ -54,6 +54,7 @@ export function selectionZDeltaRange(records: Placement[], all: Placement[]): [n
 export type Clipboard = {
   records: Placement[];
   anchor: Vec3;
+  anchorRotation: Pose['rotation'];
   worldPath: string;
 };
 export type PastePlan = {
@@ -78,6 +79,13 @@ export function unrealRotator(pitch: number, yaw: number, roll: number): Pose['r
     .multiply(new Quaternion().setFromAxisAngle(new Vector3(1, 0, 0), -roll * rad))
     .toArray() as Pose['rotation'];
 }
+export function rotationYaw(rotation: Pose['rotation']): number {
+  const yaw = new Euler().setFromQuaternion(new Quaternion(...rotation), 'ZYX').z / rad;
+  return ((yaw % 360) + 360) % 360;
+}
+export const originParity = (yaw: number): readonly [number, number] =>
+  Math.round(((yaw % 360) + 360) % 360) % 180 === 0 ? [0, 256] : [256, 0];
+export const storeyResidue = (z: number): number => ((z % 384) + 384) % 384;
 export function relativePose(child: Pose, parent: Pose): Pose {
   if (parent.scale.some((s) => Math.abs(s) < 1e-12))
     throw new Error('Cannot attach to a zero-scale support.');
@@ -625,8 +633,13 @@ export function copyGroup(data: Capture, selected: ReadonlySet<string>): Clipboa
     }
   }
   const records = data.placements.filter((p) => ids.has(p.actorPath));
-  const anchor = byId.get(selected.values().next().value!)!.transform.translation;
-  return { records: clone(records), anchor: [...anchor], worldPath: data.worldPath };
+  const anchorRecord = byId.get(selected.values().next().value!)!;
+  return {
+    records: clone(records),
+    anchor: [...anchorRecord.transform.translation],
+    anchorRotation: [...anchorRecord.transform.rotation] as Pose['rotation'],
+    worldPath: data.worldPath,
+  };
 }
 export function planPaste(
   data: Capture,
@@ -637,13 +650,32 @@ export function planPaste(
 ): PastePlan {
   if (![...destination, yaw].every(Number.isFinite) || yaw % 90 !== 0)
     throw new Error('Paste rotation must use 90° steps and finite anchor coordinates.');
-  const at = destination.map((v, i) =>
-    snap
-      ? clipboard.anchor[i] +
-        Math.round((v - clipboard.anchor[i]) / (i === 2 ? 384 : 512)) * (i === 2 ? 384 : 512)
-      : v,
-  ) as Vec3;
-  const rotation = new Quaternion(...unrealRotator(0, yaw, 0)),
+  const turn = ((yaw % 360) + 360) % 360,
+    sourceYaw = rotationYaw(clipboard.anchorRotation),
+    quarter = Math.round(sourceYaw / 90),
+    aligned = Math.abs(sourceYaw - quarter * 90) < 1e-6,
+    [parityX, parityY] = originParity(quarter * 90 + turn),
+    zAnchor = clipboard.anchor[2],
+    zReference = clipboard.records
+      .filter((p) => p.kind === 'structure')
+      .sort(
+        (a, b) =>
+          Math.abs(a.transform.translation[2] - zAnchor) -
+          Math.abs(b.transform.translation[2] - zAnchor),
+      )[0],
+    zResidue = zReference ? storeyResidue(zReference.transform.translation[2]) : 0,
+    at = destination.map((v, i) => {
+      if (!snap) return v;
+      if (i === 2) return zAnchor + Math.round((v - zAnchor) / 384) * 384 - zResidue;
+      if (!aligned) {
+        const step = 512,
+          anchor = clipboard.anchor[i];
+        return anchor + Math.round((v - anchor) / step) * step;
+      }
+      const parity = i === 0 ? parityX : parityY;
+      return Math.round((v - parity) / 512) * 512 + parity;
+    }) as Vec3;
+  const rotation = new Quaternion(...unrealRotator(0, turn, 0)),
     remap = new Map<string, string>();
   const all = clipboard.records.map((original) => {
     const p = clone(original);

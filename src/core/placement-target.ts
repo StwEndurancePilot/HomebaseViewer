@@ -3,6 +3,8 @@ import type { Placement } from './save';
 import { buildingRecord, shapeOf, unrealRotator, type Vec3 } from './editor';
 import { structureKind } from './build-pieces';
 
+export const GROUND_TILE_ORIGIN: Vec3 = [0, 256, 0];
+
 export function groundSupport(point: Vec3, records: Placement[]): Placement {
   const reference = records.find((p) => {
     if (p.captureRole !== 'placement' || !structureKind(p)) return false;
@@ -15,7 +17,7 @@ export function groundSupport(point: Vec3, records: Placement[]): Placement {
       Math.min(Math.abs(forward.x), Math.abs(forward.y)) < 1e-6
     );
   });
-  const origin = new Vector3(...(reference?.transform.translation ?? [0, 0, 0]));
+  const origin = new Vector3(...(reference?.transform.translation ?? GROUND_TILE_ORIGIN));
   const rotation = new Quaternion(...(reference?.transform.rotation ?? [0, 0, 0, 1]));
   const local = new Vector3(...point).sub(origin).applyQuaternion(rotation.clone().invert());
   local.set(
