@@ -234,9 +234,24 @@ The Trap offsets number grid is a live readout of the selection, not just an inp
 - The three editor-only keys (`editorBaseTransform`, `editorBaseMeshTransform`,
   `editorOffsets`) are stripped in `exportCapture`, so a saved blueprint is byte-identical
   to one produced without the editor bookkeeping.
+- Paste, ceiling flip and fresh trap placement establish a new offset baseline at the
+  resulting pose. Their offset readout starts at zero; subsequent movement and absolute
+  Apply preserve the pasted or flipped orientation. A trap template cannot carry its old
+  editor baseline into a newly placed trap.
 - Covered by `tests/trap-move.test.ts` ("offset readout", "offset readout accumulation"):
   accumulation across moves and rotations, absolute Apply, the 180 degree readability case
   and gizmo preview == incremental commit.
+- `tests/editor-offset-lifecycle.test.ts` covers all four paste turns followed by movement,
+  rotation preview/commit and absolute reset, ceiling flip with undo/redo, template reuse,
+  and offset/oblique trap anchors snapped through all four turns at positive and negative
+  destinations. The original three regressions failed on PR head `ba375a7` and passed on
+  the base `b8eb2d3`; these cases now pass with the fixes.
+- Run `node tests/smoke/offset-lifecycle-smoke.mjs` after `npm run build` for the built
+  Electron workflow. It checks offset input, a rotated snapped paste, movement after paste,
+  ceiling flip followed by movement, undo/redo, and the support lattice in a saved draft.
+  It uses a synthetic fixture and isolated smoke-test app state, with external invite
+  opening stubbed. Validation on 10 November 2026: this desktop check passed, as did
+  `npm run check` (208 passed, 4 skipped) and the production build.
 
 ## Ground tile lattice in empty and new blueprints
 
@@ -285,11 +300,12 @@ group inherited the source's lattice offset instead of the lattice for its new y
   have `x % 512 = 256`, `y % 512 = 0`. This holds for floors, ramps, stairs, cones, walls,
   pillars, archways, balconies, half/quarter walls and traps (the `Solid`/`Floor`/`RoofS`/
   `Stair*` families were counted directly).
-- `planPaste` now snaps the anchor destination to that parity for the anchor's yaw after the
-  paste turn (`originParity`, `rotationYaw`). `Clipboard` carries `anchorRotation` so the
-  target parity is known. The whole clipboard still moves rigidly, so intra-group spacing and
-  trap attachments are unchanged. Oblique (non-90°) anchors keep the previous
-  anchor-relative snapping.
+- `planPaste` snaps the copied building reference to that parity after the paste turn
+  (`originParity`, `rotationYaw`). `Clipboard.gridReference` holds the selected structure's
+  pose, or the captured support's pose when the anchor is a trap. The rotated displacement
+  from anchor to support is included in the snap calculation, so offset or obliquely rotated
+  traps cannot pull a cardinal support off-grid. The whole clipboard still moves rigidly,
+  preserving spacing and attachments. Oblique supports retain anchor-relative snapping.
 - Regression tests in `tests/editor.test.ts`: every source yaw 0/90/180/270 crossed with every
   paste turn, checking floor + wall + trap parity; a turned trap used as the copied anchor
   (its support must stay on the lattice); and an off-lattice `AAAA`-style floor
@@ -310,11 +326,11 @@ higher than it should be").
   (floors, walls, traps) by **+88 cm**. Reproduced with the real save through `planPaste`
   (every piece `dz = 88`).
 - Fix: Z now snaps in whole storeys relative to the clipboard anchor
-  (`anchorZ + round((z - anchorZ) / 384) * 384`) minus the anchor-nearest structure's
+  (`anchorZ + round((z - anchorZ) / 384) * 384`) minus the copied building reference's
   `storeyResidue` (`z % 384`, `editor.ts`). Concrete builds keep the same `z % 384` they had
   (0 for every surveyed save), so an unchanged paste never moves them; off-lattice legacy
   builds still re-seat, and a storey move is still a 384 cm step.
-- X/Y keep the absolute `originParity` snap from the section above.
+- X/Y use the support-relative `originParity` snap from the section above.
 - Regression tests in `tests/editor.test.ts`: a copied group anchored on an off-lattice trap
   (`z = 1448`) pastes at its own anchor with floors/walls still at 384 and the trap at 1448;
   pasting it one storey down keeps the structures on `z % 384 = 0` and moves the trap to 1064.

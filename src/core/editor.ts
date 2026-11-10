@@ -55,6 +55,7 @@ export type Clipboard = {
   records: Placement[];
   anchor: Vec3;
   anchorRotation: Pose['rotation'];
+  gridReference: Pose;
   worldPath: string;
 };
 export type PastePlan = {
@@ -161,6 +162,11 @@ export function basePose(record: Placement): { transform: Pose; meshTransform: P
     transform: structuredClone(base ?? record.transform),
     meshTransform: structuredClone(baseMesh ?? record.meshTransform),
   };
+}
+function resetOffsetBase(record: Placement) {
+  delete record.editorBaseTransform;
+  delete record.editorBaseMeshTransform;
+  delete record.editorOffsets;
 }
 export function offsetOf(record: Placement): Offsets {
   const base = basePose(record),
@@ -465,6 +471,7 @@ export function placeTrap(
   if (!Number.isFinite(turn) || turn % 90 !== 0)
     throw new Error('Standard trap orientation must use 90° steps.');
   const result = clone(template);
+  resetOffsetBase(result);
   result.actorPath = id();
   result.savedActorGuid = zeroGuid;
   result.mirrored = false;
@@ -521,6 +528,7 @@ export function flipCeilingTrap(record: Placement, support: Placement): Placemen
     throw new Error('Select ceiling traps to flip upside down.');
   const result = clone(record),
     rotation = q(record.transform).multiply(new Quaternion(0, -1, 0, 0));
+  resetOffsetBase(result);
   const delta = rotation.clone().multiply(q(record.transform).invert());
   result.transform = {
     ...clone(record.transform),
@@ -657,10 +665,15 @@ export function copyGroup(data: Capture, selected: ReadonlySet<string>): Clipboa
   }
   const records = data.placements.filter((p) => ids.has(p.actorPath));
   const anchorRecord = byId.get(selected.values().next().value!)!;
+  const gridReference =
+    anchorRecord.kind === 'trap'
+      ? byId.get(attachment(anchorRecord)!.supportActorPath)!
+      : anchorRecord;
   return {
     records: clone(records),
     anchor: [...anchorRecord.transform.translation],
     anchorRotation: [...anchorRecord.transform.rotation] as Pose['rotation'],
+    gridReference: clone(gridReference.transform),
     worldPath: data.worldPath,
   };
 }
@@ -674,19 +687,17 @@ export function planPaste(
   if (![...destination, yaw].every(Number.isFinite) || yaw % 90 !== 0)
     throw new Error('Paste rotation must use 90° steps and finite anchor coordinates.');
   const turn = ((yaw % 360) + 360) % 360,
-    sourceYaw = rotationYaw(clipboard.anchorRotation),
+    rotation = new Quaternion(...unrealRotator(0, turn, 0)),
+    reference = clipboard.gridReference,
+    referenceOffset = vec(reference.translation)
+      .sub(vec(clipboard.anchor))
+      .applyQuaternion(rotation),
+    sourceYaw = rotationYaw(reference.rotation),
     quarter = Math.round(sourceYaw / 90),
     aligned = Math.abs(sourceYaw - quarter * 90) < 1e-6,
     [parityX, parityY] = originParity(quarter * 90 + turn),
     zAnchor = clipboard.anchor[2],
-    zReference = clipboard.records
-      .filter((p) => p.kind === 'structure')
-      .sort(
-        (a, b) =>
-          Math.abs(a.transform.translation[2] - zAnchor) -
-          Math.abs(b.transform.translation[2] - zAnchor),
-      )[0],
-    zResidue = zReference ? storeyResidue(zReference.transform.translation[2]) : 0,
+    zResidue = storeyResidue(reference.translation[2]),
     at = destination.map((v, i) => {
       if (!snap) return v;
       if (i === 2) return zAnchor + Math.round((v - zAnchor) / 384) * 384 - zResidue;
@@ -696,16 +707,17 @@ export function planPaste(
         return anchor + Math.round((v - anchor) / step) * step;
       }
       const parity = i === 0 ? parityX : parityY;
-      return Math.round((v - parity) / 512) * 512 + parity;
+      const offset = referenceOffset.getComponent(i);
+      return Math.round((v + offset - parity) / 512) * 512 + parity - offset;
     }) as Vec3;
-  const rotation = new Quaternion(...unrealRotator(0, turn, 0)),
-    remap = new Map<string, string>();
+  const remap = new Map<string, string>();
   const all = clipboard.records.map((original) => {
     const p = clone(original);
     remap.set(original.actorPath, (p.actorPath = id()));
     p.savedActorGuid = zeroGuid;
     p.transform = rigidPose(p.transform, clipboard.anchor, at, rotation);
     p.meshTransform = rigidPose(p.meshTransform, clipboard.anchor, at, rotation);
+    resetOffsetBase(p);
     delete p.perkReadProbe;
     if (p.trapPerksStatus !== 'observed-effects') delete p.trapEffectSources;
     p.editorPlacementMode = 'copied';
