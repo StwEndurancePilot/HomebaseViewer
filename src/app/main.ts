@@ -18,7 +18,8 @@ import { cycleColorTheme } from '../ui/theme';
 import { partThumbnail } from '../ui/part-thumbnail';
 import { directionAt, groundSupport, surfaceSupport, wallFaceAt } from '../core/placement-target';
 import { tileKeyDelta } from '../core/tile-movement';
-import { isMenuSave, parseCapture, type Placement } from '../core/save';
+import { isMenuSave, type Placement } from '../core/save';
+import { importLocalFile } from '../cloud/local-import';
 import {
   exportDiagnostics,
   shapeOf,
@@ -495,29 +496,14 @@ async function open(files: File[]) {
         if (file.size > 128 * 1024 * 1024)
           throw new Error('Homebase files must be 128 MiB or smaller.');
         const bytes = new Uint8Array(await file.arrayBuffer());
-        let data;
-        try {
-          data = parseCapture(bytes);
-        } catch (error) {
-          const header = new TextDecoder('latin1').decode(bytes.subarray(0, 65536));
-          if (
-            !isMenuSave(bytes) &&
-            (header.startsWith('ECFD') ||
-              (bytes[0] === 31 && bytes[1] === 139) ||
-              header.includes('SavedActors') ||
-              header.includes('++Fortnite+Release'))
-          ) {
-            accountPanel.queueLocal(bytes, file.name);
-            continue;
-          }
-          throw error;
+        const data = await importLocalFile(bytes, file.name, {
+          decode: window.homebaseAccount?.decode,
+        });
+        if (!data) {
+          accountPanel.queueLocal(bytes, file.name);
+          continue;
         }
-        const template =
-          String.fromCharCode(...bytes.subarray(0, 4)) === 'GVAS'
-            ? bytes
-            : data.cloudImport
-              ? menuContainer()
-              : null;
+        const template = isMenuSave(bytes) ? bytes : data.cloudImport ? menuContainer() : null;
         const defaultedLevels = applyCloudTrapLevelFallback(data);
         const repairedMeshes = repairCloudMeshMappings(data);
         active = new EditorDocument(file.name, data, template);

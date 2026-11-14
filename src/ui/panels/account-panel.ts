@@ -1,6 +1,7 @@
 import { el } from '../dom';
 import type { State, PennyAccount } from '../../types/account';
 import { convertCloudSave } from '../../cloud/convert';
+import { importLocalFile } from '../../cloud/local-import';
 import type { Capture } from '../../core/save';
 export function setupAccountPanel(importCapture: (data: Capture, name: string) => Promise<void>) {
   let state: State = { status: 'signed-out', zones: [] },
@@ -135,7 +136,7 @@ export function setupAccountPanel(importCapture: (data: Capture, name: string) =
     el('localCloudName').textContent = pending.length
       ? `${pending[0].name}${pending.length > 1 ? ` (+${pending.length - 1} queued)` : ''}`
       : '';
-    el<HTMLButtonElement>('importLocalCloud').disabled = busy || !bridge;
+    el<HTMLButtonElement>('importLocalCloud').disabled = busy;
   }
   el('accountOpen').onclick = el('welcomeAccount').onclick = show;
   el('accountClose').onclick = () => {
@@ -170,16 +171,19 @@ export function setupAccountPanel(importCapture: (data: Capture, name: string) =
     const file = pending[0],
       zone = el<HTMLSelectElement>('localCloudZone').value;
     if (!zone) throw new Error('Choose the zone this cloud backup belongs to.');
-    const bytes = await window.homebaseAccount!.decode(file.bytes);
-    await importCapture(
-      convertCloudSave(new Uint8Array(bytes), zone, file.name),
-      file.name.replace(/\.(sav|asv)$/i, '') + '_Menu.sav',
-    );
+    const data = await importLocalFile(file.bytes, file.name, {
+      zoneId: zone,
+      decode: window.homebaseAccount?.decode,
+    });
+    if (!data) throw new Error('Choose the zone this homebase belongs to.');
+    await importCapture(data, file.name.replace(/\.(sav|asv|json|bin)$/i, '') + '_Menu.sav');
     pending.shift();
+    el<HTMLSelectElement>('localCloudZone').value = '';
     if (!pending.length) panel.hidden = true;
   });
   el('discardLocalCloud').onclick = () => {
     pending.shift();
+    el<HTMLSelectElement>('localCloudZone').value = '';
     render();
   };
   async function scanPenny() {

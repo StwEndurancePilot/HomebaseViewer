@@ -58,7 +58,7 @@ export function applyCloudTrapLevelFallback(data: Capture) {
   }
   return changed;
 }
-function compose(local: Pose, parent: Pose): Pose {
+export function compose(local: Pose, parent: Pose): Pose {
   return {
     translation: new Vector3(...local.translation)
       .multiply(new Vector3(...parent.scale))
@@ -151,18 +151,18 @@ function actorRecord(r: ArchiveReader, pathStart: number, path: string): RecordD
     );
   return candidates[0] ?? null;
 }
-function canonicalPath(path: string) {
+export function canonicalPath(path: string) {
   return path.replace(/^\/Game\/Items\/Traps\//i, '/SaveTheWorld/Items/Traps/');
 }
 const canonicalClasses = new Map(
   Object.entries(catalog.classes).map(([key, info]) => [canonicalPath(key).toLowerCase(), info]),
 );
-const missingMeshIssue =
+export const missingMeshIssue =
   'No verified primary-mesh mapping for this cloud class. Import its equivalent from a menu capture.';
 const specialClasses = new Map(
   specialBuilds.classes.map((info) => [info.classPath.toLowerCase(), info as ClassInfo]),
 );
-function classInfo(classPath: string, mirrored: boolean): ClassInfo | undefined {
+export function classInfo(classPath: string, mirrored: boolean): ClassInfo | undefined {
   const key = canonicalPath(classPath).toLowerCase() + '|' + mirrored;
   const observed = catalog.classes[key] ?? canonicalClasses.get(key);
   if (observed) return observed;

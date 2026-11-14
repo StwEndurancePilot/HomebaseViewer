@@ -12,6 +12,7 @@ import { exportJson, exportSave } from '../src/core/export';
 import { exportDiagnostics } from '../src/core/editor';
 import { parseCapture, readSaveText } from '../src/core/save';
 import buildEdits from '../src/data/build-edits.json';
+import { importLocalFile } from '../src/cloud/local-import';
 const { decodeCloudBytes } = createRequire(import.meta.url)(
   '../electron/accounts/epic-account.cjs',
 );
@@ -257,6 +258,30 @@ it('decodes ECFD and gzip while keeping malformed archives distinct from empty s
   expect(Buffer.from(decodeCloudBytes(ecfd))).toEqual(raw);
   expect(Buffer.from(decodeCloudBytes(gzipSync(ecfd)))).toEqual(raw);
   expect(() => decodeCloudBytes(Buffer.from('ECFDinvalid'))).toThrow(/damaged/);
+});
+it('opens raw API downloads through the local file workflow with no account session', async () => {
+  const raw = cloud();
+  const ecfd = cat(Buffer.from('ECFD'), Buffer.alloc(12), deflateSync(raw));
+  for (const bytes of [raw, ecfd, gzipSync(ecfd)]) {
+    const data = (await importLocalFile(bytes, 'TwinePeaks-StormShield.sav', {
+      decode: async (b) => decodeCloudBytes(b),
+    }))!;
+    expect(data.placements).toHaveLength(2);
+    expect(exportDiagnostics(data)).toEqual([]);
+    expect(parseCapture(exportSave(menuContainer(), data)).placements[1].trapPerks).toBe(
+      data.placements[1].trapPerks,
+    );
+  }
+  expect(await importLocalFile(raw, 'home_r0_a1.sav')).toBeNull();
+  expect(
+    (await importLocalFile(raw, 'home_r0_a1.sav', { zoneId: 'pve_04' }))?.placements,
+  ).toHaveLength(2);
+  await expect(importLocalFile(ecfd, 'TwinePeaks.bin')).rejects.toThrow(/desktop app/);
+  await expect(
+    importLocalFile(Buffer.from('ECFDinvalid'), 'TwinePeaks.bin', {
+      decode: async (b) => decodeCloudBytes(b),
+    }),
+  ).rejects.toThrow(/damaged/);
 });
 it('defaults missing and invalid cloud trap levels to tier 5 without changing readable levels', () => {
   const knownItem = item.replaceAll('TID_Ceiling_Electric_', 'TID_Ceiling_Electric_Single_');

@@ -143,6 +143,9 @@ export function parseCapture(bytes: Uint8Array): Capture {
         throw new Error('Invalid homebase replay record.');
     }
   } else source = JSON.parse(text);
+  return validateCapture(source);
+}
+export function validateCapture(source: unknown): Capture {
   const data = source as Capture;
   if (
     !data ||

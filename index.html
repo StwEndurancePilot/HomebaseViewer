@@ -70,7 +70,7 @@
         aria-controls="updatesPanel"
         ><i class="ph ph-arrow-circle-up" aria-hidden="true"></i
       ></md-icon-button>
-      <input id="file" type="file" accept=".sav,.asv,.json" multiple hidden />
+      <input id="file" type="file" accept=".sav,.asv,.json,.bin" multiple hidden />
       <md-icon-button
         id="discordOpen"
         aria-label="Join our Discord server"
@@ -759,8 +759,9 @@
           <p id="cloudActivity" class="muted" role="status"></p>
           <div id="cloudZones"></div>
           <section id="localCloudImport" hidden>
-            <h3>Open cloud archive</h3>
+            <h3>Open downloaded homebase</h3>
             <p id="localCloudName" class="muted"></p>
+            <p class="muted">Choose its zone to finish opening the file. No sign-in needed.</p>
             <label class="field"
               >Homebase zone<select id="localCloudZone">
                 <option value="">Choose a zone</option>
@@ -771,7 +772,7 @@
               </select></label
             >
             <div class="button-row">
-              <md-filled-button id="importLocalCloud">Import archive</md-filled-button
+              <md-filled-button id="importLocalCloud">Open homebase</md-filled-button
               ><md-text-button id="discardLocalCloud">Discard</md-text-button>
             </div>
           </section>
