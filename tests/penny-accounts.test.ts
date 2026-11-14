@@ -1,7 +1,8 @@
 import { it, expect } from 'vitest';
 import { createRequire } from 'node:module';
 import { createCipheriv, randomBytes } from 'node:crypto';
-import { execFileSync } from 'node:child_process';
+import { execFile } from 'node:child_process';
+import path from 'node:path';
 const { PennyAccounts } = createRequire(import.meta.url)('../electron/accounts/penny-accounts.cjs');
 const entry = {
   accountId: 'a'.repeat(32),
@@ -84,16 +85,27 @@ it.skipIf(process.platform !== 'win32')(
     const key = randomBytes(32);
     const script =
       "$ErrorActionPreference='Stop'; Add-Type -AssemblyName System.Security; $k=[Convert]::FromBase64String([Console]::In.ReadToEnd()); $b=[Security.Cryptography.ProtectedData]::Protect($k,$null,[Security.Cryptography.DataProtectionScope]::CurrentUser); [Console]::Out.Write([Convert]::ToBase64String($b))";
-    const protectedKey = Buffer.from(
-      execFileSync('powershell.exe', ['-NoProfile', '-NonInteractive', '-Command', script], {
-        input: key.toString('base64'),
-        encoding: 'utf8',
-        windowsHide: true,
-        timeout: 15000,
-        maxBuffer: 4096,
-      }).trim(),
-      'base64',
-    );
+    const protectedKey = await new Promise<Buffer>((resolve, reject) => {
+      const child = execFile(
+        path.join(
+          process.env.SystemRoot || 'C:\\Windows',
+          'System32',
+          'WindowsPowerShell',
+          'v1.0',
+          'powershell.exe',
+        ),
+        ['-NoProfile', '-NonInteractive', '-Command', script],
+        { windowsHide: true, timeout: 60000, maxBuffer: 4096 },
+        (error, stdout) => {
+          if (error)
+            return reject(new Error('Synthetic DPAPI fixture creation failed.', { cause: error }));
+          resolve(Buffer.from(stdout.trim(), 'base64'));
+        },
+      );
+      child.stdin!.on('error', reject);
+      child.stdin!.end(key.toString('base64'));
+    });
+    expect(protectedKey.length).toBeGreaterThan(0);
     const encrypted = {
       ...entry,
       deviceId: encoded(entry.deviceId, key),
@@ -115,5 +127,5 @@ it.skipIf(process.platform !== 'win32')(
     const list = await reader.scan();
     expect(await reader.credentials(list.accounts[0].id)).toEqual(entry);
   },
-  45000,
+  90000,
 );
